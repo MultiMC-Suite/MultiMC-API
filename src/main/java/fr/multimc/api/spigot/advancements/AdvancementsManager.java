@@ -1,29 +1,27 @@
-package fr.multimc.api.commons.advancements;
+package fr.multimc.api.spigot.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
 import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
+import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
-import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
+@SuppressWarnings({"unused", "BusyWait"})
 public class AdvancementsManager implements Listener {
 
     UltimateAdvancementAPI advancementAPI;
     private final JavaPlugin plugin;
-    List<AdvancementTab> advancementTabs;
+    HashMap<String, AdvancementTab> advancementTabs;
 
     public AdvancementsManager(JavaPlugin plugin, boolean removeAll){
         this.plugin = plugin;
         this.advancementAPI = UltimateAdvancementAPI.getInstance(plugin);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        advancementTabs = new ArrayList<>();
+        advancementTabs = new HashMap<>();
         if(removeAll){
             this.removeAllAdvancements();
         }
@@ -46,32 +44,23 @@ public class AdvancementsManager implements Listener {
                             throw new RuntimeException(e);
                         }
                     }
-                    System.out.println("Granting root advancement");
                     tab.automaticallyGrantRootAdvancement();
                 }
             }.runTaskAsynchronously(this.plugin);
         }
-        this.advancementTabs.add(tab);
+        this.advancementTabs.put(tabName, tab);
         return tab;
     }
 
     public AdvancementTab getAdvancementTab(String tabName){
-        return this.advancementAPI.getAdvancementTab(tabName);
+        return this.advancementTabs.get(tabName);
     }
 
-    public AdvancementDisplay getAdvancementDisplay(Material material, String name, AdvancementFrameType advancementFrameType, float posX, float posY, String[] description){
-        return new AdvancementDisplay(material, name, advancementFrameType, true, true, posX, posY, description);
+    public void addAdvancement(AdvancementTab advancementTab, RootAdvancement rootAdvancement){
+        advancementTab.registerAdvancements(rootAdvancement);
     }
 
-    public void addAdvancement(AdvancementType advancementType, String advancementId, AdvancementTab advancementTab, AdvancementDisplay advancementDisplay, String texture){
-        switch (advancementType) {
-            case ROOT -> {
-                RootAdvancement rootAdvancement = new RootAdvancement(advancementTab, advancementId, advancementDisplay, texture);
-                advancementTab.registerAdvancements(rootAdvancement);
-            }
-            case CLASSIC -> {
-                // TODO
-            }
-        }
+    public void addAdvancement(AdvancementTab advancementTab, BaseAdvancement advancement){
+        advancementTab.registerAdvancements(advancementTab.getRootAdvancement(), advancement);
     }
 }
