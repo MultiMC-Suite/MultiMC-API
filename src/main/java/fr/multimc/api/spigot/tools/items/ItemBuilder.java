@@ -76,6 +76,7 @@ public class ItemBuilder {
      * @param name
      * @return
      */
+    @Deprecated
     public ItemBuilder setName(@Nullable String name) {
         ItemMeta meta = this.getMeta();
         String display = Objects.isNull(name) ? null : ChatColor.translateAlternateColorCodes('&', name);
@@ -88,6 +89,7 @@ public class ItemBuilder {
      * @param lore
      * @return
      */
+    @Deprecated
     public ItemBuilder setLore(@Nullable List<String> lore) {
         List<String> list = new ArrayList<>();
         lore.forEach(line -> list.add(ChatColor.translateAlternateColorCodes('&', line)));
@@ -102,6 +104,7 @@ public class ItemBuilder {
      * @param lore
      * @return
      */
+    @Deprecated
     public ItemBuilder setLore(@Nullable String... lore) {
         return this.setLore(Arrays.asList(lore));
     }
