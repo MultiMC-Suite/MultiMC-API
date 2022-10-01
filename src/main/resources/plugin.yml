@@ -1,0 +1,8 @@
+main: 'fr.multimc.api.spigot.ServerApi'
+name: 'MultiMC-API'
+
+version: '1.0-SNAPSHOT'
+api-version: '1.19'
+
+authors: [ 'Loïc MAES', 'Tom CZEKAJ' ]
+description: 'Manage a game tournament server.'
