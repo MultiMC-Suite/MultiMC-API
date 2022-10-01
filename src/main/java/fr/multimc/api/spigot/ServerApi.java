@@ -4,6 +4,7 @@ import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
 import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
+import com.fren_gor.ultimateAdvancementAPI.advancement.multiParents.MultiParentsAdvancement;
 import fr.multimc.api.spigot.advancements.AdvancementBuilder;
 import fr.multimc.api.spigot.advancements.AdvancementsManager;
 import org.bukkit.Material;
@@ -36,13 +37,23 @@ public class ServerApi extends JavaPlugin {
                 .getRootAdvancement(tab);
         BaseAdvancement advancement1 = new AdvancementBuilder("Son2")
                 .setItem(Material.DIAMOND)
-                .setPosition(0, 1)
+                .setPosition(1, 0)
                 .getAdvancement(advancement);
         BaseAdvancement advancement2 = new AdvancementBuilder("Son3")
                 .setItem(Material.EMERALD)
-                .setPosition(0, 2)
+                .setPosition(2, 0)
                 .getAdvancement(advancement1);
-        tab.registerAdvancements(advancement, advancement1, advancement2);
+        MultiParentsAdvancement advancement3 = new AdvancementBuilder("Son4")
+                .setItem(Material.EMERALD)
+                .setPosition(2, 1)
+                .getMultiParentAdvancement(advancement1, advancement2);
+        tab.registerAdvancements(advancement, advancement1, advancement2, advancement3);
+
+        System.out.println("---------------------");
+        System.out.println(advancement1.getParent());
+        System.out.println(advancement2.getParent());
+        System.out.println(advancement3.getParents());
+        System.out.println("---------------------");
     }
 
     public static JavaPlugin getInstance() {

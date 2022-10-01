@@ -5,6 +5,7 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
+import com.fren_gor.ultimateAdvancementAPI.advancement.multiParents.MultiParentsAdvancement;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -61,6 +62,10 @@ public class AdvancementBuilder {
      */
     public BaseAdvancement getAdvancement(RootAdvancement parentAdvancement){
         return new BaseAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancement);
+    }
+
+    public MultiParentsAdvancement getMultiParentAdvancement(BaseAdvancement... parentAdvancements){
+        return new MultiParentsAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancements);
     }
 
     private AdvancementDisplay getAdvancementDisplay(){
