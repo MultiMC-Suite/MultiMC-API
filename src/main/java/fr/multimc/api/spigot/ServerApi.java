@@ -1,13 +1,15 @@
 package fr.multimc.api.spigot;
 
 import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
+import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
+import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
-import fr.multimc.api.commons.advancements.AdvancementType;
-import fr.multimc.api.commons.advancements.AdvancementsManager;
+import fr.multimc.api.spigot.advancements.AdvancementBuilder;
+import fr.multimc.api.spigot.advancements.AdvancementsManager;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("unused")
 public class ServerApi extends JavaPlugin {
 
     private static JavaPlugin instance;
@@ -25,9 +27,22 @@ public class ServerApi extends JavaPlugin {
     @Override
     public void onEnable() {
         AdvancementsManager advancementsManager = new AdvancementsManager(this, true);
-        AdvancementDisplay advancementDisplay = advancementsManager.getAdvancementDisplay(Material.DIAMOND, "Test Advancement", AdvancementFrameType.CHALLENGE, 5, 0, new String[]{"Description", ":p"});
         AdvancementTab tab = advancementsManager.addAdvancementTab("test", true);
-        advancementsManager.addAdvancement(AdvancementType.ROOT, "test", tab, advancementDisplay, "textures/block/cobblestone.png");
+
+        RootAdvancement advancement = new AdvancementBuilder("Builder test")
+                .setItem(Material.STICK)
+                .setAdvancementFrameType(AdvancementFrameType.CHALLENGE)
+                .setDescription(new String[]{"Description", ":p"})
+                .getRootAdvancement(tab);
+        BaseAdvancement advancement1 = new AdvancementBuilder("Son2")
+                .setItem(Material.DIAMOND)
+                .setPosition(0, 1)
+                .getAdvancement(advancement);
+        BaseAdvancement advancement2 = new AdvancementBuilder("Son3")
+                .setItem(Material.EMERALD)
+                .setPosition(0, 2)
+                .getAdvancement(advancement1);
+        tab.registerAdvancements(advancement, advancement1, advancement2);
     }
 
     public static JavaPlugin getInstance() {
