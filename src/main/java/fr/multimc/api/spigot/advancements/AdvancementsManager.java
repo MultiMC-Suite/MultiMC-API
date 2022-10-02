@@ -16,12 +16,14 @@ public class AdvancementsManager implements Listener {
     UltimateAdvancementAPI advancementAPI;
     private final JavaPlugin plugin;
     HashMap<String, AdvancementTab> advancementTabs;
+    HashMap<String, BaseAdvancement> baseAdvancements;
 
     public AdvancementsManager(JavaPlugin plugin, boolean removeAll){
         this.plugin = plugin;
         this.advancementAPI = UltimateAdvancementAPI.getInstance(plugin);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         advancementTabs = new HashMap<>();
+        baseAdvancements = new HashMap<>();
         if(removeAll){
             this.removeAllAdvancements();
         }
@@ -61,6 +63,18 @@ public class AdvancementsManager implements Listener {
     }
 
     public void addAdvancement(AdvancementTab advancementTab, BaseAdvancement advancement){
+        baseAdvancements.put(advancement.getKey().getKey(), advancement);
         advancementTab.registerAdvancements(advancementTab.getRootAdvancement(), advancement);
+    }
+
+    public void addAdvancement(AdvancementTab advancementTab, RootAdvancement rootAdvancement, BaseAdvancement... advancements){
+        for(BaseAdvancement advancement : advancements){
+            baseAdvancements.put(advancement.getKey().getKey(), advancement);
+        }
+        advancementTab.registerAdvancements(rootAdvancement, advancements);
+    }
+
+    public BaseAdvancement getBaseAdvancement(String key){
+        return this.baseAdvancements.get(key);
     }
 }

@@ -7,7 +7,10 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDispla
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import com.fren_gor.ultimateAdvancementAPI.advancement.multiParents.MultiParentsAdvancement;
 import org.bukkit.Material;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class AdvancementBuilder {
@@ -55,6 +58,9 @@ public class AdvancementBuilder {
     public BaseAdvancement getAdvancement(BaseAdvancement parentAdvancement){
         return new BaseAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancement);
     }
+    public <E extends Event> BaseAdvancement getTriggeredAdvancement(BaseAdvancement parentAdvancement, int maxProgression, Class<E> eventClass, Consumer<E> consumer){
+        return new TriggeredAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancement, maxProgression, eventClass, consumer);
+    }
     /**
      * Get advancement from builder
      * @param parentAdvancement Parent advancement
@@ -67,6 +73,8 @@ public class AdvancementBuilder {
     public MultiParentsAdvancement getMultiParentAdvancement(BaseAdvancement... parentAdvancements){
         return new MultiParentsAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancements);
     }
+
+
 
     private AdvancementDisplay getAdvancementDisplay(){
         return new AdvancementDisplay(item, name, advancementFrameType, this.showToast, this.announceChat, posX, posY, description);
