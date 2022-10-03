@@ -1,7 +1,5 @@
 main: 'fr.multimc.api.spigot.ServerApi'
 name: 'MultiMC-API'
-softdepend:
-  - UltimateAdvancementAPI
 
 version: '1.0-SNAPSHOT'
 api-version: '1.19'
