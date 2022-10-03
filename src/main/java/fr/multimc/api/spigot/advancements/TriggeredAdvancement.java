@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import java.util.function.Consumer;
 
 public class TriggeredAdvancement extends BaseAdvancement {
-    public <E extends Event> TriggeredAdvancement(String key, AdvancementDisplay display, Advancement parent, int maxProgression, Class<E> eventClass, Consumer<E> consumer) {
+    protected <E extends Event> TriggeredAdvancement(String key, AdvancementDisplay display, Advancement parent, int maxProgression, Class<E> eventClass, Consumer<E> consumer) {
         super(key, display, parent, maxProgression);
         registerEvent(eventClass, consumer);
 
