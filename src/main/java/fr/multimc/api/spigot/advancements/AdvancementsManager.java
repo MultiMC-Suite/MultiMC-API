@@ -10,14 +10,25 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
+/**
+ * The advancement manager helps you to create and manage your advancements and advancements tab through the UltimateAdvancement API
+ * @author Tom CZEKAJ
+ * @version 1.0
+ * @since 03/10/2022
+ */
 @SuppressWarnings({"unused", "BusyWait"})
 public class AdvancementsManager implements Listener {
 
-    UltimateAdvancementAPI advancementAPI;
     private final JavaPlugin plugin;
+    UltimateAdvancementAPI advancementAPI;
     HashMap<String, AdvancementTab> advancementTabs;
     HashMap<String, BaseAdvancement> baseAdvancements;
 
+    /**
+     * Constructor of the AdvancementsManager class
+     * @param plugin Instance of the plugin
+     * @param removeAll If vanilla advancements need to be removed
+     */
     public AdvancementsManager(JavaPlugin plugin, boolean removeAll){
         this.plugin = plugin;
         this.advancementAPI = UltimateAdvancementAPI.getInstance(plugin);
@@ -29,6 +40,9 @@ public class AdvancementsManager implements Listener {
         }
     }
 
+    /**
+     * Remove all vanilla advancements
+     */
     private void removeAllAdvancements(){
         advancementAPI.disableVanillaAdvancements();
     }
@@ -54,19 +68,31 @@ public class AdvancementsManager implements Listener {
         return tab;
     }
 
-    public AdvancementTab getAdvancementTab(String tabName){
-        return this.advancementTabs.get(tabName);
-    }
-
+    /**
+     * Add the root advancements of a tab
+     * @param advancementTab The advancement tab instance
+     * @param rootAdvancement The root advancement
+     */
     public void addAdvancement(AdvancementTab advancementTab, RootAdvancement rootAdvancement){
         advancementTab.registerAdvancements(rootAdvancement);
     }
 
+    /**
+     * Add an advancement to an advancement tab
+     * @param advancementTab The advancement tab instance
+     * @param advancement The advancement
+     */
     public void addAdvancement(AdvancementTab advancementTab, BaseAdvancement advancement){
         baseAdvancements.put(advancement.getKey().getKey(), advancement);
         advancementTab.registerAdvancements(advancementTab.getRootAdvancement(), advancement);
     }
 
+    /**
+     * Add one or more advancements to an advancement tab
+     * @param advancementTab The advancement tab instance
+     * @param rootAdvancement The root advancement
+     * @param advancements One or more advancements
+     */
     public void addAdvancement(AdvancementTab advancementTab, RootAdvancement rootAdvancement, BaseAdvancement... advancements){
         for(BaseAdvancement advancement : advancements){
             baseAdvancements.put(advancement.getKey().getKey(), advancement);
@@ -74,7 +100,21 @@ public class AdvancementsManager implements Listener {
         advancementTab.registerAdvancements(rootAdvancement, advancements);
     }
 
-    public BaseAdvancement getBaseAdvancement(String key){
-        return this.baseAdvancements.get(key);
+    /**
+     * Get an advancement tab from it name
+     * @param tabName Name of the advancement tab
+     * @return The advancement tab instance
+     */
+    public AdvancementTab getAdvancementTab(String tabName){
+        return this.advancementTabs.get(tabName);
+    }
+
+    /**
+     * Get an advancement from it name
+     * @param name Name of the advancement
+     * @return The advancement instance
+     */
+    public BaseAdvancement getBaseAdvancement(String name){
+        return this.baseAdvancements.get(AdvancementBuilder.getAdvancementKey(name));
     }
 }
