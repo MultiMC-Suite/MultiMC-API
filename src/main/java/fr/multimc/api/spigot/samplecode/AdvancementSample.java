@@ -30,33 +30,35 @@ public class AdvancementSample implements SampleCode, Listener {
         advancementsManager = new AdvancementsManager(plugin, true);
         AdvancementTab tab = advancementsManager.addAdvancementTab("test", true);
 
-        RootAdvancement advancement = new AdvancementBuilder("Builder test")
-                .setItem(Material.STICK)
+        RootAdvancement rootAdvancement = new AdvancementBuilder("Root advancement")
+                .setItem(Material.NETHERITE_INGOT)
                 .setAdvancementFrameType(AdvancementFrameType.CHALLENGE)
-                .setDescription(new String[]{"Description", ":p"})
+                .setDescription(new String[]{"This is the", "root advancement sample"})
                 .getRootAdvancement(tab);
-        BaseAdvancement advancement1 = new AdvancementBuilder("Son2")
-                .setItem(Material.AXOLOTL_SPAWN_EGG)
+        BaseAdvancement advancement1 = new AdvancementBuilder("Get Wood")
+                .setItem(Material.OAK_LOG)
                 .setPosition(1, 0)
-                .getAdvancement(advancement);
-        BaseAdvancement advancement2 = new AdvancementBuilder("Son3")
+                .setDescription(new String[]{"This is the", "first advancement sample", "without any trigger"})
+                .getAdvancement(rootAdvancement);
+        BaseAdvancement advancement2 = new AdvancementBuilder("Get Diamonds")
                 .setItem(Material.DIAMOND)
                 .setPosition(2, 0)
-                .setDescription(new String[]{"Get 5 diamonds"})
+                .setDescription(new String[]{"Get 5 diamonds", "for sample"})
                 .getTriggeredAdvancement(advancement1, 5, EntityPickupItemEvent.class, (EntityPickupItemEvent e) -> {
                     if(e.getEntity() instanceof Player player){
                         if(e.getItem().getItemStack().getType() == Material.DIAMOND){
                             for(int i = 0; i < e.getItem().getItemStack().getAmount(); i++){
-                                advancementsManager.getBaseAdvancement("son3").incrementProgression(player);
+                                advancementsManager.getBaseAdvancement("Get Diamonds").incrementProgression(player);
                             }
                         }
                     }
                 });
-        MultiParentsAdvancement advancement3 = new AdvancementBuilder("Son4")
+        MultiParentsAdvancement advancement3 = new AdvancementBuilder("Get emeralds")
                 .setItem(Material.EMERALD)
                 .setPosition(2, 1)
+                .setDescription(new String[]{"Sample for multi-parent", "advancement"})
                 .getMultiParentAdvancement(advancement1, advancement2);
-        advancementsManager.addAdvancement(tab, advancement, advancement1, advancement2, advancement3);
+        advancementsManager.addAdvancement(tab, rootAdvancement, advancement1, advancement2, advancement3);
     }
 
     @EventHandler
@@ -65,13 +67,16 @@ public class AdvancementSample implements SampleCode, Listener {
         if(uuid != null){
             Player player =  Bukkit.getPlayer(uuid);
             if(player != null){
-                player.sendMessage(String.format("Progression updated: %d on %d", e.getNewProgression(), advancementsManager.getBaseAdvancement(e.getAdvancementKey().getKey()).getMaxProgression()));
+                BaseAdvancement advancement = advancementsManager.getBaseAdvancement(e.getAdvancementKey().getKey());
+                if(advancement != null){
+                    player.sendMessage(String.format("Progression updated: %d on %d", e.getNewProgression(), advancement.getMaxProgression()));
+                }
             }
         }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        advancementsManager.getBaseAdvancement("son2").grant(e.getPlayer());
+        advancementsManager.getBaseAdvancement("Get Wood").grant(e.getPlayer());
     }
 }
