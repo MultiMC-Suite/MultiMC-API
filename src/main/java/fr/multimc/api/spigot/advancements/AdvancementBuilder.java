@@ -12,6 +12,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
+/**
+ * The advancement builder helps you to create your advancements through the UltimateAdvancement API
+ * @author Tom CZEKAJ
+ * @version 1.0
+ * @since 03/10/2022
+ */
 @SuppressWarnings("unused")
 public class AdvancementBuilder {
 
@@ -26,7 +32,7 @@ public class AdvancementBuilder {
     private String backgroundTexture;
 
     /**
-     * Advancement builder constructor
+     * Constructor of the AdvancementBuilder class
      * @param name Advancement name
      */
     public AdvancementBuilder(String name){
@@ -42,83 +48,149 @@ public class AdvancementBuilder {
     }
 
     /**
-     * Get root advancement from builder
-     * @param advancementTab Advancement tab
-     * @return Root advancement
+     * Get RootAdvancement instance from builder
+     * @param advancementTab AdvancementTab instance
+     * @return RootAdvancement instance
      */
     public RootAdvancement getRootAdvancement(AdvancementTab advancementTab){
-        return new RootAdvancement(advancementTab, this.getAdvancementKey(), this.getAdvancementDisplay(), this.backgroundTexture);
+        return new RootAdvancement(advancementTab, getAdvancementKey(this.name), this.getAdvancementDisplay(), this.backgroundTexture);
     }
 
     /**
-     * Get advancement from builder
-     * @param parentAdvancement Parent advancement
-     * @return Advancement
+     * Get a BaseAdvancement instance from builder
+     * @param parentAdvancement Parent BaseAdvancement instance
+     * @return BaseAdvancement instance
      */
     public BaseAdvancement getAdvancement(BaseAdvancement parentAdvancement){
-        return new BaseAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancement);
+        return new BaseAdvancement(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement);
     }
-    public <E extends Event> BaseAdvancement getTriggeredAdvancement(BaseAdvancement parentAdvancement, int maxProgression, Class<E> eventClass, Consumer<E> consumer){
-        return new TriggeredAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancement, maxProgression, eventClass, consumer);
-    }
+
     /**
-     * Get advancement from builder
-     * @param parentAdvancement Parent advancement
-     * @return Advancement
+     * Get a BaseAdvancement instance from builder
+     * @param parentAdvancement Parent RootAdvancement instance
+     * @return BaseAdvancement instance
      */
     public BaseAdvancement getAdvancement(RootAdvancement parentAdvancement){
-        return new BaseAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancement);
+        return new BaseAdvancement(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement);
     }
 
+    /**
+     * Get a MultiParentsAdvancement instance from builder
+     * @param parentAdvancements Parents BaseAdvancement instances
+     * @return MultiParentAdvancement instance
+     */
     public MultiParentsAdvancement getMultiParentAdvancement(BaseAdvancement... parentAdvancements){
-        return new MultiParentsAdvancement(this.getAdvancementKey(), this.getAdvancementDisplay(), parentAdvancements);
+        return new MultiParentsAdvancement(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancements);
     }
 
+    /**
+     * Get BaseAdvancement instance with custom action trigger from builder
+     * @param parentAdvancement Parent BaseAdvancement instance
+     * @param maxProgression Max progression of the defined action
+     * @param eventClass Trigger event class
+     * @param consumer Trigger event action (lambda)
+     * @return BaseAdvancement instance
+     * @param <E> A class that extends org.bukkit.event.Event
+     */
+    public <E extends Event> BaseAdvancement getTriggeredAdvancement(BaseAdvancement parentAdvancement, int maxProgression, Class<E> eventClass, Consumer<E> consumer){
+        return new TriggeredAdvancement(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement, maxProgression, eventClass, consumer);
+    }
 
-
+    /**
+     * Get an AdvancementDisplay instance from builder's variables
+     * @return An AdvancementDisplay instance
+     */
     private AdvancementDisplay getAdvancementDisplay(){
         return new AdvancementDisplay(item, name, advancementFrameType, this.showToast, this.announceChat, posX, posY, description);
+    }
+
+    /**
+     * Set advancement display item
+     * @param item ItemStack instance
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setItem(ItemStack item){
+        this.item = item;
+        return this;
+    }
+
+    /**
+     * Set advancement display item
+     * @param material Material enum value
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setItem(Material material){
+        this.item = new ItemStack(material);
+        return this;
+    }
+
+    /**
+     * Set advancement frame type (can be TASK, CHALLENGE or GOAL)
+     * @param advancementFrameType AdvancementFrameType enum value
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setAdvancementFrameType(AdvancementFrameType advancementFrameType){
+        this.advancementFrameType = advancementFrameType;
+        return this;
+    }
+
+    /**
+     * Set advancement display position on the advancement tab
+     * @param posX X position
+     * @param posY Y position
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setPosition(float posX, float posY) {
+        this.posX = posX;
+        this.posY = posY;
+        return this;
+    }
+
+    /**
+     * Set advancement description
+     * @param description Description
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setDescription(String[] description) {
+        this.description = description;
+        return this;
+    }
+
+    /**
+     * Set if the advancement need to be displayed as a toast when obtained by a player
+     * @param showToast True if the advancement need to be displayed as a toast
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setShowToast(boolean showToast) {
+        this.showToast = showToast;
+        return this;
+    }
+
+    /**
+     * Set if the advancement need to be announced to the chat when obtained by a player
+     * @param announceChat True if the advancement need to be announced to the chat
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setAnnounceChat(boolean announceChat) {
+        this.announceChat = announceChat;
+        return this;
+    }
+
+    /**
+     * Set advancement tab background texture for advancement tab (only needed for root advancement)
+     * @param backgroundTexture Background texture location (for dirt: textures/block/dirt.png)
+     * @return Local instance of AdvancementBuilder
+     */
+    public AdvancementBuilder setBackgroundTexture(String backgroundTexture) {
+        this.backgroundTexture = backgroundTexture;
+        return this;
     }
 
     /**
      * Get advancement key from advancement name (base name is lowercase and spaces are replaced by underscores)
      * @return Advancement key
      */
-    private String getAdvancementKey(){
-        return this.name.toLowerCase().replace(' ', '_');
-    }
-
-    public AdvancementBuilder setItem(ItemStack item){
-        this.item = item;
-        return this;
-    }
-    public AdvancementBuilder setItem(Material material){
-        this.item = new ItemStack(material);
-        return this;
-    }
-    public AdvancementBuilder setAdvancementFrameType(AdvancementFrameType advancementFrameType){
-        this.advancementFrameType = advancementFrameType;
-        return this;
-    }
-    public AdvancementBuilder setPosition(float posX, float posY) {
-        this.posX = posX;
-        this.posY = posY;
-        return this;
-    }
-    public AdvancementBuilder setDescription(String[] description) {
-        this.description = description;
-        return this;
-    }
-    public AdvancementBuilder setShowToast(boolean showToast) {
-        this.showToast = showToast;
-        return this;
-    }
-    public AdvancementBuilder setAnnounceChat(boolean announceChat) {
-        this.announceChat = announceChat;
-        return this;
-    }
-    public AdvancementBuilder setBackgroundTexture(String backgroundTexture) {
-        this.backgroundTexture = backgroundTexture;
-        return this;
+    public static String getAdvancementKey(String advancementName){
+        return advancementName.toLowerCase().replace(' ', '_');
     }
 }
