@@ -3,6 +3,13 @@ package fr.multimc.api.spigot.tools.players;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * Useful enumeration of the different possible speed level for a player.
+ *
+ * @author Loïc MAES
+ * @version 1.0
+ * @since 04/10/2022
+ */
 public enum PlayerSpeed {
     LEVEL_0(0f, 0f),
     LEVEL_1(.1f, .2f),
@@ -24,34 +31,38 @@ public enum PlayerSpeed {
     }
 
     /**
+     * Get a speed level from the player's walk speed level.
      *
-     * @param walkSpeed
-     * @return
+     * @param walkSpeed Speed level.
+     * @return Optional speed level.
      */
     public static Optional<PlayerSpeed> fromWalkSpeed(float walkSpeed) {
         return Arrays.stream(values()).filter(speed -> speed.getWalkLevel() == walkSpeed).findFirst();
     }
 
     /**
+     * Get a speed level from the player's fly speed level.
      *
-     * @param flySpeed
-     * @return
+     * @param flySpeed Speed level.
+     * @return Optional speed level.
      */
     public static Optional<PlayerSpeed> fromFlySpeed(float flySpeed) {
         return Arrays.stream(values()).filter(speed -> speed.getFlyLevel() == flySpeed).findFirst();
     }
 
     /**
+     * Get the walk speed value.
      *
-     * @return
+     * @return Speed level.
      */
     public float getWalkLevel() {
         return walkLevel;
     }
 
     /**
+     * Get the fly speed value.
      *
-     * @return
+     * @return Speed level.
      */
     public float getFlyLevel() {
         return flyLevel;
