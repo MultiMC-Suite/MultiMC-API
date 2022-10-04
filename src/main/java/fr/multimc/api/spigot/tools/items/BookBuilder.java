@@ -7,34 +7,44 @@ import org.bukkit.inventory.meta.BookMeta;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Create easily a book.
+ *
+ * @author Loïc MAES
+ * @version 1.0
+ * @since 04/10/2022
+ */
 public class BookBuilder extends ItemBuilder {
     /**
-     *
+     * Create an instance of BookBuilder based on the ItemBuilder.
      */
     public BookBuilder() {
         super(Material.WRITTEN_BOOK);
     }
 
     /**
+     * Create an instance of BookBuilder based on the ItemBuilder with an existing item.
      *
-     * @param item
+     * @param item Item.
      */
     public BookBuilder(@Nonnull ItemStack item) {
         super(item);
     }
 
     /**
+     * Create an instance of BookBuilder based on the ItemBuilder with a custom amount.
      *
-     * @param amount
+     * @param amount Amount.
      */
     public BookBuilder(int amount) {
         super(Material.WRITTEN_BOOK, amount);
     }
 
     /**
+     * Set the book author name.
      *
-     * @param author
-     * @return
+     * @param author Author name.
+     * @return Current instance of the builder.
      */
     public BookBuilder setAuthor(@Nullable String author) {
         BookMeta meta = (BookMeta) this.getMeta();
@@ -43,9 +53,10 @@ public class BookBuilder extends ItemBuilder {
     }
 
     /**
+     * Add pages to the book.
      *
-     * @param pages
-     * @return
+     * @param pages Pages.
+     * @return Current instance of the builder.
      */
     @Deprecated
     public BookBuilder addPages(@Nonnull String... pages) {
@@ -55,9 +66,10 @@ public class BookBuilder extends ItemBuilder {
     }
 
     /**
+     * Add pages to the book.
      *
-     * @param page
-     * @return
+     * @param page Pages.
+     * @return Current instance of the builder.
      */
     @Deprecated
     public BookBuilder addPage(@Nonnull String page) {
@@ -65,9 +77,10 @@ public class BookBuilder extends ItemBuilder {
     }
 
     /**
+     * Set the book generation.
      *
-     * @param generation
-     * @return
+     * @param generation Generation.
+     * @return Current instance of the builder.
      */
     public BookBuilder setGeneration(@Nullable BookMeta.Generation generation) {
         BookMeta meta = (BookMeta) this.getMeta();
@@ -76,9 +89,10 @@ public class BookBuilder extends ItemBuilder {
     }
 
     /**
+     * Set the book title.
      *
-     * @param title
-     * @return
+     * @param title Title.
+     * @return Current instance of the builder.
      */
     public BookBuilder setTitle(@Nullable String title) {
         BookMeta meta = (BookMeta) this.getMeta();
