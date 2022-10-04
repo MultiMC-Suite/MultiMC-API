@@ -7,16 +7,15 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDispla
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import com.fren_gor.ultimateAdvancementAPI.advancement.multiParents.MultiParentsAdvancement;
 import org.bukkit.Material;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.function.Consumer;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * The advancement builder helps you to create your advancements through the UltimateAdvancement API
  * @author Tom CZEKAJ
  * @version 1.0
- * @since 03/10/2022
+ * @since 04/10/2022
  */
 @SuppressWarnings("unused")
 public class AdvancementBuilder {
@@ -87,13 +86,25 @@ public class AdvancementBuilder {
      * Get BaseAdvancement instance with custom action trigger from builder
      * @param parentAdvancement Parent BaseAdvancement instance
      * @param maxProgression Max progression of the defined action
-     * @param eventClass Trigger event class
-     * @param consumer Trigger event action (lambda)
-     * @return BaseAdvancement instance
-     * @param <E> A class that extends org.bukkit.event.Event
+     * @return TriggeredAdvancement instance
      */
-    public <E extends Event> BaseAdvancement getTriggeredAdvancement(BaseAdvancement parentAdvancement, int maxProgression, Class<E> eventClass, Consumer<E> consumer){
-        return new TriggeredAdvancement(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement, maxProgression, eventClass, consumer);
+    public TriggeredAdvancement getTriggeredAdvancement(BaseAdvancement parentAdvancement, int maxProgression){
+        return new TriggeredAdvancement(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement, maxProgression);
+    }
+
+    /**
+     * Get BaseAdvancement instance with custom action trigger from builder
+     * @param parentAdvancement Parent BaseAdvancement instance
+     * @param maxProgression Max progression of the defined action
+     * @param triggeredAdvancementClass Custom TriggeredAdvancement class
+     * @return TriggeredAdvancement instance
+     */
+    public TriggeredAdvancement getTriggeredAdvancement(BaseAdvancement parentAdvancement, int maxProgression, Class<? extends TriggeredAdvancement> triggeredAdvancementClass){
+        try {
+            return (TriggeredAdvancement) triggeredAdvancementClass.getConstructors()[0].newInstance(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement, maxProgression);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
