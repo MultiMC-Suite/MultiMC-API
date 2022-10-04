@@ -13,17 +13,30 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Manage the GUIs:
+ * - Save it in list;
+ * - Open it to a player;
+ * - Open multiple instances of one;
+ * - Manage interactions.
+ *
+ * @author Loïc MAES
+ * @version 1.0
+ * @since 03/10/2022
+ */
 public class GuiManager implements Listener {
-    private final Plugin plugin;
-    private final Map<Class<? extends GuiBuilder>, GuiBuilder> guis;
+    private final Plugin plugin; // Main plugin instance.
+    private final Map<Class<? extends GuiBuilder>, GuiBuilder> guis; // GUIs list.
 
     /**
+     * Create the instance of the GUI manager.
      *
-     * @param plugin
+     * @param plugin Main plugin instance.
      */
     public GuiManager(@Nonnull Plugin plugin) {
         this.plugin = plugin;
@@ -31,17 +44,28 @@ public class GuiManager implements Listener {
     }
 
     /**
+     * Register a GUI to the list.
      *
-     * @param gui
+     * @param gui GuiBuilder instance.
      */
     public void registerGui(@Nonnull GuiBuilder gui) {
         this.guis.put(gui.getClass(), gui);
     }
 
     /**
+     * Register a list of GUIs to the main list.
      *
-     * @param player
-     * @param guiClass
+     * @param guis Guis list.
+     */
+    public void registerGui(@Nonnull GuiBuilder... guis) {
+        Arrays.asList(guis).forEach(this::registerGui);
+    }
+
+    /**
+     * Open the target GUI instance to the player to let him interact with.
+     *
+     * @param player Inventory owner.
+     * @param guiClass GUI class reference.
      */
     public void openGui(@Nonnull Player player, @Nonnull Class<? extends GuiBuilder> guiClass) {
         if (player.getOpenInventory() instanceof PlayerInventory) player.closeInventory();
@@ -53,17 +77,19 @@ public class GuiManager implements Listener {
     }
 
     /**
+     * Get the GUI instance in the local list (if present).
      *
-     * @param guiClass
-     * @return
+     * @param guiClass GUI class reference.
+     * @return The GUI instance.
      */
     private GuiBuilder getGui(@Nonnull Class<? extends GuiBuilder> guiClass) {
         return this.guis.get(guiClass);
     }
 
     /**
+     * Manage the whole interactions in GUIs.
      *
-     * @param event
+     * @param event Event fired.
      */
     @EventHandler
     public void inventoryClick(InventoryClickEvent event) {
