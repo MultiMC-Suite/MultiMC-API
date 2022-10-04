@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.samplecode;
+package fr.multimc.api.spigot.samplecode.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
 import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
@@ -8,18 +8,19 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.multiParents.MultiParents
 import com.fren_gor.ultimateAdvancementAPI.events.advancement.ProgressionUpdateEvent;
 import fr.multimc.api.spigot.advancements.AdvancementBuilder;
 import fr.multimc.api.spigot.advancements.AdvancementsManager;
+import fr.multimc.api.spigot.advancements.TriggeredAdvancement;
+import fr.multimc.api.spigot.samplecode.SampleCode;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 
-public class AdvancementSample implements SampleCode, Listener {
+public class AdvancementSampleCode implements SampleCode, Listener {
 
     private static AdvancementsManager advancementsManager;
 
@@ -40,24 +41,16 @@ public class AdvancementSample implements SampleCode, Listener {
                 .setPosition(1, 0)
                 .setDescription(new String[]{"This is the", "first advancement sample", "without any trigger"})
                 .getAdvancement(rootAdvancement);
-        BaseAdvancement advancement2 = new AdvancementBuilder("Get Diamonds")
+        TriggeredAdvancement advancement2 = new AdvancementBuilder("Get Diamonds")
                 .setItem(Material.DIAMOND)
                 .setPosition(2, 0)
                 .setDescription(new String[]{"Get 5 diamonds", "for sample"})
-                .getTriggeredAdvancement(advancement1, 5, EntityPickupItemEvent.class, (EntityPickupItemEvent e) -> {
-                    if(e.getEntity() instanceof Player player){
-                        if(e.getItem().getItemStack().getType() == Material.DIAMOND){
-                            for(int i = 0; i < e.getItem().getItemStack().getAmount(); i++){
-                                advancementsManager.getBaseAdvancement("Get Diamonds").incrementProgression(player);
-                            }
-                        }
-                    }
-                });
+                .getTriggeredAdvancement(advancement1, 5, CustomAdvancementSample.class);
         MultiParentsAdvancement advancement3 = new AdvancementBuilder("Get emeralds")
-                .setItem(Material.EMERALD)
-                .setPosition(2, 1)
-                .setDescription(new String[]{"Sample for multi-parent", "advancement"})
-                .getMultiParentAdvancement(advancement1, advancement2);
+            .setItem(Material.EMERALD)
+            .setPosition(2, 1)
+            .setDescription(new String[]{"Sample for multi-parent", "advancement"})
+            .getMultiParentAdvancement(advancement1, advancement2);
         advancementsManager.addAdvancement(tab, rootAdvancement, advancement1, advancement2, advancement3);
     }
 
