@@ -30,6 +30,15 @@ public class Database {
 
     private Connection connection;
 
+    /**
+     * Database constructor for MYSQL
+     * @param ip Database IP
+     * @param port Database port
+     * @param userName Database username
+     * @param password Database password
+     * @param databaseName Database name
+     * @param logger Plugin logger
+     */
     public Database(String ip, int port, String userName, String password, String databaseName, Logger logger){
         this.ip = ip;
         this.port = port;
@@ -42,6 +51,11 @@ public class Database {
         this.connect();
     }
 
+    /**
+     * Database constructor for SQLITE
+     * @param databaseFile Database file
+     * @param logger Plugin logger
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Database(File databaseFile, Logger logger){
         this.databaseFile = databaseFile;
@@ -52,6 +66,10 @@ public class Database {
         this.connect();
     }
 
+    /**
+     * Initialize the connection object with a new connection to the database
+     * @return Custom DatabaseStatus, can be SUCCESS or SQLERROR
+     */
     public DatabaseStatus connect(){
         DriverManager.setLoginTimeout(2);
         try{
@@ -74,6 +92,10 @@ public class Database {
         return DatabaseStatus.SQLERROR;
     }
 
+    /**
+     * Reset the connection object and reconnect it to the database
+     * @return Custom DatabaseStatus, can be SUCCESS or SQLERROR
+     */
     @SuppressWarnings("UnusedReturnValue")
     public DatabaseStatus reconnect(){
         if(this.connection != null){
@@ -83,6 +105,10 @@ public class Database {
         return this.connect();
     }
 
+    /**
+     * Close the connection with the database
+     * @return Custom DatabaseStatus, can be SUCCESS or SQLERROR
+     */
     public DatabaseStatus disconnect(){
         try {
             this.connection.close();
@@ -93,6 +119,10 @@ public class Database {
         return DatabaseStatus.SQLERROR;
     }
 
+    /**
+     * Get a statement to execute operations with the database
+     * @return SQL Statement
+     */
     private Statement getStatement(){
         try {
             return this.connection.createStatement();
@@ -103,22 +133,33 @@ public class Database {
         return null;
     }
 
+    /**
+     * Execute a query from a query string and a boolean to select from execute and execute update
+     * @param query SQL query String
+     * @param update True if the operation need updating with the database
+     * @return Custom QueryResult
+     */
     public QueryResult executeQuery(String query, boolean update){
         return this.executeQuery(new QueryBuilder(update ? QueryType.UPDATE : QueryType.SELECT, query).getQuery());
     }
 
+    /**
+     * Execute a query from a Query object
+     * @param query Custom Query
+     * @return Custom QueryResult
+     */
     public QueryResult executeQuery(Query query){
-        String preparedQuery = this.changeQuerySyntax(query.getQuery());
+        String preparedQuery = this.changeQuerySyntax(query.query());
 
         DatabaseStatus queryStatus = DatabaseStatus.SQLERROR;
         ResultSet resultSet = null;
         try {
             Statement statement = this.getStatement();
             if(statement != null) {
-                if(query.getQueryType() == QueryType.SELECT) {
+                if(query.queryType() == QueryType.SELECT) {
                     resultSet = statement.executeQuery(preparedQuery);
                     queryStatus = DatabaseStatus.SUCCESS;
-                }else if(query.getQueryType() == QueryType.UPDATE) {
+                }else if(query.queryType() == QueryType.UPDATE) {
                     statement.executeUpdate(preparedQuery);
                     queryStatus = DatabaseStatus.SUCCESS;
                 }
@@ -126,9 +167,14 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new QueryResult(query.getQueryType(), queryStatus, resultSet);
+        return new QueryResult(query.queryType(), queryStatus, resultSet);
     }
 
+    /**
+     * Check if a given table exists in the database
+     * @param tableName Target table name
+     * @return Custom DatabaseStatus, can be TABLE_EXIST, TABLE_NOT_EXIST or SQLERROR
+     */
     public DatabaseStatus isTableExist(String tableName){
         Query query;
         if(this.databaseType == DatabaseType.MYSQL){
@@ -156,6 +202,11 @@ public class Database {
         return DatabaseStatus.SQLERROR;
     }
 
+    /**
+     * Convert a given SQL query to be used for SQLITE
+     * @param inputString SQL query String
+     * @return Converted query String
+     */
     private String changeQuerySyntax(String inputString){
         if(this.databaseType == DatabaseType.SQLITE){
             List<String> fieldNames = new ArrayList<>();

@@ -6,6 +6,7 @@ import fr.multimc.api.commons.database.query.QueryResult;
 import fr.multimc.api.commons.database.query.QueryType;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class Table {
 
     private final Database database;
@@ -13,12 +14,23 @@ public class Table {
     private boolean initialized;
 
 
+    /**
+     * Table constructor without any initialization fields
+     * @param database Database
+     * @param name Table name
+     */
     public Table(@NotNull Database database, String name){
         this.database = database;
         this.name = name;
         this.initialized = this.database.isTableExist(this.name) == DatabaseStatus.TABLE_EXIST;
     }
 
+    /**
+     * Table constructor for distincts fields
+     * @param database Database
+     * @param name Table name
+     * @param fields Table fields (array of String)
+     */
     public Table(@NotNull Database database, String name, String... fields){
         this.database = database;
         this.name = name;
@@ -32,12 +44,22 @@ public class Table {
         this.initializeTable(query.toString());
     }
 
+    /**
+     * Table constructor for a unique string with all fields into
+     * @param database Database
+     * @param name Table name
+     * @param fields Table fields formatted into a String
+     */
     public Table(@NotNull Database database, String name, String fields){
         this.database = database;
         this.name = name;
         this.initializeTable(fields);
     }
 
+    /**
+     * Initialize table in the database
+     * @param fields Table fields formatted into a String
+     */
     private void initializeTable(String fields){
         QueryResult queryResult = this.database.executeQuery(
                 new QueryBuilder(QueryType.UPDATE,
@@ -46,12 +68,26 @@ public class Table {
         this.initialized = queryResult.queryStatus() == DatabaseStatus.SUCCESS;
     }
 
+    /**
+     * Get table name
+     * @return String that is the table name
+     */
     public String getTableName(){
         return this.name;
     }
+
+    /**
+     * Get the database object
+     * @return Database
+     */
     public Database getDatabase(){
         return this.database;
     }
+
+    /**
+     * Check if the table is initialized in the database
+     * @return True if the table is initialized
+     */
     public boolean isInitialized(){
         return this.initialized;
     }
