@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+@SuppressWarnings({"unused"})
 public class Database {
 
     private String ip;
@@ -23,9 +24,9 @@ public class Database {
     private String databaseName;
 
     private File databaseFile;
-    private Logger logger;
-    private DatabaseType databaseType;
-    private HashMap<String, Table> tables;
+    private final Logger logger;
+    private final DatabaseType databaseType;
+    private final HashMap<String, Table> tables;
 
     private Connection connection;
 
@@ -38,13 +39,17 @@ public class Database {
         this.logger = logger;
         this.databaseType = DatabaseType.MYSQL;
         this.tables = new HashMap<>();
+        this.connect();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public Database(File databaseFile, Logger logger){
         this.databaseFile = databaseFile;
         this.logger = logger;
         this.databaseType = DatabaseType.SQLITE;
         this.tables = new HashMap<>();
+        databaseFile.getParentFile().mkdirs();
+        this.connect();
     }
 
     public DatabaseStatus connect(){
@@ -69,6 +74,7 @@ public class Database {
         return DatabaseStatus.SQLERROR;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public DatabaseStatus reconnect(){
         if(this.connection != null){
             DatabaseStatus status = this.disconnect();
@@ -118,7 +124,7 @@ public class Database {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return new QueryResult(query.getQueryType(), queryStatus, resultSet);
     }
@@ -157,6 +163,7 @@ public class Database {
             outputString = new StringBuilder(outputString.toString().replace(" INT ", " INTEGER "));
             outputString = new StringBuilder(outputString.toString().replace(" INT,", " INTEGER,"));
             outputString = new StringBuilder(outputString.toString().replace("UNSIGNED", ""));
+            outputString = new StringBuilder(outputString.toString().replace("AUTO_INCREMENT", "AUTOINCREMENT"));
             outputString = new StringBuilder(outputString.toString().replace("  ", " "));
             for(String temp: inputString.split("\\(")[0].split(",")){
                 if(temp.contains("AUTO_INCREMENT")){

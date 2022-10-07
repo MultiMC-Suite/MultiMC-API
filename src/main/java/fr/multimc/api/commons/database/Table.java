@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class Table {
 
-    private Database database;
-    private String name;
+    private final Database database;
+    private final String name;
     private boolean initialized;
 
 
@@ -20,6 +20,8 @@ public class Table {
     }
 
     public Table(@NotNull Database database, String name, String... fields){
+        this.database = database;
+        this.name = name;
         StringBuilder query = new StringBuilder();
         for(int i = 0; i < fields.length; i++){
             query.append(fields[i]);
@@ -27,19 +29,19 @@ public class Table {
                 query.append(", ");
             }
         }
-        QueryResult queryResult = this.database.executeQuery(
-                new QueryBuilder(QueryType.UPDATE,
-                        String.format("CREATE TABLE IF NOT EXISTS %s (%s)", name, query.toString()))
-                        .getQuery());
-        this.initialized = queryResult.queryStatus() == DatabaseStatus.SUCCESS;
+        this.initializeTable(query.toString());
     }
 
     public Table(@NotNull Database database, String name, String fields){
         this.database = database;
         this.name = name;
+        this.initializeTable(fields);
+    }
+
+    private void initializeTable(String fields){
         QueryResult queryResult = this.database.executeQuery(
                 new QueryBuilder(QueryType.UPDATE,
-                        String.format("CREATE TABLE IF NOT EXISTS %s (%s)", name, fields))
+                        String.format("CREATE TABLE IF NOT EXISTS %s (%s);", name, fields))
                         .getQuery());
         this.initialized = queryResult.queryStatus() == DatabaseStatus.SUCCESS;
     }

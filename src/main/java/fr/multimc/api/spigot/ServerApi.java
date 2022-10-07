@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot;
 
+import fr.multimc.api.spigot.samplecode.database.DatabaseSampleCode;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ServerApi extends JavaPlugin {
@@ -18,7 +19,7 @@ public class ServerApi extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
+        new DatabaseSampleCode().run(this);
     }
 
     public static JavaPlugin getInstance() {
