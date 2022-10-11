@@ -42,16 +42,18 @@ public class QueryBuilder {
      * Set the QueryType
      * @param queryType Custom QueryType
      */
-    public void setQueryType(QueryType queryType) {
+    public QueryBuilder setQueryType(QueryType queryType) {
         this.queryType = queryType;
+        return this;
     }
 
     /**
      * Set the query String
      * @param query SQL query String
      */
-    public void setQuery(String query) {
+    public QueryBuilder setQuery(String query) {
         this.query = query;
+        return this;
     }
 
 }
