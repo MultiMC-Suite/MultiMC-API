@@ -24,6 +24,14 @@ public class SchematicManager {
 
     private final Clipboard clipboard;
 
+    public SchematicManager(File schematicFile){
+        try {
+            this.clipboard = this.loadSchematic(schematicFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public SchematicManager(File dataFolder, String schematicName){
         try {
             this.clipboard = this.loadSchematic(new File(String.format("%s/%s", dataFolder.getPath(), schematicName)));
