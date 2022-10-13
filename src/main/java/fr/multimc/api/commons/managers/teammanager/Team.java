@@ -11,7 +11,6 @@ public class Team {
 
     private final String name;
     private final int id;
-    private final int teamSize;
     private final List<Player> players;
 
     public Team(String name, int id, Player... localPlayers){
@@ -19,7 +18,6 @@ public class Team {
         this.id = id;
         this.players = new ArrayList<>();
         this.players.addAll(Arrays.asList(localPlayers));
-        this.teamSize = localPlayers.length;
     }
 
     public List<Player> getPlayers() {
@@ -35,6 +33,6 @@ public class Team {
     }
 
     public int getTeamSize() {
-        return teamSize;
+        return players.size();
     }
 }
