@@ -12,7 +12,6 @@ import java.util.List;
 public class TeamManager {
 
     private final TeamsTable teamsTable;
-    private List<Team> teams;
 
     public TeamManager(Database database) {
         this.teamsTable = new TeamsTable(database);
@@ -23,7 +22,7 @@ public class TeamManager {
     }
 
     public List<Team> loadTeams(){
-        this.teams = new ArrayList<>();
+        List<Team> teams = new ArrayList<>();
         HashMap<Integer, List<String>> playersByTeam = teamsTable.getPlayersByTeam();
         System.out.println(playersByTeam);
         for(int teamId: playersByTeam.keySet()){
@@ -40,14 +39,9 @@ public class TeamManager {
                     }
                 }
                 Team team = new Team(teamsTable.getTeamName(teamId), teamId, players.toArray(new Player[0]));
-                this.teams.add(team);
+                teams.add(team);
             }
         }
-        return this.getTeams();
+        return teams;
     }
-
-    public List<Team> getTeams() {
-        return this.teams;
-    }
-
 }

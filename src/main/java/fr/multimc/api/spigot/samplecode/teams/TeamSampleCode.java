@@ -8,7 +8,6 @@ import fr.multimc.api.commons.managers.game.instances.InstanceSettings;
 import fr.multimc.api.commons.managers.teammanager.TeamManager;
 import fr.multimc.api.spigot.samplecode.SampleCode;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,7 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,12 +35,12 @@ public class TeamSampleCode implements SampleCode, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
-        teamManager.addTeam("T1", "Xen0Xys", "XenAdmin");
-//        teamManager.addTeam("T2", "XenAdmin");
+        teamManager.addTeam("T1", "Xen0Xys");
+        teamManager.addTeam("T2", "XenAdmin");
 
         File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
         InstanceSettings settings = new InstanceSettings(schemFile,
-                GameType.ONLY_TEAM,
+                GameType.TEAM_VS_TEAM,
                 600, List.of(new CustomLocation[]{new CustomLocation(-2.5, 1, -1.5), new CustomLocation(-4.5, 4, -5.5)}),
                 new ArrayList<>(),
                 new HashMap<>(),
@@ -50,12 +48,11 @@ public class TeamSampleCode implements SampleCode, Listener {
                 "multimc");
         instanceManager = new InstanceManager(plugin, CustomInstanceSample.class, settings);
         lobbyWorld = instanceManager.getLobbyWorld();
-
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        Location tpLocation = new Location(lobbyWorld, 0.5, 100, 0.5);
+        Location tpLocation = new Location(lobbyWorld, 0.5, 105, 0.5);
         e.getPlayer().teleport(tpLocation);
     }
 
