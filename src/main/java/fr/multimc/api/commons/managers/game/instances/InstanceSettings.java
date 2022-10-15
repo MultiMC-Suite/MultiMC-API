@@ -19,7 +19,7 @@ public class InstanceSettings {
     private final List<CustomEntity> entities;
     private final HashMap<String, String> customSettings;
     private final int tickTime;
-    private String worldsPrefix;
+    private final String worldsPrefix;
 
     public InstanceSettings(){
         this.schematicFile = new File("");
