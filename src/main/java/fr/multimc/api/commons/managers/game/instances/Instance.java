@@ -100,17 +100,10 @@ public class Instance extends BukkitRunnable{
         }
     }
 
-    private Location getLocationFromCustomLocation(CustomLocation customLocation){
-        return new Location(this.instanceLocation.getWorld(),
-                this.instanceLocation.getX() + customLocation.x(),
-                this.instanceLocation.getY() + customLocation.y(),
-                this.instanceLocation.getZ() + customLocation.z());
-    }
-
     private List<Location> getSpawnPoints(){
         List<Location> spawnPoints = new ArrayList<>();
         for(CustomLocation customLocation : this.instanceSettings.getSpawnPoints()){
-            spawnPoints.add(this.getLocationFromCustomLocation(customLocation));
+            spawnPoints.add(customLocation.toAbsolute(this.instanceLocation));
         }
         return spawnPoints;
     }
@@ -124,9 +117,7 @@ public class Instance extends BukkitRunnable{
     }
 
     private void teleportPlayer(Player player, Location location){
-        Bukkit.getScheduler().runTask(this.plugin, () -> {
-            player.teleport(location);
-        });
+        Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
     }
 
     public InstanceSettings getInstanceSettings() {
