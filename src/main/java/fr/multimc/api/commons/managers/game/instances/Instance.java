@@ -5,6 +5,7 @@ import fr.multimc.api.commons.managers.game.CustomEntity;
 import fr.multimc.api.commons.managers.game.CustomLocation;
 import fr.multimc.api.commons.managers.teammanager.Team;
 import fr.multimc.api.commons.managers.worldmanagement.SchematicManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -27,6 +28,8 @@ public class Instance extends BukkitRunnable{
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
 
+    private int remainingTime;
+
     public Instance(JavaPlugin plugin, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
         this.plugin = plugin;
         this.instanceId = instanceId;
@@ -34,6 +37,7 @@ public class Instance extends BukkitRunnable{
         this.instanceLocation = instanceLocation;
         this.teams = new ArrayList<>(teams);
         this.instanceEntities = new ArrayList<>();
+        this.remainingTime = this.instanceSettings.getDuration();
     }
 
     public void init(){
@@ -50,8 +54,6 @@ public class Instance extends BukkitRunnable{
             instanceEntities.add(entity.spawn(instanceLocation, this.instanceId));
         }
     }
-
-    // TODO: Restart or something like that
 
     public void start(){
         switch(this.instanceSettings.getGameType()) {
@@ -79,26 +81,61 @@ public class Instance extends BukkitRunnable{
         this.runTaskAsynchronously(this.plugin);
     }
 
+    public void restart(){
+        // Stop BukkitRunnable
+        this.isRunning = false;
+        this.cancel();
+        // Reset instance
+        this.resetInstance();
+        // Restart instance
+        this.init();
+        this.start();
+    }
+
+    private void resetInstance(){
+        // Clear entities
+        this.instanceEntities.forEach(Entity::remove);
+        this.instanceEntities.clear();
+        // Reset time
+        this.remainingTime = this.instanceSettings.getDuration();
+    }
+
     public void stop(){
         this.isRunning = false;
-    }
-
-    public void tick(){
-
-    }
-
-    @SuppressWarnings("BusyWait")
-    @Override
-    public void run(){
-        while(this.isRunning){
-            try {
-                Thread.sleep(instanceSettings.getTickTime());
-                this.tick();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        this.cancel();
+        for(Team team: this.teams){
+            for(Player player: team.getPlayers()){
+                player.sendMessage(Component.text("Instance stopped!"));
             }
         }
     }
+
+    @Override
+    public void run(){
+        double deltaTick = 0.05 * this.instanceSettings.getTickTime();
+        long lastTickTime;
+        long lastSecondTime;
+        long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
+        long nextSecondTime = System.currentTimeMillis() + 1000L;
+        while(isRunning && remainingTime >= 0){
+            if(System.currentTimeMillis() >= nextTickTime){
+                this.tick();
+                lastTickTime = System.currentTimeMillis();
+                nextTickTime = (long) (lastTickTime + deltaTick * 1000L);
+            }
+            if(System.currentTimeMillis() >= nextSecondTime){
+                for(Player player: this.teams.get(0).getPlayers()){
+                    player.sendMessage(Component.text(String.format("%s seconds remaining", remainingTime)));
+                }
+                this.remainingTime--;
+                lastSecondTime = System.currentTimeMillis();
+                nextSecondTime = lastSecondTime + 1000L;
+            }
+        }
+        this.stop();
+    }
+
+    public void tick(){}
 
     private List<Location> getSpawnPoints(){
         List<Location> spawnPoints = new ArrayList<>();
@@ -138,5 +175,9 @@ public class Instance extends BukkitRunnable{
 
     public List<Entity> getInstanceEntities() {
         return instanceEntities;
+    }
+
+    public int getRemainingTime() {
+        return remainingTime;
     }
 }

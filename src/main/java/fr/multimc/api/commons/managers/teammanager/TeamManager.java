@@ -24,7 +24,6 @@ public class TeamManager {
     public List<Team> loadTeams(){
         List<Team> teams = new ArrayList<>();
         HashMap<Integer, List<String>> playersByTeam = teamsTable.getPlayersByTeam();
-        System.out.println(playersByTeam);
         for(int teamId: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamId);
             List<Player> players = new ArrayList<>();

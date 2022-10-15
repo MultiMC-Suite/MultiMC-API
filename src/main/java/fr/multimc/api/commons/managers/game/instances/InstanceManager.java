@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public class InstanceManager {
@@ -23,6 +24,7 @@ public class InstanceManager {
     private final GameType gameType;
     private final Class<? extends Instance> instanceClass;
     private final InstanceSettings settings;
+    private final Logger logger;
 
     public InstanceManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings) {
         this.plugin = plugin;
@@ -30,6 +32,7 @@ public class InstanceManager {
         this.gameType = settings.getGameType();
         this.instanceClass = instanceClass;
         this.settings = settings;
+        this.logger = plugin.getLogger();
         this.generateLobbyWorld();
         this.generateGameWorld();
     }
@@ -49,8 +52,12 @@ public class InstanceManager {
 
     private void generateWorld(String name){
         if (Bukkit.getWorld(name) == null) {
+            this.logger.info(String.format("Generating world %s...", name));
             CustomWorldCreator worldCreator = new CustomWorldCreator();
             worldCreator.generate(name);
+            this.logger.info(String.format("World %s generated and loaded!", name));
+        }else{
+            this.logger.info(String.format("World %s loaded!", name));
         }
     }
 
@@ -70,30 +77,23 @@ public class InstanceManager {
         return String.format("%s_game", this.settings.getWorldsPrefix());
     }
 
-    public boolean start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         this.teams = new ArrayList<>(teams);
-        System.out.println("Starting instances");
         List<List<Team>> gameTeams = new ArrayList<>();
-        System.out.println("Game teams created");
-        switch (this.gameType){
-            case SOLO:
-                System.out.println("Loading game teams");
+        switch (this.gameType) {
+            case SOLO -> {
                 List<Team> localTeams1 = this.getOnePlayerTeams();
                 gameTeams.add(localTeams1);
-                System.out.println("Game teams loaded");
-                break;
-            case ONLY_TEAM:
+            }
+            case ONLY_TEAM -> {
                 List<Team> localTeams2 = new ArrayList<>(teams);
                 gameTeams.add(localTeams2);
-                break;
-            case TEAM_VS_TEAM:
-                gameTeams = this.getTeamsTuple(this.teams);
-                break;
+            }
+            case TEAM_VS_TEAM -> gameTeams = this.getTeamsTuple(this.teams);
         }
         // Create instances
-        System.out.println(String.format("%d instances to create", this.getInstanceCount()));
         for(int i = 0; i < this.getInstanceCount(); i++){
-            System.out.printf(String.format("Creating instance %d/%d%n", i, this.getInstanceCount()));
+            this.logger.info(String.format("Creating instance %d/%d", i+1, this.getInstanceCount()));
             Location location = new Location(this.getGameWorld(), i * 50, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
@@ -108,18 +108,21 @@ public class InstanceManager {
             }
         }
         // Init instances
-        for(Instance instance: instances){
-            System.out.println("Initializing instance with id " + instance.getInstanceId());
-            instance.init();
-            System.out.println("Instance initialized with id " + instance.getInstanceId());
-        }
+        instances.forEach(this::initInstance);
         // Start instances
-        for(Instance instance: instances){
-            System.out.println("Starting instance with id " + instance.getInstanceId());
-            instance.start();
-            System.out.println("Instance started with id " + instance.getInstanceId());
-        }
-        return true;
+        instances.forEach(this::startInstance);
+    }
+
+    private void initInstance(Instance instance){
+        this.logger.info(String.format("Initializing instance %d...", instance.getInstanceId()));
+        instance.init();
+        this.logger.info(String.format("Instance %d initialized!", instance.getInstanceId()));
+    }
+
+    private void startInstance(Instance instance){
+        this.logger.info(String.format("Starting instance %d...", instance.getInstanceId()));
+        instance.start();
+        this.logger.info(String.format("Instance %d started!", instance.getInstanceId()));
     }
 
     private List<List<Team>> getTeamsTuple(List<Team> teams){
@@ -164,4 +167,6 @@ public class InstanceManager {
         }
         return teams;
     }
+
+
 }

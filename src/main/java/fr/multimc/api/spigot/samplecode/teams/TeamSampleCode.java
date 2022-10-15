@@ -36,12 +36,11 @@ public class TeamSampleCode implements SampleCode, Listener {
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
         teamManager.addTeam("T1", "Xen0Xys");
-        teamManager.addTeam("T2", "XenAdmin");
 
         File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
         InstanceSettings settings = new InstanceSettings(schemFile,
-                GameType.TEAM_VS_TEAM,
-                600, List.of(new CustomLocation[]{new CustomLocation(-2.5, 1, -1.5), new CustomLocation(-4.5, 4, -5.5)}),
+                GameType.SOLO,
+                10, List.of(new CustomLocation[]{new CustomLocation(-2.5, 1, -1.5), new CustomLocation(-4.5, 4, -5.5)}),
                 new ArrayList<>(),
                 new HashMap<>(),
                 20,
@@ -61,7 +60,6 @@ public class TeamSampleCode implements SampleCode, Listener {
         String message = PlainTextComponentSerializer.plainText().serialize(e.message());
         if(message.contains("start")){
             e.setCancelled(true);
-            System.out.println("Loading instance...");
             try {
                 instanceManager.start(teamManager.loadTeams());
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
