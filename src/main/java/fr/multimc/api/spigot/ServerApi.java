@@ -1,8 +1,9 @@
 package fr.multimc.api.spigot;
 
-import fr.multimc.api.spigot.samplecode.database.DatabaseSampleCode;
+import fr.multimc.api.spigot.samplecode.teams.TeamSampleCode;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("unused")
 public class ServerApi extends JavaPlugin {
 
     private static JavaPlugin instance;
@@ -19,7 +20,7 @@ public class ServerApi extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new DatabaseSampleCode().run(this);
+        new TeamSampleCode().run(this);
     }
 
     public static JavaPlugin getInstance() {
