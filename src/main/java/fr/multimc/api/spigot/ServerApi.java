@@ -20,7 +20,7 @@ public class ServerApi extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new TeamSampleCode().run(this);
+        
     }
 
     public static JavaPlugin getInstance() {
