@@ -18,7 +18,7 @@ public class InstanceSettings {
     private final List<CustomLocation> spawnPoints;
     private final List<CustomEntity> entities;
     private final HashMap<String, String> customSettings;
-    private final int tickTime;
+    private final int tickDelay;
     private final String worldsPrefix;
 
     public InstanceSettings(){
@@ -28,17 +28,28 @@ public class InstanceSettings {
         this.spawnPoints = new ArrayList<>();
         this.entities = new ArrayList<>();
         this.customSettings = new HashMap<>();
-        this.tickTime = 1;
+        this.tickDelay = 1;
         this.worldsPrefix = "multimc";
     }
 
+    /**
+     * Constructor of InstanceSettings
+     * @param schematicFile File for the game schematic
+     * @param gameType GameType of the game
+     * @param duration Duration of the game
+     * @param spawnPoints List of spawn points
+     * @param entities List of entities to spawn
+     * @param customSettings Custom settings
+     * @param tickDelay Delay in game tick between two calls of Instance's tick method
+     * @param worldsPrefix Prefix of the worlds
+     */
     public InstanceSettings(File schematicFile,
                             GameType gameType,
                             int duration,
                             List<CustomLocation> spawnPoints,
                             List<CustomEntity> entities,
                             HashMap<String, String> customSettings,
-                            int tickTime,
+                            int tickDelay,
                             String worldsPrefix) {
         this.schematicFile = schematicFile;
         this.gameType = gameType;
@@ -46,7 +57,7 @@ public class InstanceSettings {
         this.spawnPoints = spawnPoints;
         this.entities = entities;
         this.customSettings = customSettings;
-        this.tickTime = tickTime;
+        this.tickDelay = tickDelay;
         this.worldsPrefix = worldsPrefix;
     }
 
@@ -74,8 +85,8 @@ public class InstanceSettings {
         return customSettings;
     }
 
-    public int getTickTime() {
-        return tickTime;
+    public int getTickDelay() {
+        return tickDelay;
     }
 
     public String getWorldsPrefix() {

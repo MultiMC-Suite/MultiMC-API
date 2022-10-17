@@ -5,7 +5,6 @@ import fr.multimc.api.commons.managers.game.CustomEntity;
 import fr.multimc.api.commons.managers.game.CustomLocation;
 import fr.multimc.api.commons.managers.teammanager.Team;
 import fr.multimc.api.commons.managers.worldmanagement.SchematicManager;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -21,6 +20,7 @@ import java.util.List;
 public class Instance extends BukkitRunnable{
 
     private final JavaPlugin plugin;
+    private final InstanceManager instanceManager;
     private final int instanceId;
     private final InstanceSettings instanceSettings;
     private final Location instanceLocation;
@@ -30,8 +30,9 @@ public class Instance extends BukkitRunnable{
 
     private int remainingTime;
 
-    public Instance(JavaPlugin plugin, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
+    public Instance(JavaPlugin plugin, InstanceManager instanceManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
         this.plugin = plugin;
+        this.instanceManager = instanceManager;
         this.instanceId = instanceId;
         this.instanceSettings = settings;
         this.instanceLocation = instanceLocation;
@@ -79,6 +80,7 @@ public class Instance extends BukkitRunnable{
         }
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
+        // this.runTaskTimerAsynchronously(this.plugin, 0, 20);
     }
 
     public void restart(){
@@ -100,19 +102,26 @@ public class Instance extends BukkitRunnable{
         this.remainingTime = this.instanceSettings.getDuration();
     }
 
-    public void stop(){
+    public void stop(boolean teleportLobby){
         this.isRunning = false;
         this.cancel();
-        for(Team team: this.teams){
-            for(Player player: team.getPlayers()){
-                player.sendMessage(Component.text("Instance stopped!"));
+        if(teleportLobby){
+            for(Team team : this.teams){
+                for(Player player : team.getPlayers()){
+                    player.teleport(this.instanceManager.getLobbySpawnLocation());
+                }
             }
         }
     }
 
+    public void stop(){
+        this.stop(true);
+    }
+
+    @SuppressWarnings("BusyWait")
     @Override
     public void run(){
-        double deltaTick = 0.05 * this.instanceSettings.getTickTime();
+        double deltaTick = 0.05 * this.instanceSettings.getTickDelay();
         long lastTickTime;
         long lastSecondTime;
         long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
@@ -120,19 +129,23 @@ public class Instance extends BukkitRunnable{
         while(isRunning && remainingTime >= 0){
             if(System.currentTimeMillis() >= nextTickTime){
                 this.tick();
-                lastTickTime = System.currentTimeMillis();
+                lastTickTime = nextTickTime;
                 nextTickTime = (long) (lastTickTime + deltaTick * 1000L);
             }
             if(System.currentTimeMillis() >= nextSecondTime){
-                for(Player player: this.teams.get(0).getPlayers()){
-                    player.sendMessage(Component.text(String.format("%s seconds remaining", remainingTime)));
-                }
                 this.remainingTime--;
-                lastSecondTime = System.currentTimeMillis();
+                lastSecondTime = nextSecondTime;
                 nextSecondTime = lastSecondTime + 1000L;
             }
+            try {
+                Thread.sleep(2);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        this.stop();
+        if(remainingTime < 0){
+            this.stop(true);
+        }
     }
 
     public void tick(){}
@@ -179,5 +192,9 @@ public class Instance extends BukkitRunnable{
 
     public int getRemainingTime() {
         return remainingTime;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 }

@@ -1,11 +1,11 @@
 package fr.multimc.api.commons.managers.game.instances;
 
 import fr.multimc.api.commons.managers.game.GameType;
+import fr.multimc.api.commons.managers.game.Lobby;
 import fr.multimc.api.commons.managers.teammanager.Team;
 import fr.multimc.api.commons.managers.worldmanagement.CustomWorldCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,14 +26,14 @@ public class InstanceManager {
     private final InstanceSettings settings;
     private final Logger logger;
 
-    public InstanceManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings) {
+    public InstanceManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, Lobby lobby) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.getGameType();
         this.instanceClass = instanceClass;
         this.settings = settings;
         this.logger = plugin.getLogger();
-        this.generateLobbyWorld();
+        this.generateLobbyWorld(lobby);
         this.generateGameWorld();
     }
 
@@ -41,13 +41,9 @@ public class InstanceManager {
         this.generateWorld(this.getGameWorldName());
     }
 
-    private void generateLobbyWorld(){
+    private void generateLobbyWorld(Lobby lobby) {
         this.generateWorld(this.getLobbyWorldName());
-        for(int x = -1; x < 2; x++){
-            for(int z = -1; z < 2; z++){
-                this.getLobbyWorld().getBlockAt(x, 100, z).setType(Material.BEDROCK);
-            }
-        }
+        lobby.init();
     }
 
     private void generateWorld(String name){
@@ -94,17 +90,17 @@ public class InstanceManager {
         // Create instances
         for(int i = 0; i < this.getInstanceCount(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i+1, this.getInstanceCount()));
-            Location location = new Location(this.getGameWorld(), i * 50, 100, 0);
+            Location location = new Location(this.getGameWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
                     List<Team> instanceTeams = new ArrayList<>();
                     instanceTeams.add(gameTeams.get(0).get(i));
-                    this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, i, this.settings, location, instanceTeams));
+                    this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, instanceTeams));
                 }
                 case ONLY_TEAM ->
-                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, i, this.settings, location, List.of(gameTeams.get(0).get(i))));
+                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, List.of(gameTeams.get(0).get(i))));
                 case TEAM_VS_TEAM ->
-                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, i, this.settings, location, gameTeams.get(i)));
+                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
             }
         }
         // Init instances
@@ -123,6 +119,10 @@ public class InstanceManager {
         this.logger.info(String.format("Starting instance %d...", instance.getInstanceId()));
         instance.start();
         this.logger.info(String.format("Instance %d started!", instance.getInstanceId()));
+    }
+
+    public void stop(){
+        instances.forEach(Instance::stop);
     }
 
     private List<List<Team>> getTeamsTuple(List<Team> teams){
@@ -168,5 +168,7 @@ public class InstanceManager {
         return teams;
     }
 
-
+    public Location getLobbySpawnLocation(){
+        return this.getLobbyWorld().getSpawnLocation();
+    }
 }
