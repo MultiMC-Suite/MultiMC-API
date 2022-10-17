@@ -1,10 +1,10 @@
 package fr.multimc.api.spigot.tools.players;
 
 import fr.multimc.api.commons.tools.enums.Status;
-import fr.multimc.api.commons.tools.status.*;
+import fr.multimc.api.commons.tools.status.SameValue;
+import fr.multimc.api.commons.tools.status.Success;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
