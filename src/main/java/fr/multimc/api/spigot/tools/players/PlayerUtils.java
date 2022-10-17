@@ -3,6 +3,7 @@ package fr.multimc.api.spigot.tools.players;
 import fr.multimc.api.commons.tools.enums.Status;
 import fr.multimc.api.commons.tools.status.*;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -91,7 +92,6 @@ public class PlayerUtils {
      * @param message Message to send.
      * @return Operation's status.
      */
-    @Deprecated
     public Status sendMessage(@Nonnull String message) {
         this.player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         return new Success(String.format("The message '%s' has been sent to %s", message, this.getNickName()));
@@ -103,10 +103,9 @@ public class PlayerUtils {
      * @param component Message component to send.
      * @return Operation's status.
      */
-    @Deprecated
-    public Status sendMessage(@Nonnull TextComponent component) {
+    public Status sendMessage(@Nonnull Component component) {
         player.sendMessage(component);
-        return new Success(String.format("The message '%s' has been sent to %s.", component.getText(), this.getNickName()));
+        return new Success(String.format("The message has been sent to %s.", this.getNickName()));
     }
 
     /**
@@ -115,7 +114,6 @@ public class PlayerUtils {
      * @param component Component to send.
      * @return Operation's status.
      */
-    @Deprecated
     public Status sendMessage(@Nonnull ClickableMessageBuilder component) {
         return this.sendMessage(component.build());
     }

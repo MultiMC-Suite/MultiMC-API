@@ -1,17 +1,13 @@
 package fr.multimc.api.spigot.tools.items;
 
+import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.Style;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -90,11 +86,10 @@ public class ItemBuilder {
      * @param name Display name.
      * @return Current instance of the builder.
      */
-    @Deprecated
     public ItemBuilder setName(@Nullable String name) {
         ItemMeta meta = this.getMeta();
         String display = Objects.isNull(name) ? null : ChatColor.translateAlternateColorCodes('&', name);
-        meta.setDisplayName(display);
+        meta.displayName(new TextBuilder(display).build());
         return this.applyMeta(meta);
     }
 
@@ -104,13 +99,12 @@ public class ItemBuilder {
      * @param lore Description lines.
      * @return Current instance of the builder.
      */
-    @Deprecated
     public ItemBuilder setLore(@Nullable List<String> lore) {
-        List<String> list = new ArrayList<>();
-        if (!Objects.isNull(lore)) lore.forEach(line -> list.add(ChatColor.translateAlternateColorCodes('&', line)));
+        List<Component> list = new ArrayList<>();
+        if (!Objects.isNull(lore)) lore.forEach(line -> list.add(new TextBuilder(ChatColor.translateAlternateColorCodes('&', line)).build()));
 
         ItemMeta meta = this.getMeta();
-        meta.setLore(list);
+        meta.lore(list);
         return this.applyMeta(meta);
     }
 
@@ -120,7 +114,6 @@ public class ItemBuilder {
      * @param lore Descriptions lines.
      * @return Current instance of the builder.
      */
-    @Deprecated
     public ItemBuilder setLore(@Nullable String... lore) {
         return this.setLore(Arrays.asList(lore));
     }
