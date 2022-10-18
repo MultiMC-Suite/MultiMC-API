@@ -108,7 +108,7 @@ public class Instance extends BukkitRunnable{
         if(teleportLobby){
             for(Team team : this.teams){
                 for(Player player : team.getPlayers()){
-                    player.teleport(this.instanceManager.getLobbySpawnLocation());
+                    this.teleportPlayer(player, this.instanceManager.getLobbySpawnLocation());
                 }
             }
         }

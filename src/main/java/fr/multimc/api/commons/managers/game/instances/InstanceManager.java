@@ -20,6 +20,7 @@ public class InstanceManager {
 
     private final JavaPlugin plugin;
     private final List<Instance> instances;
+    private final Lobby lobby;
     private List<Team> teams = new ArrayList<>();
     private final GameType gameType;
     private final Class<? extends Instance> instanceClass;
@@ -33,6 +34,7 @@ public class InstanceManager {
         this.instanceClass = instanceClass;
         this.settings = settings;
         this.logger = plugin.getLogger();
+        this.lobby = lobby;
         this.generateLobbyWorld(lobby);
         this.generateGameWorld();
     }
@@ -161,7 +163,7 @@ public class InstanceManager {
         List<Team> teams = new ArrayList<>();
         for(Team team : this.teams){
             for(Player player: team.getPlayers()){
-                Team onePlayerTeam = new Team(team.getName(), team.getId(), player);
+                Team onePlayerTeam = new Team(team.getName(), team.getTeamCode(), player);
                 teams.add(onePlayerTeam);
             }
         }
@@ -169,6 +171,6 @@ public class InstanceManager {
     }
 
     public Location getLobbySpawnLocation(){
-        return this.getLobbyWorld().getSpawnLocation();
+        return this.lobby.getSpawnPoint();
     }
 }

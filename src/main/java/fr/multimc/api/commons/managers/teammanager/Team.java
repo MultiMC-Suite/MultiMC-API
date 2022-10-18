@@ -10,12 +10,12 @@ import java.util.List;
 public class Team {
 
     private final String name;
-    private final int id;
+    private final String teamCode;
     private final List<Player> players;
 
-    public Team(String name, int id, Player... localPlayers){
+    public Team(String name, String teamCode, Player... localPlayers){
         this.name = name;
-        this.id = id;
+        this.teamCode = teamCode;
         this.players = new ArrayList<>();
         this.players.addAll(Arrays.asList(localPlayers));
     }
@@ -28,8 +28,8 @@ public class Team {
         return name;
     }
 
-    public int getId() {
-        return id;
+    public String getTeamCode() {
+        return teamCode;
     }
 
     public int getTeamSize() {

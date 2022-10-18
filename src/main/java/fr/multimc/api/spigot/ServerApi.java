@@ -19,7 +19,7 @@ public class ServerApi extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     public static JavaPlugin getInstance() {

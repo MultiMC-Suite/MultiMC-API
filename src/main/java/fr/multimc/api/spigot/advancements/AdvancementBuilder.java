@@ -108,6 +108,21 @@ public class AdvancementBuilder {
     }
 
     /**
+     * Get BaseAdvancement instance with custom action trigger from builder
+     * @param parentAdvancement Parent RootAdvancement instance
+     * @param maxProgression Max progression of the defined action
+     * @param triggeredAdvancementClass Custom TriggeredAdvancement class
+     * @return TriggeredAdvancement instance
+     */
+    public TriggeredAdvancement getTriggeredAdvancement(RootAdvancement parentAdvancement, int maxProgression, Class<? extends TriggeredAdvancement> triggeredAdvancementClass){
+        try {
+            return (TriggeredAdvancement) triggeredAdvancementClass.getConstructors()[0].newInstance(getAdvancementKey(this.name), this.getAdvancementDisplay(), parentAdvancement, maxProgression);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Get an AdvancementDisplay instance from builder's variables
      * @return An AdvancementDisplay instance
      */
