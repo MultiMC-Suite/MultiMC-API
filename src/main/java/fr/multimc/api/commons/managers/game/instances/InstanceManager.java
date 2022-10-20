@@ -8,6 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +19,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public class InstanceManager {
+public class InstanceManager implements Listener {
 
     private final JavaPlugin plugin;
     private final List<Instance> instances;
@@ -36,8 +39,11 @@ public class InstanceManager {
         this.settings = settings;
         this.logger = plugin.getLogger();
         this.lobby = lobby;
+        // Generate worlds
         this.generateLobbyWorld(lobby);
         this.generateGameWorld();
+        // Register local events handlers
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     private void generateGameWorld() {
@@ -77,6 +83,7 @@ public class InstanceManager {
     }
 
     public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        this.instances.clear();
         this.teams = new ArrayList<>(teams);
         List<List<Team>> gameTeams = new ArrayList<>();
         switch (this.gameType) {
@@ -107,26 +114,39 @@ public class InstanceManager {
             }
         }
         // Init instances
-        instances.forEach(this::initInstance);
+        this.instances.forEach(this::initInstances);
+        try {
+            System.out.println("Waiting");
+            Thread.sleep(5000);
+            System.out.println("End waiting");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         // Start instances
-        instances.forEach(this::startInstance);
+        this.instances.forEach(this::startInstances);
         this.isStarted = true;
     }
 
-    private void initInstance(Instance instance){
+    public void stopInstances(){
+        instances.forEach(this::stopInstances);
+    }
+
+    private void initInstances(Instance instance){
         this.logger.info(String.format("Initializing instance %d...", instance.getInstanceId()));
         instance.init();
         this.logger.info(String.format("Instance %d initialized!", instance.getInstanceId()));
     }
 
-    private void startInstance(Instance instance){
+    private void startInstances(Instance instance){
         this.logger.info(String.format("Starting instance %d...", instance.getInstanceId()));
         instance.start();
         this.logger.info(String.format("Instance %d started!", instance.getInstanceId()));
     }
 
-    public void stop(){
-        instances.forEach(Instance::stop);
+    private void stopInstances(Instance instance){
+        this.logger.info(String.format("Stopping instance %d...", instance.getInstanceId()));
+        instance.stop();
+        this.logger.info(String.format("Instance %d stopped!", instance.getInstanceId()));
     }
 
     private List<List<Team>> getTeamsTuple(List<Team> teams){
@@ -177,6 +197,26 @@ public class InstanceManager {
     }
 
     public boolean isStarted() {
-        return isStarted;
+        return this.isStarted;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e){
+        Player player = e.getPlayer();
+        if(this.isStarted){
+            for(Instance instance : this.instances){
+                if(instance.isPlayerOnInstance(player)){
+                    if(instance.isRunning()){
+                        this.logger.info(String.format("Reconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
+                        instance.reconnectPlayer(player);
+                        this.logger.info(String.format("Player %s reconnected to instance %d...", player.getName(), instance.getInstanceId()));
+                    }else{
+                        player.teleport(this.getLobbySpawnLocation());
+                    }
+                }
+            }
+        }else{
+            player.teleport(this.getLobbySpawnLocation());
+        }
     }
 }

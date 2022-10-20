@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -27,6 +28,8 @@ public class Instance extends BukkitRunnable{
     private final List<Team> teams;
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
+    private final List<Player> players;
+    HashMap<Player, Location> playerSpawns;
 
     private int remainingTime;
 
@@ -39,8 +42,14 @@ public class Instance extends BukkitRunnable{
         this.teams = new ArrayList<>(teams);
         this.instanceEntities = new ArrayList<>();
         this.remainingTime = this.instanceSettings.getDuration();
+        this.players = this.getInstancePlayers();
+        this.playerSpawns = this.getPlayerSpawnsList();
     }
 
+    // GAME ACTIONS
+    /**
+     * Initialize game instance
+     */
     public void init(){
         // Place schematic
         File schematicFile = instanceSettings.getSchematicFile();
@@ -56,33 +65,43 @@ public class Instance extends BukkitRunnable{
         }
     }
 
+    /**
+     * Start game instance
+     */
     public void start(){
-        switch(this.instanceSettings.getGameType()) {
-            case SOLO -> this.teleportPlayer(this.teams.get(0).getPlayers().get(0), this.getSpawnPoints().get(0));
-            case ONLY_TEAM -> {
-                List<Location> spawnPoints = this.getSpawnPoints();
-                int mod = spawnPoints.size();
-                for (int i = 0; i < this.getPlayerCount(); i++) {
-                    this.teleportPlayer(this.teams.get(0).getPlayers().get(i), spawnPoints.get(i % mod));
-                }
-            }
-            case TEAM_VS_TEAM -> {
-                int spawnPointsCount = this.getSpawnPoints().size() % 2 == 0 ? this.getSpawnPoints().size() / 2 : ((this.getSpawnPoints().size() - 1) / 2);
-                List<Location> t1SpawnPoints = this.getSpawnPoints().subList(0, spawnPointsCount);
-                List<Location> t2SpawnPoints = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
-                for (int i = 0; i < this.teams.get(0).getPlayers().size(); i++) {
-                    this.teleportPlayer(this.teams.get(0).getPlayers().get(i), t1SpawnPoints.get(i % t1SpawnPoints.size()));
-                }
-                for (int i = 0; i < this.teams.get(1).getPlayers().size(); i++) {
-                    this.teleportPlayer(this.teams.get(1).getPlayers().get(i), t2SpawnPoints.get(i % t2SpawnPoints.size()));
-                }
-            }
+        // Teleport players
+        for(Player player: this.playerSpawns.keySet()){
+            this.teleportPlayer(player, this.playerSpawns.get(player));
         }
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
         // this.runTaskTimerAsynchronously(this.plugin, 0, 20);
     }
 
+    /**
+     * Stop instance
+     * @param teleportLobby True if player need to be teleported to the lobby at the end
+     */
+    public void stop(boolean teleportLobby){
+        this.isRunning = false;
+        if(teleportLobby){
+            for(Player player : this.players){
+                this.teleportPlayer(player, this.instanceManager.getLobbySpawnLocation());
+            }
+        }
+        this.cancel();
+    }
+
+    /**
+     * Default instance stop (players will return to the lobby)
+     */
+    public void stop(){
+        this.stop(true);
+    }
+
+    /**
+     * Restart game instance
+     */
     public void restart(){
         // Stop BukkitRunnable
         this.isRunning = false;
@@ -94,6 +113,9 @@ public class Instance extends BukkitRunnable{
         this.start();
     }
 
+    /**
+     * Reset game instance before restarting
+     */
     private void resetInstance(){
         // Clear entities
         this.instanceEntities.forEach(Entity::remove);
@@ -102,22 +124,14 @@ public class Instance extends BukkitRunnable{
         this.remainingTime = this.instanceSettings.getDuration();
     }
 
-    public void stop(boolean teleportLobby){
-        this.isRunning = false;
-        this.cancel();
-        if(teleportLobby){
-            for(Team team : this.teams){
-                for(Player player : team.getPlayers()){
-                    this.teleportPlayer(player, this.instanceManager.getLobbySpawnLocation());
-                }
-            }
-        }
-    }
+    /**
+     * Method called every tick delay defined in InstanceSettings
+     */
+    public void tick(){}
 
-    public void stop(){
-        this.stop(true);
-    }
-
+    /**
+     * Main game loop, run async when instance is started
+     */
     @SuppressWarnings("BusyWait")
     @Override
     public void run(){
@@ -148,8 +162,85 @@ public class Instance extends BukkitRunnable{
         }
     }
 
-    public void tick(){}
+    /**
+     * Asynchronously teleport a player to a location
+     * @param player Player to teleport
+     * @param location Target location
+     */
+    private void teleportPlayer(Player player, Location location){
+        Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
+    }
 
+    /**
+     * Called to reconnect a disconnected player
+     * @param player Player to reconnect
+     */
+    public void reconnectPlayer(Player player){
+        // Delete old player and add new one into players list
+        this.players.removeIf(_player -> _player.getName().equals(player.getName()));
+        this.players.add(player);
+        // Delete old player spawn and re-set it into playerSpawns list
+        for(Player _player : this.playerSpawns.keySet()){
+            if(_player.getName().equals(player.getName())){
+                Location spawnLocation = this.playerSpawns.get(_player);
+                this.playerSpawns.remove(_player);
+                this.playerSpawns.put(player, spawnLocation);
+                break;
+            }
+        }
+        // If instance is running, teleport player into it
+        if(this.isRunning){
+            this.teleportPlayer(player, this.playerSpawns.get(player));
+        }
+    }
+
+    // PRIVATE GETTERS
+    /**
+     * Return a map with all players spawns locations
+     * @return Hashmap with as key a Player and as value a Location
+     */
+    private HashMap<Player, Location> getPlayerSpawnsList(){
+        HashMap<Player, Location> playerSpawns = new HashMap<>();
+        switch(this.instanceSettings.getGameType()) {
+            case SOLO -> playerSpawns.put(this.teams.get(0).getPlayers().get(0), this.getSpawnPoints().get(0));
+            case ONLY_TEAM -> {
+                List<Location> spawnPoints = this.getSpawnPoints();
+                int mod = spawnPoints.size();
+                for (int i = 0; i < this.getPlayerCount(); i++) {
+                    playerSpawns.put(this.teams.get(0).getPlayers().get(i), spawnPoints.get(i % mod));
+                }
+            }
+            case TEAM_VS_TEAM -> {
+                int spawnPointsCount = this.getSpawnPoints().size() % 2 == 0 ? this.getSpawnPoints().size() / 2 : ((this.getSpawnPoints().size() - 1) / 2);
+                List<Location> t1SpawnPoints = this.getSpawnPoints().subList(0, spawnPointsCount);
+                List<Location> t2SpawnPoints = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
+                for (int i = 0; i < this.teams.get(0).getPlayers().size(); i++) {
+                    playerSpawns.put(this.teams.get(0).getPlayers().get(i), t1SpawnPoints.get(i % t1SpawnPoints.size()));
+                }
+                for (int i = 0; i < this.teams.get(1).getPlayers().size(); i++) {
+                    playerSpawns.put(this.teams.get(1).getPlayers().get(i), t2SpawnPoints.get(i % t2SpawnPoints.size()));
+                }
+            }
+        }
+        return playerSpawns;
+    }
+
+    /**
+     * Get all players in this instance
+     * @return List of players
+     */
+    private List<Player> getInstancePlayers(){
+        List<Player> localPlayers = new ArrayList<>();
+        for(Team team: this.getTeams()){
+            localPlayers.addAll(team.getPlayers());
+        }
+        return localPlayers;
+    }
+
+    /**
+     * Get all spawn Locations
+     * @return List of locations
+     */
     private List<Location> getSpawnPoints(){
         List<Location> spawnPoints = new ArrayList<>();
         for(CustomLocation customLocation : this.instanceSettings.getSpawnPoints()){
@@ -158,43 +249,51 @@ public class Instance extends BukkitRunnable{
         return spawnPoints;
     }
 
+    /**
+     * Get game player count
+     * @return Number of player on this instance
+     */
     private int getPlayerCount(){
-        int count = 0;
-        for(Team team : this.teams){
-            count += team.getPlayers().size();
+        return this.players.size();
+    }
+
+    /**
+     * Check if the player is on this instance
+     * @param player Target player
+     * @return True if the player is on this instance
+     */
+    public boolean isPlayerOnInstance(Player player){
+        for(Player _player: this.players){
+            if(_player.getName().equals(player.getName())){
+                return true;
+            }
         }
-        return count;
+        return false;
     }
 
-    private void teleportPlayer(Player player, Location location){
-        Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
-    }
-
+    // PUBLIC GETTERS
     public InstanceSettings getInstanceSettings() {
         return instanceSettings;
     }
-
     public Location getInstanceLocation() {
         return instanceLocation;
     }
-
     public List<Team> getTeams() {
         return teams;
     }
-
     public int getInstanceId() {
         return instanceId;
     }
-
     public List<Entity> getInstanceEntities() {
         return instanceEntities;
     }
-
     public int getRemainingTime() {
         return remainingTime;
     }
-
     public boolean isRunning() {
         return isRunning;
+    }
+    public List<Player> getPlayers() {
+        return players;
     }
 }

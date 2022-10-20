@@ -10,11 +10,8 @@ import fr.multimc.api.commons.managers.teammanager.TeamManager;
 import fr.multimc.api.spigot.samplecode.SampleCode;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -27,7 +24,6 @@ public class TeamSampleCode implements SampleCode, Listener {
 
     private TeamManager teamManager;
     private InstanceManager instanceManager;
-    private World lobbyWorld;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -48,13 +44,6 @@ public class TeamSampleCode implements SampleCode, Listener {
                 "multimc");
         Lobby lobby = new Lobby(schemFile, new CustomLocation(0, 5, 0), "multimc_lobby");
         instanceManager = new InstanceManager(plugin, CustomInstanceSample.class, settings, lobby);
-        lobbyWorld = instanceManager.getLobbyWorld();
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e){
-        Location tpLocation = new Location(lobbyWorld, 0.5, 105, 0.5);
-        e.getPlayer().teleport(tpLocation);
     }
 
     @EventHandler
@@ -76,7 +65,7 @@ public class TeamSampleCode implements SampleCode, Listener {
             }
         }else if(message.contains("stop")){
             e.setCancelled(true);
-            instanceManager.stop();
+            instanceManager.stopInstances();
         }
     }
 }
