@@ -36,7 +36,7 @@ public class TeamSampleCode implements SampleCode, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
-         teamManager.addTeam("CODELA", "T1", "Xen0Xys");
+        teamManager.addTeam("CODELA", "T1", "Xen0Xys");
 
         File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
         InstanceSettings settings = new InstanceSettings(schemFile,

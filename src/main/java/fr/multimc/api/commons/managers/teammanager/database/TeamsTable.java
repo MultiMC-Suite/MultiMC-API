@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class TeamsTable extends Table {
@@ -69,5 +70,25 @@ public class TeamsTable extends Table {
 
     public PlayersTable getPlayersTable() {
         return this.playersTable;
+    }
+
+    public HashMap<String, String> getTeamNames() {
+        HashMap<String, String> teamNames = new HashMap<>();
+        Query teamQuery = new QueryBuilder()
+                .setQueryType(QueryType.SELECT)
+                .setQuery(String.format("SELECT code, name FROM %s;", this.getTableName()))
+                .getQuery();
+        QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
+        ResultSet resultSet = queryResult.resultSet();
+        try{
+            while(resultSet.next()){
+                String code = resultSet.getString("code");
+                String name = resultSet.getString("name");
+                teamNames.put(code, name);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return teamNames;
     }
 }
