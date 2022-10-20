@@ -115,13 +115,6 @@ public class InstanceManager implements Listener {
         }
         // Init instances
         this.instances.forEach(this::initInstances);
-        try {
-            System.out.println("Waiting");
-            Thread.sleep(5000);
-            System.out.println("End waiting");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         // Start instances
         this.instances.forEach(this::startInstances);
         this.isStarted = true;
