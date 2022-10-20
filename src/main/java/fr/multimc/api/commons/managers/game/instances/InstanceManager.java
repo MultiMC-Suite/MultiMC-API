@@ -26,6 +26,7 @@ public class InstanceManager {
     private final Class<? extends Instance> instanceClass;
     private final InstanceSettings settings;
     private final Logger logger;
+    private boolean isStarted = false;
 
     public InstanceManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, Lobby lobby) {
         this.plugin = plugin;
@@ -109,6 +110,7 @@ public class InstanceManager {
         instances.forEach(this::initInstance);
         // Start instances
         instances.forEach(this::startInstance);
+        this.isStarted = true;
     }
 
     private void initInstance(Instance instance){
@@ -172,5 +174,9 @@ public class InstanceManager {
 
     public Location getLobbySpawnLocation(){
         return this.lobby.getSpawnPoint();
+    }
+
+    public boolean isStarted() {
+        return isStarted;
     }
 }

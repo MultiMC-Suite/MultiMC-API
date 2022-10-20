@@ -35,4 +35,8 @@ public class Team {
     public int getTeamSize() {
         return players.size();
     }
+
+    public boolean isPlayerInTeam(Player player) {
+        return players.contains(player);
+    }
 }

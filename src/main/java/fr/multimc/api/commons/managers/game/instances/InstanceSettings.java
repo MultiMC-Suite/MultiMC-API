@@ -17,7 +17,7 @@ public class InstanceSettings {
     private final int duration;
     private final List<CustomLocation> spawnPoints;
     private final List<CustomEntity> entities;
-    private final HashMap<String, String> customSettings;
+    private final HashMap<String, Object> customSettings;
     private final int tickDelay;
     private final String worldsPrefix;
 
@@ -48,7 +48,7 @@ public class InstanceSettings {
                             int duration,
                             List<CustomLocation> spawnPoints,
                             List<CustomEntity> entities,
-                            HashMap<String, String> customSettings,
+                            HashMap<String, Object> customSettings,
                             int tickDelay,
                             String worldsPrefix) {
         this.schematicFile = schematicFile;
@@ -81,7 +81,7 @@ public class InstanceSettings {
         return entities;
     }
 
-    public HashMap<String, String> getCustomSettings() {
+    public HashMap<String, Object> getCustomSettings() {
         return customSettings;
     }
 

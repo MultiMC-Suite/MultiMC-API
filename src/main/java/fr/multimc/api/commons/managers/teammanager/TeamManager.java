@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class TeamManager {
 
     private final TeamsTable teamsTable;
     private final PlayersTable playersTable;
+    private List<Team> teams = new ArrayList<>();
 
     public TeamManager(Database database) {
         this.teamsTable = new TeamsTable(database);
@@ -25,7 +27,7 @@ public class TeamManager {
     }
 
     public List<Team> loadTeams(){
-        List<Team> teams = new ArrayList<>();
+        teams = new ArrayList<>();
         HashMap<String, List<String>> playersByTeam = playersTable.getPlayersByTeam();
         for(String teamCode: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamCode);
@@ -45,5 +47,27 @@ public class TeamManager {
             }
         }
         return teams;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public Team getTeamFromCode(String teamCode){
+        for(Team team: teams){
+            if(team.getTeamCode().equals(teamCode)){
+                return team;
+            }
+        }
+        return null;
+    }
+
+    public Team getTeamFromPlayer(Player player){
+        for(Team team: teams){
+            if(team.isPlayerInTeam(player)){
+                return team;
+            }
+        }
+        return null;
     }
 }
