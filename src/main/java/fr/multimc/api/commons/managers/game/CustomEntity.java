@@ -9,9 +9,9 @@ public record CustomEntity(EntityType entityType, CustomLocation location) {
 
     public Entity spawn(Location instanceLocation, int instanceId) {
         Location spawnLocation = new Location(instanceLocation.getWorld(),
-                instanceLocation.getX() + location.x(),
-                instanceLocation.getY() + location.y(),
-                instanceLocation.getZ() + location.z());
+                instanceLocation.getX() + location.getX(),
+                instanceLocation.getY() + location.getY(),
+                instanceLocation.getZ() + location.getZ());
         Entity entity = spawnLocation.getWorld().spawnEntity(spawnLocation, entityType);
         this.setInstanceId(entity, instanceId);
         return entity;
