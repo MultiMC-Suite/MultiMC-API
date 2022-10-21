@@ -8,3 +8,20 @@ api-version: '1.19'
 
 authors: [ 'Loïc MAES', 'Tom CZEKAJ' ]
 description: 'Manage a game tournament server.'
+
+commands:
+  relativeto:
+    description: Set the relative position of a player.
+    usage: /relativeto <x> <y> <z>
+    permission: fr.multimc.api.commands.relativeto
+
+permissions:
+  fr.multimc.api.*:
+    children:
+      fr.multimc.api.commands.*: true
+  fr.multimc.api.commands.*:
+    children:
+      fr.multimc.api.commands.relativeto: true
+  fr.multimc.api.commands.relativeto:
+    description: Give relative position from a given point.
+    default: op
