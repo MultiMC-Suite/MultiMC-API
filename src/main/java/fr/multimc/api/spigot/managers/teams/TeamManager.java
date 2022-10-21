@@ -1,8 +1,8 @@
-package fr.multimc.api.commons.managers.teammanager;
+package fr.multimc.api.spigot.managers.teams;
 
 import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.commons.managers.teammanager.database.PlayersTable;
-import fr.multimc.api.commons.managers.teammanager.database.TeamsTable;
+import fr.multimc.api.commons.database.tables.PlayersTable;
+import fr.multimc.api.commons.database.tables.TeamsTable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

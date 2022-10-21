@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.teammanager.database;
+package fr.multimc.api.commons.database.tables;
 
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.commons.database.Table;

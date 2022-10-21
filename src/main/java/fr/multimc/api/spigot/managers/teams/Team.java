@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.teammanager;
+package fr.multimc.api.spigot.managers.teams;
 
 import org.bukkit.entity.Player;
 

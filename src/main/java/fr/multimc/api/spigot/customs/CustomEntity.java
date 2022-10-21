@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.game;
+package fr.multimc.api.spigot.customs;
 
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import org.bukkit.Location;

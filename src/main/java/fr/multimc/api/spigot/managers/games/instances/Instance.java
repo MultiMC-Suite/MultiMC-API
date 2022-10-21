@@ -1,10 +1,10 @@
-package fr.multimc.api.commons.managers.game.instances;
+package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.commons.managers.game.CustomEntity;
-import fr.multimc.api.commons.managers.game.CustomLocation;
-import fr.multimc.api.commons.managers.teammanager.Team;
-import fr.multimc.api.commons.managers.worldmanagement.SchematicManager;
+import fr.multimc.api.spigot.customs.CustomEntity;
+import fr.multimc.api.spigot.customs.CustomLocation;
+import fr.multimc.api.spigot.managers.teams.Team;
+import fr.multimc.api.spigot.managers.worlds.SchematicManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -21,7 +21,7 @@ import java.util.List;
 public class Instance extends BukkitRunnable{
 
     private final JavaPlugin plugin;
-    private final InstanceManager instanceManager;
+    private final InstancesManager instancesManager;
     private final int instanceId;
     private final InstanceSettings instanceSettings;
     private final Location instanceLocation;
@@ -33,9 +33,9 @@ public class Instance extends BukkitRunnable{
 
     private int remainingTime;
 
-    public Instance(JavaPlugin plugin, InstanceManager instanceManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
+    public Instance(JavaPlugin plugin, InstancesManager instancesManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
         this.plugin = plugin;
-        this.instanceManager = instanceManager;
+        this.instancesManager = instancesManager;
         this.instanceId = instanceId;
         this.instanceSettings = settings;
         this.instanceLocation = instanceLocation;
@@ -86,7 +86,7 @@ public class Instance extends BukkitRunnable{
         this.isRunning = false;
         if(teleportLobby){
             for(Player player : this.players){
-                this.teleportPlayer(player, this.instanceManager.getLobbySpawnLocation());
+                this.teleportPlayer(player, this.instancesManager.getLobbySpawnLocation());
             }
         }
         this.cancel();

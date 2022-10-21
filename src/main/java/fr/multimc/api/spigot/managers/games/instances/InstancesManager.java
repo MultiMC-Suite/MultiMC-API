@@ -1,9 +1,9 @@
-package fr.multimc.api.commons.managers.game.instances;
+package fr.multimc.api.spigot.managers.games.instances;
 
-import fr.multimc.api.commons.managers.game.GameType;
-import fr.multimc.api.commons.managers.game.Lobby;
-import fr.multimc.api.commons.managers.teammanager.Team;
-import fr.multimc.api.commons.managers.worldmanagement.CustomWorldCreator;
+import fr.multimc.api.spigot.managers.games.GameType;
+import fr.multimc.api.spigot.managers.games.Lobby;
+import fr.multimc.api.spigot.managers.teams.Team;
+import fr.multimc.api.spigot.managers.worlds.CustomWorldCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public class InstanceManager implements Listener {
+public class InstancesManager implements Listener {
 
     private final JavaPlugin plugin;
     private final List<Instance> instances;
@@ -31,7 +31,7 @@ public class InstanceManager implements Listener {
     private final Logger logger;
     private boolean isStarted = false;
 
-    public InstanceManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, Lobby lobby) {
+    public InstancesManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, Lobby lobby) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.getGameType();

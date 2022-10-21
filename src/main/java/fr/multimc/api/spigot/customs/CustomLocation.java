@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.game;
+package fr.multimc.api.spigot.customs;
 
 import org.bukkit.Location;
 
