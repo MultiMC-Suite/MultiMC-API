@@ -1,8 +1,8 @@
-package fr.multimc.api.commons.managers.game.instances;
+package fr.multimc.api.spigot.managers.games.instances;
 
-import fr.multimc.api.commons.managers.game.CustomEntity;
-import fr.multimc.api.commons.managers.game.CustomLocation;
-import fr.multimc.api.commons.managers.game.GameType;
+import fr.multimc.api.spigot.customs.CustomEntity;
+import fr.multimc.api.spigot.customs.CustomLocation;
+import fr.multimc.api.spigot.managers.games.GameType;
 
 import java.io.File;
 import java.util.ArrayList;

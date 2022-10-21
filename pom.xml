@@ -6,7 +6,7 @@
 
     <groupId>fr.multimc</groupId>
     <artifactId>MultiMC-API</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
@@ -31,6 +31,10 @@
         <repository>
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -90,6 +94,11 @@
             <groupId>io.github.bananapuncher714</groupId>
             <artifactId>nbteditor</artifactId>
             <version>7.18.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MegavexNetwork</groupId>
+            <artifactId>scoreboard-library</artifactId>
+            <version>730f9794c5</version>
         </dependency>
     </dependencies>
 

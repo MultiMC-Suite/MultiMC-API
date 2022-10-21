@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.worldmanagement;
+package fr.multimc.api.spigot.managers.worlds;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;

@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.game;
+package fr.multimc.api.spigot.managers.games;
 
 public enum GameType {
     ONLY_TEAM,

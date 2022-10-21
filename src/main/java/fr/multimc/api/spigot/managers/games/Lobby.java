@@ -1,7 +1,8 @@
-package fr.multimc.api.commons.managers.game;
+package fr.multimc.api.spigot.managers.games;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.commons.managers.worldmanagement.SchematicManager;
+import fr.multimc.api.spigot.customs.CustomLocation;
+import fr.multimc.api.spigot.managers.worlds.SchematicManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

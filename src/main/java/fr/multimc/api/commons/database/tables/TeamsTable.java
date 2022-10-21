@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.managers.teammanager.database;
+package fr.multimc.api.commons.database.tables;
 
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.commons.database.Table;
@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class TeamsTable extends Table {
@@ -69,5 +70,57 @@ public class TeamsTable extends Table {
 
     public PlayersTable getPlayersTable() {
         return this.playersTable;
+    }
+
+    public HashMap<String, String> getTeamNames() {
+        HashMap<String, String> teamNames = new HashMap<>();
+        Query teamQuery = new QueryBuilder()
+                .setQueryType(QueryType.SELECT)
+                .setQuery(String.format("SELECT code, name FROM %s;", this.getTableName()))
+                .getQuery();
+        QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
+        ResultSet resultSet = queryResult.resultSet();
+        try{
+            while(resultSet.next()){
+                String code = resultSet.getString("code");
+                String name = resultSet.getString("name");
+                teamNames.put(code, name);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return teamNames;
+    }
+
+    public HashMap<String, Integer> getCurrentScores(){
+        HashMap<String, Integer> scores = new HashMap<>();
+        Query teamQuery = new QueryBuilder()
+                .setQueryType(QueryType.SELECT)
+                .setQuery(String.format("SELECT code, score FROM %s;", this.getTableName()))
+                .getQuery();
+        QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
+        ResultSet resultSet = queryResult.resultSet();
+        try{
+            while(resultSet.next()){
+                String code = resultSet.getString("code");
+                int score = resultSet.getInt("score");
+                scores.put(code, score);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return scores;
+    }
+
+    public void updateScores(HashMap<String, Integer> scores){
+        StringBuilder playersQueryString = new StringBuilder();
+        for(String teamCode : scores.keySet()){
+            playersQueryString.append(String.format("UPDATE %s SET score=%d WHERE code=%s;", this.getTableName(), scores.get(teamCode), teamCode));
+        }
+        Query playerQuery = new QueryBuilder()
+                .setQueryType(QueryType.UPDATE)
+                .setQuery(playersQueryString.toString())
+                .getQuery();
+        this.getDatabase().executeQuery(playerQuery);
     }
 }
