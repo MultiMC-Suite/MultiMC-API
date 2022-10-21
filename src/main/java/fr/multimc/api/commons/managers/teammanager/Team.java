@@ -37,6 +37,11 @@ public class Team {
     }
 
     public boolean isPlayerInTeam(Player player) {
-        return players.contains(player);
+        for(Player _player: this.players){
+            if(_player.getName().equals(player.getName())){
+                return true;
+            }
+        }
+        return false;
     }
 }
