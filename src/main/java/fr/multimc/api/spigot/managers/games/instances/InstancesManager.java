@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.InvocationTargetException;
@@ -201,7 +202,7 @@ public class InstancesManager implements Listener {
                 if(instance.isPlayerOnInstance(player)){
                     if(instance.isRunning()){
                         this.logger.info(String.format("Reconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
-                        instance.reconnectPlayer(player);
+                        instance.onPlayerReconnect(player);
                         this.logger.info(String.format("Player %s reconnected to instance %d...", player.getName(), instance.getInstanceId()));
                     }else{
                         player.teleport(this.getLobbySpawnLocation());
@@ -210,6 +211,22 @@ public class InstancesManager implements Listener {
             }
         }else{
             player.teleport(this.getLobbySpawnLocation());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e){
+        Player player = e.getPlayer();
+        if(this.isStarted){
+            for(Instance instance : this.instances){
+                if(instance.isPlayerOnInstance(player)){
+                    if(instance.isRunning()){
+                        this.logger.info(String.format("Disconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
+                        instance.onPlayerDisconnect(player);
+                        this.logger.info(String.format("Player %s disconnected to instance %d...", player.getName(), instance.getInstanceId()));
+                    }
+                }
+            }
         }
     }
 }

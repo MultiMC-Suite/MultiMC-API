@@ -175,7 +175,7 @@ public class Instance extends BukkitRunnable{
      * Called to reconnect a disconnected player
      * @param player Player to reconnect
      */
-    public void reconnectPlayer(Player player){
+    public void onPlayerReconnect(Player player){
         // Delete old player and add new one into players list
         this.players.removeIf(_player -> _player.getName().equals(player.getName()));
         this.players.add(player);
@@ -192,6 +192,13 @@ public class Instance extends BukkitRunnable{
         if(this.isRunning){
             this.teleportPlayer(player, this.playerSpawns.get(player));
         }
+    }
+
+    /**
+     * Called when a player disconnect from the server
+     */
+    public void onPlayerDisconnect(Player player){
+
     }
 
     // PRIVATE GETTERS
