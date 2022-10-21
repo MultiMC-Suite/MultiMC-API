@@ -91,4 +91,36 @@ public class TeamsTable extends Table {
         }
         return teamNames;
     }
+
+    public HashMap<String, Integer> getCurrentScores(){
+        HashMap<String, Integer> scores = new HashMap<>();
+        Query teamQuery = new QueryBuilder()
+                .setQueryType(QueryType.SELECT)
+                .setQuery(String.format("SELECT code, score FROM %s;", this.getTableName()))
+                .getQuery();
+        QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
+        ResultSet resultSet = queryResult.resultSet();
+        try{
+            while(resultSet.next()){
+                String code = resultSet.getString("code");
+                int score = resultSet.getInt("score");
+                scores.put(code, score);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return scores;
+    }
+
+    public void updateScores(HashMap<String, Integer> scores){
+        StringBuilder playersQueryString = new StringBuilder();
+        for(String teamCode : scores.keySet()){
+            playersQueryString.append(String.format("UPDATE %s SET score=%d WHERE code=%s;", this.getTableName(), scores.get(teamCode), teamCode));
+        }
+        Query playerQuery = new QueryBuilder()
+                .setQueryType(QueryType.UPDATE)
+                .setQuery(playersQueryString.toString())
+                .getQuery();
+        this.getDatabase().executeQuery(playerQuery);
+    }
 }
