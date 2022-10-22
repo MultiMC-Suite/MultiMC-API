@@ -51,16 +51,4 @@ public class RelativeLocation {
     public float getYaw() {
         return yaw;
     }
-
-    public long getBlockX() {
-        return Math.round(x);
-    }
-
-    public long getBlockY() {
-        return Math.round(y);
-    }
-
-    public long getBlockZ() {
-        return Math.round(z);
-    }
 }
