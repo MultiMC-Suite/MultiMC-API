@@ -19,7 +19,7 @@ public class WorldSettings {
         this.PREVENT_PVP = false;
         this.PREVENT_BUILD = false;
         this.PREVENT_FOOD_LOSS = false;
-        this.SPAWN = new RelativeLocation(0, 100, 0);
+        this.SPAWN = new RelativeLocation(0.5, 100, 0.5);
     }
 
     public WorldSettings(@NotNull String worldName, Schematic schematic) {
@@ -29,7 +29,7 @@ public class WorldSettings {
         this.PREVENT_PVP = false;
         this.PREVENT_BUILD = false;
         this.PREVENT_FOOD_LOSS = false;
-        this.SPAWN = new RelativeLocation(0, 100, 0);
+        this.SPAWN = new RelativeLocation(0.5, 100, 0.5);
     }
 
     public WorldSettings(@NotNull String world_name, Schematic schematic, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food) {
@@ -39,7 +39,7 @@ public class WorldSettings {
         this.PREVENT_PVP = prevent_pvp;
         this.PREVENT_BUILD = prevent_build;
         this.PREVENT_FOOD_LOSS = prevent_food;
-        this.SPAWN = new RelativeLocation(0, 100, 0);
+        this.SPAWN = new RelativeLocation(0.5, 100, 0.5);
     }
 
     public WorldSettings(@NotNull String world_name, Schematic schematic, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food, RelativeLocation spawn) {

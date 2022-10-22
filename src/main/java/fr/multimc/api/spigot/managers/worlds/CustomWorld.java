@@ -58,7 +58,7 @@ public class CustomWorld implements Listener {
     }
 
     public Location getSpawnPoint(){
-        return this.worldSettings.SPAWN.toAbsolute(new Location(this.world, 0.5, 100, 0.5));
+        return this.worldSettings.SPAWN.toAbsolute(new Location(this.world, 0, 0, 0));
     }
 
     @EventHandler
