@@ -54,7 +54,7 @@ public class Instance extends BukkitRunnable{
     public void init(){
         // Place schematic
         File schematicFile = instanceSettings.getSchematicFile();
-        Schematic schematic = new Schematic(this.plugin, schematicFile);
+        Schematic schematic = new Schematic(schematicFile);
         try {
             SchematicOptions options = new SchematicOptions(
                     instanceLocation);
@@ -89,7 +89,7 @@ public class Instance extends BukkitRunnable{
         this.isRunning = false;
         if(teleportLobby){
             for(Player player : this.players){
-                this.teleportPlayer(player, this.instancesManager.getLobbySpawnLocation());
+                this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
             }
         }
         this.cancel();

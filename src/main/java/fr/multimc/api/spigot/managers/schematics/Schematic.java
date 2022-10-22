@@ -22,15 +22,15 @@ import java.io.IOException;
 
 public class Schematic {
     private final Clipboard clipboard;
-    private final Plugin plugin;
     private final String name;
     private final File file;
 
     public Schematic(@Nonnull Plugin plugin, @Nonnull String name) {
-        this.plugin = plugin;
         this.name = name;
         this.file = new File(plugin.getDataFolder() + "/schematics/" + name + ".schem");
-        this.saveDefaults(false);
+        if(!file.exists()) {
+            plugin.saveResource(file.getPath(), false);
+        }
 
         try {
             this.clipboard = this.load();
@@ -39,34 +39,15 @@ public class Schematic {
         }
     }
 
-    public Schematic(@Nonnull Plugin plugin, @Nonnull File file) {
-        this.plugin = plugin;
+    public Schematic(File file) {
         this.name = file.getName().replace(".schem", "");
         this.file = file;
-        this.saveDefaults(false);
 
         try {
             this.clipboard = this.load();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Schematic(@Nonnull Plugin plugin, @Nonnull String name, File file) {
-        this.plugin = plugin;
-        this.name = name;
-        this.file = file;
-        this.saveDefaults(false);
-
-        try {
-            this.clipboard = this.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void saveDefaults(boolean force) {
-        this.plugin.saveResource("schematics/" + this.name + ".schem", force);
     }
 
     private Clipboard load() throws IOException {
