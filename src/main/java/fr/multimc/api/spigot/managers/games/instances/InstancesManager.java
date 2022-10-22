@@ -206,11 +206,13 @@ public class InstancesManager implements Listener {
                         this.logger.info(String.format("Player %s reconnected to instance %d...", player.getName(), instance.getInstanceId()));
                     }else{
                         player.teleport(this.getLobbySpawnLocation());
+                        player.getInventory().clear();
                     }
                 }
             }
         }else{
             player.teleport(this.getLobbySpawnLocation());
+            player.getInventory().clear();
         }
     }
 
