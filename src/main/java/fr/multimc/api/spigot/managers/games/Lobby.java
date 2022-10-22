@@ -1,41 +1,42 @@
 package fr.multimc.api.spigot.managers.games;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.spigot.customs.CustomLocation;
-import fr.multimc.api.spigot.managers.worlds.SchematicManager;
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
+import fr.multimc.api.spigot.managers.schematics.Schematic;
+import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
+import javax.annotation.Nonnull;
 
 @SuppressWarnings("unused")
-public class Lobby {
+public class Lobby implements Listener {
+    private final JavaPlugin plugin;
+    private final LobbyOptions options;
 
-    private final File schematicFile;
-    private final CustomLocation spawnPoint;
-    private final String worldName;
-
-    public Lobby(File schematicFile, CustomLocation spawnPoint, String worldName) {
-        this.schematicFile = schematicFile;
-        this.spawnPoint = spawnPoint;
-        this.worldName = worldName;
+    public Lobby(@Nonnull JavaPlugin plugin, @Nonnull LobbyOptions options) {
+        this.plugin = plugin;
+        this.options = options;
     }
 
     public void init(){
-        SchematicManager schematicManager = new SchematicManager(schematicFile);
+        Schematic schematic = new Schematic(this.plugin, "lobby");
         Location schematicLocation = this.getPasteLocation();
         try {
-            schematicManager.pasteSchematic(schematicLocation, false, false, false);
+            SchematicOptions options = new SchematicOptions(schematicLocation);
+            schematic.paste(options);
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Location getPasteLocation(){
-        return new Location(Bukkit.getWorld(worldName), 0, 100, 0);
+        return new Location(Bukkit.getWorld(this.options.WORLD_NAME), 0, 100, 0);
     }
 
     public Location getSpawnPoint() {
-        return this.spawnPoint.toAbsolute(new Location(Bukkit.getWorld(worldName), 0, 100, 0));
+        return this.options.SPAWN.toAbsolute(this.getPasteLocation());
     }
 }

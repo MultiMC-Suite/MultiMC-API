@@ -1,9 +1,10 @@
-package fr.multimc.api.spigot.customs;
+package fr.multimc.api.spigot.tools.locations;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 @SuppressWarnings("unused")
-public class CustomLocation{
+public class RelativeLocation {
 
     private final double x;
     private final double y;
@@ -11,7 +12,7 @@ public class CustomLocation{
     private final float pitch;
     private final float yaw;
 
-    public CustomLocation(double x, double y, double z, float yaw, float pitch) {
+    public RelativeLocation(double x, double y, double z, float yaw, float pitch) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -19,7 +20,7 @@ public class CustomLocation{
         this.yaw = yaw;
     }
 
-    public CustomLocation(double x, double y, double z) {
+    public RelativeLocation(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -27,8 +28,8 @@ public class CustomLocation{
         this.yaw = 0;
     }
 
-    public static CustomLocation getRelativeLocation(Location loc1, Location loc2){
-        return new CustomLocation(loc1.getX() - loc2.getX(), loc1.getY() - loc2.getY(), loc1.getZ() - loc2.getZ(), loc1.getYaw() - loc2.getYaw(), loc1.getPitch() - loc2.getPitch());
+    public static RelativeLocation getRelativeLocation(Location loc1, Location loc2){
+        return new RelativeLocation(loc1.getX() - loc2.getX(), loc1.getY() - loc2.getY(), loc1.getZ() - loc2.getZ(), loc1.getYaw() - loc2.getYaw(), loc1.getPitch() - loc2.getPitch());
     }
 
     public Location toAbsolute(Location loc){
@@ -49,5 +50,17 @@ public class CustomLocation{
     }
     public float getYaw() {
         return yaw;
+    }
+
+    public long getBlockX() {
+        return Math.round(x);
+    }
+
+    public long getBlockY() {
+        return Math.round(y);
+    }
+
+    public long getBlockZ() {
+        return Math.round(z);
     }
 }
