@@ -1,11 +1,12 @@
 package fr.multimc.api.spigot.customs;
 
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-public record CustomEntity(EntityType entityType, CustomLocation location) {
+public record CustomEntity(EntityType entityType, RelativeLocation location) {
 
     public Entity spawn(Location instanceLocation, int instanceId) {
         Location spawnLocation = new Location(instanceLocation.getWorld(),

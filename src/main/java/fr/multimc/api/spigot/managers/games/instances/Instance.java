@@ -2,9 +2,10 @@ package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.customs.CustomEntity;
-import fr.multimc.api.spigot.customs.CustomLocation;
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
+import fr.multimc.api.spigot.managers.schematics.Schematic;
+import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
 import fr.multimc.api.spigot.managers.teams.Team;
-import fr.multimc.api.spigot.managers.worlds.SchematicManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -53,9 +54,11 @@ public class Instance extends BukkitRunnable{
     public void init(){
         // Place schematic
         File schematicFile = instanceSettings.getSchematicFile();
-        SchematicManager schematicManager = new SchematicManager(schematicFile);
+        Schematic schematic = new Schematic(schematicFile);
         try {
-            schematicManager.pasteSchematic(instanceLocation, false, false, false);
+            SchematicOptions options = new SchematicOptions(
+                    instanceLocation);
+            schematic.paste(options);
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -86,7 +89,7 @@ public class Instance extends BukkitRunnable{
         this.isRunning = false;
         if(teleportLobby){
             for(Player player : this.players){
-                this.teleportPlayer(player, this.instancesManager.getLobbySpawnLocation());
+                this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
             }
         }
         this.cancel();
@@ -250,7 +253,7 @@ public class Instance extends BukkitRunnable{
      */
     private List<Location> getSpawnPoints(){
         List<Location> spawnPoints = new ArrayList<>();
-        for(CustomLocation customLocation : this.instanceSettings.getSpawnPoints()){
+        for(RelativeLocation customLocation : this.instanceSettings.getSpawnPoints()){
             spawnPoints.add(customLocation.toAbsolute(this.instanceLocation));
         }
         return spawnPoints;

@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import fr.multimc.api.spigot.customs.CustomEntity;
-import fr.multimc.api.spigot.customs.CustomLocation;
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.games.GameType;
 
 import java.io.File;
@@ -15,7 +15,7 @@ public class InstanceSettings {
     private final File schematicFile;
     private final GameType gameType;
     private final int duration;
-    private final List<CustomLocation> spawnPoints;
+    private final List<RelativeLocation> spawnPoints;
     private final List<CustomEntity> entities;
     private final HashMap<String, Object> customSettings;
     private final int tickDelay;
@@ -46,7 +46,7 @@ public class InstanceSettings {
     public InstanceSettings(File schematicFile,
                             GameType gameType,
                             int duration,
-                            List<CustomLocation> spawnPoints,
+                            List<RelativeLocation> spawnPoints,
                             List<CustomEntity> entities,
                             HashMap<String, Object> customSettings,
                             int tickDelay,
@@ -73,7 +73,7 @@ public class InstanceSettings {
         return duration;
     }
 
-    public List<CustomLocation> getSpawnPoints() {
+    public List<RelativeLocation> getSpawnPoints() {
         return spawnPoints;
     }
 

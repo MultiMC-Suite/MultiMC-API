@@ -1,12 +1,10 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import fr.multimc.api.spigot.managers.games.GameType;
-import fr.multimc.api.spigot.managers.games.Lobby;
 import fr.multimc.api.spigot.managers.teams.Team;
-import fr.multimc.api.spigot.managers.worlds.CustomWorldCreator;
+import fr.multimc.api.spigot.managers.worlds.CustomWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +22,6 @@ public class InstancesManager implements Listener {
 
     private final JavaPlugin plugin;
     private final List<Instance> instances;
-    private final Lobby lobby;
     private List<Team> teams = new ArrayList<>();
     private final GameType gameType;
     private final Class<? extends Instance> instanceClass;
@@ -32,7 +29,10 @@ public class InstancesManager implements Listener {
     private final Logger logger;
     private boolean isStarted = false;
 
-    public InstancesManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, Lobby lobby) {
+    private final CustomWorld lobby;
+    private final CustomWorld game;
+
+    public InstancesManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, CustomWorld lobby, CustomWorld game) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.getGameType();
@@ -40,47 +40,9 @@ public class InstancesManager implements Listener {
         this.settings = settings;
         this.logger = plugin.getLogger();
         this.lobby = lobby;
-        // Generate worlds
-        this.generateLobbyWorld(lobby);
-        this.generateGameWorld();
+        this.game = game;
         // Register local events handlers
         Bukkit.getPluginManager().registerEvents(this, plugin);
-    }
-
-    private void generateGameWorld() {
-        this.generateWorld(this.getGameWorldName());
-    }
-
-    private void generateLobbyWorld(Lobby lobby) {
-        this.generateWorld(this.getLobbyWorldName());
-        lobby.init();
-    }
-
-    private void generateWorld(String name){
-        if (Bukkit.getWorld(name) == null) {
-            this.logger.info(String.format("Generating world %s...", name));
-            CustomWorldCreator worldCreator = new CustomWorldCreator();
-            worldCreator.generate(name);
-            this.logger.info(String.format("World %s generated and loaded!", name));
-        }else{
-            this.logger.info(String.format("World %s loaded!", name));
-        }
-    }
-
-    public World getLobbyWorld(){
-        return Bukkit.getWorld(this.getLobbyWorldName());
-    }
-
-    public World getGameWorld(){
-        return Bukkit.getWorld(this.getGameWorldName());
-    }
-
-    private String getLobbyWorldName(){
-        return String.format("%s_lobby", this.settings.getWorldsPrefix());
-    }
-
-    private String getGameWorldName(){
-        return String.format("%s_game", this.settings.getWorldsPrefix());
     }
 
     public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -101,7 +63,7 @@ public class InstancesManager implements Listener {
         // Create instances
         for(int i = 0; i < this.getInstanceCount(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i+1, this.getInstanceCount()));
-            Location location = new Location(this.getGameWorld(), i * 1000, 100, 0);
+            Location location = new Location(this.game.getWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
                     List<Team> instanceTeams = new ArrayList<>();
@@ -186,12 +148,22 @@ public class InstancesManager implements Listener {
         return teams;
     }
 
-    public Location getLobbySpawnLocation(){
-        return this.lobby.getSpawnPoint();
+
+    public CustomWorld getLobbyWorld(){
+        return this.lobby;
+    }
+
+    public CustomWorld getGameWorld(){
+        return this.game;
     }
 
     public boolean isStarted() {
         return this.isStarted;
+    }
+
+    @Deprecated
+    public Location getLobbySpawnLocation(){
+        return this.lobby.getSpawnPoint();
     }
 
     @EventHandler
@@ -205,13 +177,13 @@ public class InstancesManager implements Listener {
                         instance.onPlayerReconnect(player);
                         this.logger.info(String.format("Player %s reconnected to instance %d...", player.getName(), instance.getInstanceId()));
                     }else{
-                        player.teleport(this.getLobbySpawnLocation());
+                        player.teleport(this.getLobbyWorld().getSpawnPoint());
                         player.getInventory().clear();
                     }
                 }
             }
         }else{
-            player.teleport(this.getLobbySpawnLocation());
+            player.teleport(this.getLobbyWorld().getSpawnPoint());
             player.getInventory().clear();
         }
     }
