@@ -1,9 +1,11 @@
 package fr.multimc.api.spigot.samplecode.teams;
 
 import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.spigot.customs.CustomLocation;
+import fr.multimc.api.spigot.managers.schematics.Schematic;
+import fr.multimc.api.spigot.managers.worlds.CustomWorld;
+import fr.multimc.api.spigot.managers.worlds.WorldSettings;
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.games.GameType;
-import fr.multimc.api.spigot.managers.games.Lobby;
 import fr.multimc.api.spigot.managers.games.instances.InstancesManager;
 import fr.multimc.api.spigot.managers.games.instances.InstanceSettings;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
@@ -37,13 +39,24 @@ public class TeamSampleCode implements SampleCode, Listener {
         File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
         InstanceSettings settings = new InstanceSettings(schemFile,
                 GameType.SOLO,
-                60, List.of(new CustomLocation[]{new CustomLocation(-2.5, 1, -1.5), new CustomLocation(-4.5, 4, -5.5)}),
+                60, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 new ArrayList<>(),
                 new HashMap<>(),
                 20,
                 "multimc");
-        Lobby lobby = new Lobby(schemFile, new CustomLocation(0, 5, 0), "multimc_lobby");
-        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, lobby);
+        WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
+                new Schematic(plugin, "instances_test"),
+                true,
+                true,
+                true,
+                true);
+        WorldSettings gameWorldSettings = new WorldSettings("multimc_game",
+                null,
+                true,
+                true,
+                true,
+                true);
+        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new CustomWorld(plugin, lobbyWorldSettings), new CustomWorld(plugin, gameWorldSettings));
     }
 
     @EventHandler
