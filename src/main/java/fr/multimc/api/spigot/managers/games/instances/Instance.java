@@ -4,7 +4,6 @@ import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.customs.CustomEntity;
 import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.managers.schematics.Schematic;
 import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
 import fr.multimc.api.spigot.managers.teams.Team;
 import org.bukkit.Bukkit;
@@ -15,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -53,12 +51,10 @@ public class Instance extends BukkitRunnable{
      */
     public void init(){
         // Place schematic
-        File schematicFile = instanceSettings.getSchematicFile();
-        Schematic schematic = new Schematic(schematicFile);
         try {
-            SchematicOptions options = new SchematicOptions(
-                    instanceLocation);
-            schematic.paste(options);
+            SchematicOptions options = instanceSettings.getSchematicOptions();
+            options.setLocation(instanceLocation);
+            instanceSettings.getSchematic().paste(instanceSettings.getSchematicOptions());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -74,9 +70,12 @@ public class Instance extends BukkitRunnable{
     public void start(){
         // Teleport players
         for(UUID uuid: this.playerSpawns.keySet()){
-            for(APIPlayer player : this.players){
-                if(Objects.requireNonNull(player.getPlayer()).getUniqueId().equals(uuid)){
-                    this.teleportPlayer(Objects.requireNonNull(player.getPlayer()), this.playerSpawns.get(uuid));
+            for(APIPlayer apiPlayer : this.players){
+                if(apiPlayer.getUUID().equals(uuid)){
+                    Player player = apiPlayer.getPlayer();
+                    if(player != null){
+                        this.teleportPlayer(player, this.playerSpawns.get(uuid));
+                    }
                 }
             }
         }

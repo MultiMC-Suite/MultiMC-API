@@ -1,10 +1,11 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import fr.multimc.api.spigot.customs.CustomEntity;
+import fr.multimc.api.spigot.managers.schematics.Schematic;
+import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.games.GameType;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class InstanceSettings {
 
-    private final File schematicFile;
+    private final Schematic schematic;
+    private final SchematicOptions schematicOptions;
     private final GameType gameType;
     private final int duration;
     private final List<RelativeLocation> spawnPoints;
@@ -22,7 +24,8 @@ public class InstanceSettings {
     private final String worldsPrefix;
 
     public InstanceSettings(){
-        this.schematicFile = new File("");
+        this.schematic = null;
+        this.schematicOptions = null;
         this.gameType = GameType.ONLY_TEAM;
         this.duration = 600;
         this.spawnPoints = new ArrayList<>();
@@ -34,7 +37,7 @@ public class InstanceSettings {
 
     /**
      * Constructor of InstanceSettings
-     * @param schematicFile File for the game schematic
+     * @param schematic File for the game schematic
      * @param gameType GameType of the game
      * @param duration Duration of the game
      * @param spawnPoints List of spawn points
@@ -43,7 +46,8 @@ public class InstanceSettings {
      * @param tickDelay Delay in game tick between two calls of Instance's tick method
      * @param worldsPrefix Prefix of the worlds
      */
-    public InstanceSettings(File schematicFile,
+    public InstanceSettings(Schematic schematic,
+                            SchematicOptions schematicOptions,
                             GameType gameType,
                             int duration,
                             List<RelativeLocation> spawnPoints,
@@ -51,7 +55,8 @@ public class InstanceSettings {
                             HashMap<String, Object> customSettings,
                             int tickDelay,
                             String worldsPrefix) {
-        this.schematicFile = schematicFile;
+        this.schematic = schematic;
+        this.schematicOptions = schematicOptions;
         this.gameType = gameType;
         this.duration = duration;
         this.spawnPoints = spawnPoints;
@@ -61,8 +66,12 @@ public class InstanceSettings {
         this.worldsPrefix = worldsPrefix;
     }
 
-    public File getSchematicFile() {
-        return schematicFile;
+    public Schematic getSchematic() {
+        return schematic;
+    }
+
+    public SchematicOptions getSchematicOptions() {
+        return schematicOptions;
     }
 
     public GameType getGameType() {

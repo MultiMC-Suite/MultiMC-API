@@ -2,6 +2,7 @@ package fr.multimc.api.spigot.samplecode.teams;
 
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.spigot.managers.schematics.Schematic;
+import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
 import fr.multimc.api.spigot.managers.worlds.APIWorld;
 import fr.multimc.api.spigot.managers.worlds.WorldSettings;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
@@ -37,7 +38,9 @@ public class TeamSampleCode implements SampleCode, Listener {
         teamManager.addTeam("CODELA", "T1", "Xen0Xys");
 
         File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
-        InstanceSettings settings = new InstanceSettings(schemFile,
+        Schematic schematic = new Schematic(schemFile);
+        InstanceSettings settings = new InstanceSettings(schematic,
+                new SchematicOptions(),
                 GameType.SOLO,
                 15, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 new ArrayList<>(),

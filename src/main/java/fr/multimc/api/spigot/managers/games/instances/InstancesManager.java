@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -47,6 +48,19 @@ public class InstancesManager implements Listener {
     }
 
     public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    startAsync(teams);
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.runTaskAsynchronously(this.plugin);
+    }
+
+    private void startAsync(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         this.instances.clear();
         this.teams = new ArrayList<>(teams);
         List<List<Team>> gameTeams = new ArrayList<>();
