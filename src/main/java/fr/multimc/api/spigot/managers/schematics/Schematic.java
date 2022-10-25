@@ -20,16 +20,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+@SuppressWarnings("unused")
 public class Schematic {
     private final Clipboard clipboard;
     private final String name;
-    private final File file;
+    private final File schematicFile;
 
     public Schematic(@Nonnull Plugin plugin, @Nonnull String name) {
         this.name = name;
-        this.file = new File(plugin.getDataFolder() + "/schematics/" + name + ".schem");
-        if(!file.exists()) {
-            plugin.saveResource(file.getPath(), false);
+        File pluginFile = new File("schematics/" + name + ".schem");
+        this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
+        System.out.println(pluginFile);
+        System.out.println(schematicFile);
+        if(!schematicFile.exists()) {
+            plugin.saveResource(pluginFile.getPath(), false);
         }
 
         try {
@@ -39,9 +43,9 @@ public class Schematic {
         }
     }
 
-    public Schematic(File file) {
-        this.name = file.getName().replace(".schem", "");
-        this.file = file;
+    public Schematic(File schematicFile) {
+        this.name = schematicFile.getName().replace(".schem", "");
+        this.schematicFile = schematicFile;
 
         try {
             this.clipboard = this.load();
@@ -52,10 +56,10 @@ public class Schematic {
 
     private Clipboard load() throws IOException {
         Clipboard localClipboard;
-        ClipboardFormat format = ClipboardFormats.findByFile(this.file);
+        ClipboardFormat format = ClipboardFormats.findByFile(this.schematicFile);
 
         assert format != null;
-        try (ClipboardReader reader = format.getReader(new FileInputStream(this.file))) {
+        try (ClipboardReader reader = format.getReader(new FileInputStream(this.schematicFile))) {
             localClipboard = reader.read();
         }
 
@@ -79,8 +83,8 @@ public class Schematic {
         return name;
     }
 
-    public File getFile() throws NullPointerException {
-        if (!this.file.exists()) throw new NullPointerException("Provied file doesn't exist!");
-        return file;
+    public File getSchematicFile() throws NullPointerException {
+        if (!this.schematicFile.exists()) throw new NullPointerException("Provied file doesn't exist!");
+        return schematicFile;
     }
 }

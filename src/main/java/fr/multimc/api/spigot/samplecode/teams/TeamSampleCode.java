@@ -37,8 +37,7 @@ public class TeamSampleCode implements SampleCode, Listener {
         teamManager = new TeamManager(database);
         teamManager.addTeam("CODELA", "T1", "Xen0Xys");
 
-        File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
-        Schematic schematic = new Schematic(schemFile);
+        Schematic schematic = new Schematic(plugin, "instances_test");
         InstanceSettings settings = new InstanceSettings(schematic,
                 new SchematicOptions(),
                 GameType.SOLO,
@@ -48,7 +47,7 @@ public class TeamSampleCode implements SampleCode, Listener {
                 20,
                 "multimc");
         WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
-                new Schematic(plugin, "instances_test"),
+                schematic,
                 true,
                 true,
                 true,
