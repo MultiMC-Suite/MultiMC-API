@@ -1,8 +1,9 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import fr.multimc.api.spigot.managers.games.GameType;
+import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.managers.teams.Team;
-import fr.multimc.api.spigot.managers.worlds.CustomWorld;
+import fr.multimc.api.spigot.managers.worlds.APIWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -29,10 +30,10 @@ public class InstancesManager implements Listener {
     private final Logger logger;
     private boolean isStarted = false;
 
-    private final CustomWorld lobby;
-    private final CustomWorld game;
+    private final APIWorld lobby;
+    private final APIWorld game;
 
-    public InstancesManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, CustomWorld lobby, CustomWorld game) {
+    public InstancesManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, APIWorld lobby, APIWorld game) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.getGameType();
@@ -123,7 +124,7 @@ public class InstancesManager implements Listener {
             case SOLO:
                 int count = 0;
                 for(Team team : this.teams){
-                    count += team.getPlayers().size();
+                    count += team.getTeamSize();
                 }
                 return count;
             case ONLY_TEAM:
@@ -140,7 +141,7 @@ public class InstancesManager implements Listener {
     private List<Team> getOnePlayerTeams(){
         List<Team> teams = new ArrayList<>();
         for(Team team : this.teams){
-            for(Player player: team.getPlayers()){
+            for(APIPlayer player: team.getPlayers()){
                 Team onePlayerTeam = new Team(team.getName(), team.getTeamCode(), player);
                 teams.add(onePlayerTeam);
             }
@@ -149,11 +150,11 @@ public class InstancesManager implements Listener {
     }
 
 
-    public CustomWorld getLobbyWorld(){
+    public APIWorld getLobbyWorld(){
         return this.lobby;
     }
 
-    public CustomWorld getGameWorld(){
+    public APIWorld getGameWorld(){
         return this.game;
     }
 
@@ -174,7 +175,7 @@ public class InstancesManager implements Listener {
                 if(instance.isPlayerOnInstance(player)){
                     if(instance.isRunning()){
                         this.logger.info(String.format("Reconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
-                        instance.onPlayerReconnect(player);
+                        instance.onPlayerReconnect(new APIPlayer(player));
                         this.logger.info(String.format("Player %s reconnected to instance %d...", player.getName(), instance.getInstanceId()));
                     }else{
                         player.teleport(this.getLobbyWorld().getSpawnPoint());

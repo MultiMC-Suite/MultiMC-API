@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot.tools.gui;
 
+import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,6 +30,7 @@ import java.util.Objects;
  * @version 1.0
  * @since 03/10/2022
  */
+@SuppressWarnings("unused")
 public class GuiManager implements Listener {
     private final Plugin plugin; // Main plugin instance.
     private final Map<Class<? extends GuiBuilder>, GuiBuilder> guis; // GUIs list.
@@ -71,7 +73,7 @@ public class GuiManager implements Listener {
         if (player.getOpenInventory() instanceof PlayerInventory) player.closeInventory();
 
         final GuiBuilder gui = this.getGui(guiClass);
-        final Inventory inventory = this.plugin.getServer().createInventory(null, 0, ChatColor.translateAlternateColorCodes('&', Objects.isNull(gui.title()) ? "&8Inventory" : gui.title()));
+        final Inventory inventory = this.plugin.getServer().createInventory(null, 0, new TextBuilder(Objects.isNull(gui.title()) ? "&8Inventory" : gui.title()).build());
         gui.fill(player, inventory);
         player.openInventory(inventory);
     }

@@ -2,6 +2,7 @@ package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.customs.CustomEntity;
+import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.schematics.Schematic;
 import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
@@ -29,8 +30,8 @@ public class Instance extends BukkitRunnable{
     private final List<Team> teams;
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
-    private final List<Player> players;
-    HashMap<Player, Location> playerSpawns;
+    private final List<APIPlayer> players;
+    HashMap<APIPlayer, Location> playerSpawns;
 
     private int remainingTime;
 
@@ -73,8 +74,8 @@ public class Instance extends BukkitRunnable{
      */
     public void start(){
         // Teleport players
-        for(Player player: this.playerSpawns.keySet()){
-            this.teleportPlayer(player, this.playerSpawns.get(player));
+        for(APIPlayer player: this.playerSpawns.keySet()){
+            this.teleportPlayer(player.getPlayer(), this.playerSpawns.get(player));
         }
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
@@ -88,8 +89,8 @@ public class Instance extends BukkitRunnable{
     public void stop(boolean teleportLobby){
         this.isRunning = false;
         if(teleportLobby){
-            for(Player player : this.players){
-                this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
+            for(APIPlayer player : this.players){
+                this.teleportPlayer(player.getPlayer(), this.instancesManager.getLobbyWorld().getSpawnPoint());
             }
         }
         this.cancel();
@@ -178,13 +179,14 @@ public class Instance extends BukkitRunnable{
      * Called to reconnect a disconnected player
      * @param player Player to reconnect
      */
-    public void onPlayerReconnect(Player player){
+    public void onPlayerReconnect(APIPlayer player){
         // Delete old player and add new one into players list
-        this.players.removeIf(_player -> _player.getName().equals(player.getName()));
+        // TODO: test without removing player
+        this.players.removeIf(_player -> _player.equals(player));
         this.players.add(player);
         // Delete old player spawn and re-set it into playerSpawns list
-        for(Player _player : this.playerSpawns.keySet()){
-            if(_player.getName().equals(player.getName())){
+        for(APIPlayer _player : this.playerSpawns.keySet()){
+            if(_player.equals(player)){
                 Location spawnLocation = this.playerSpawns.get(_player);
                 this.playerSpawns.remove(_player);
                 this.playerSpawns.put(player, spawnLocation);
@@ -193,7 +195,7 @@ public class Instance extends BukkitRunnable{
         }
         // If instance is running, teleport player into it
         if(this.isRunning){
-            this.teleportPlayer(player, this.playerSpawns.get(player));
+            this.teleportPlayer(player.getPlayer(), this.playerSpawns.get(player));
         }
     }
 
@@ -209,8 +211,8 @@ public class Instance extends BukkitRunnable{
      * Return a map with all players spawns locations
      * @return Hashmap with as key a Player and as value a Location
      */
-    private HashMap<Player, Location> getPlayerSpawnsList(){
-        HashMap<Player, Location> playerSpawns = new HashMap<>();
+    private HashMap<APIPlayer, Location> getPlayerSpawnsList(){
+        HashMap<APIPlayer, Location> playerSpawns = new HashMap<>();
         switch(this.instanceSettings.getGameType()) {
             case SOLO -> playerSpawns.put(this.teams.get(0).getPlayers().get(0), this.getSpawnPoints().get(0));
             case ONLY_TEAM -> {
@@ -224,10 +226,10 @@ public class Instance extends BukkitRunnable{
                 int spawnPointsCount = this.getSpawnPoints().size() % 2 == 0 ? this.getSpawnPoints().size() / 2 : ((this.getSpawnPoints().size() - 1) / 2);
                 List<Location> t1SpawnPoints = this.getSpawnPoints().subList(0, spawnPointsCount);
                 List<Location> t2SpawnPoints = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
-                for (int i = 0; i < this.teams.get(0).getPlayers().size(); i++) {
+                for (int i = 0; i < this.teams.get(0).getTeamSize(); i++) {
                     playerSpawns.put(this.teams.get(0).getPlayers().get(i), t1SpawnPoints.get(i % t1SpawnPoints.size()));
                 }
-                for (int i = 0; i < this.teams.get(1).getPlayers().size(); i++) {
+                for (int i = 0; i < this.teams.get(1).getTeamSize(); i++) {
                     playerSpawns.put(this.teams.get(1).getPlayers().get(i), t2SpawnPoints.get(i % t2SpawnPoints.size()));
                 }
             }
@@ -239,8 +241,8 @@ public class Instance extends BukkitRunnable{
      * Get all players in this instance
      * @return List of players
      */
-    private List<Player> getInstancePlayers(){
-        List<Player> localPlayers = new ArrayList<>();
+    private List<APIPlayer> getInstancePlayers(){
+        List<APIPlayer> localPlayers = new ArrayList<>();
         for(Team team: this.getTeams()){
             localPlayers.addAll(team.getPlayers());
         }
@@ -273,7 +275,7 @@ public class Instance extends BukkitRunnable{
      * @return True if the player is on this instance
      */
     public boolean isPlayerOnInstance(Player player){
-        for(Player _player: this.players){
+        for(APIPlayer _player: this.players){
             if(_player.getName().equals(player.getName())){
                 return true;
             }
@@ -303,7 +305,7 @@ public class Instance extends BukkitRunnable{
     public boolean isRunning() {
         return isRunning;
     }
-    public List<Player> getPlayers() {
+    public List<APIPlayer> getPlayers() {
         return players;
     }
 }

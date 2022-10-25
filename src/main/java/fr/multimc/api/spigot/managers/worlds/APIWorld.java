@@ -15,13 +15,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class CustomWorld implements Listener {
+public class APIWorld implements Listener {
 
     private final WorldSettings worldSettings;
     private final JavaPlugin plugin;
     private World world;
 
-    public CustomWorld(JavaPlugin plugin, WorldSettings worldSettings) {
+    public APIWorld(JavaPlugin plugin, WorldSettings worldSettings) {
         this.plugin = plugin;
         this.worldSettings = worldSettings;
         this.world = this.getWorld();

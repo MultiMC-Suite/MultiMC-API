@@ -3,8 +3,6 @@ package fr.multimc.api.spigot.managers.teams;
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.commons.database.tables.PlayersTable;
 import fr.multimc.api.commons.database.tables.TeamsTable;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,18 +32,14 @@ public class TeamManager {
         // Iterate by team code
         for(String teamCode: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamCode);
-            List<Player> players = new ArrayList<>();
+            List<APIPlayer> players = new ArrayList<>();
             // Add all players to team
             for(String playerName: playersName){
-                Player player = Bukkit.getPlayer(playerName);
-                if(player != null){
-                    players.add(player);
-                }else{
-                    return null;
-                }
+                APIPlayer player = new APIPlayer(playerName);
+                players.add(player);
             }
             // Add team object to list
-            Team team = new Team(teamNames.get(teamCode), teamCode, players.toArray(new Player[0]));
+            Team team = new Team(teamNames.get(teamCode), teamCode, players.toArray(new APIPlayer[0]));
             teams.add(team);
         }
         return teams;
@@ -64,7 +58,7 @@ public class TeamManager {
         return null;
     }
 
-    public Team getTeamFromPlayer(Player player){
+    public Team getTeamFromPlayer(APIPlayer player){
         for(Team team: teams){
             if(team.isPlayerInTeam(player)){
                 return team;

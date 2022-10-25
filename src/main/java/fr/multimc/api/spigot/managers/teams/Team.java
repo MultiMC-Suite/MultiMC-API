@@ -1,27 +1,38 @@
 package fr.multimc.api.spigot.managers.teams;
 
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class Team {
 
     private final String name;
     private final String teamCode;
-    private final List<Player> players;
+    private final List<APIPlayer> players;
 
-    public Team(String name, String teamCode, Player... localPlayers){
+
+    public Team(String name, String teamCode, APIPlayer... localPlayers){
         this.name = name;
         this.teamCode = teamCode;
         this.players = new ArrayList<>();
         this.players.addAll(Arrays.asList(localPlayers));
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public boolean isPlayerInTeam(UUID uuid){
+        for(APIPlayer player: this.players){
+            if(player.getUUID() == uuid){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPlayerInTeam(APIPlayer player){
+        for(APIPlayer _player: this.players){
+            if(_player.equals(player)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getName() {
@@ -36,12 +47,7 @@ public class Team {
         return players.size();
     }
 
-    public boolean isPlayerInTeam(Player player) {
-        for(Player _player: this.players){
-            if(_player.getName().equals(player.getName())){
-                return true;
-            }
-        }
-        return false;
+    public List<APIPlayer> getPlayers() {
+        return players;
     }
 }
