@@ -197,7 +197,7 @@ public class InstancesManager implements Listener {
                 if(instance.isPlayerOnInstance(player)){
                     if(instance.isRunning()){
                         this.logger.info(String.format("Disconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
-                        instance.onPlayerDisconnect(player);
+                        instance.onPlayerDisconnect(new APIPlayer(player));
                         this.logger.info(String.format("Player %s disconnected to instance %d...", player.getName(), instance.getInstanceId()));
                     }
                 }

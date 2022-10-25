@@ -39,7 +39,7 @@ public class TeamSampleCode implements SampleCode, Listener {
         File schemFile = new File(plugin.getDataFolder().getPath() + "/schematics/instances_test.schem");
         InstanceSettings settings = new InstanceSettings(schemFile,
                 GameType.SOLO,
-                60, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
+                15, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 new ArrayList<>(),
                 new HashMap<>(),
                 20,

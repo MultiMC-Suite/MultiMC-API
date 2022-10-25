@@ -13,11 +13,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class Instance extends BukkitRunnable{
@@ -31,7 +30,7 @@ public class Instance extends BukkitRunnable{
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
     private final List<APIPlayer> players;
-    HashMap<APIPlayer, Location> playerSpawns;
+    HashMap<UUID, Location> playerSpawns;
 
     private int remainingTime;
 
@@ -74,8 +73,12 @@ public class Instance extends BukkitRunnable{
      */
     public void start(){
         // Teleport players
-        for(APIPlayer player: this.playerSpawns.keySet()){
-            this.teleportPlayer(player.getPlayer(), this.playerSpawns.get(player));
+        for(UUID uuid: this.playerSpawns.keySet()){
+            for(APIPlayer player : this.players){
+                if(Objects.requireNonNull(player.getPlayer()).getUniqueId().equals(uuid)){
+                    this.teleportPlayer(Objects.requireNonNull(player.getPlayer()), this.playerSpawns.get(uuid));
+                }
+            }
         }
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
@@ -89,8 +92,11 @@ public class Instance extends BukkitRunnable{
     public void stop(boolean teleportLobby){
         this.isRunning = false;
         if(teleportLobby){
-            for(APIPlayer player : this.players){
-                this.teleportPlayer(player.getPlayer(), this.instancesManager.getLobbyWorld().getSpawnPoint());
+            for(APIPlayer apiPlayer : this.players){
+                Player player = apiPlayer.getPlayer();
+                if(player != null){
+                    this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
+                }
             }
         }
         this.cancel();
@@ -171,7 +177,7 @@ public class Instance extends BukkitRunnable{
      * @param player Player to teleport
      * @param location Target location
      */
-    private void teleportPlayer(Player player, Location location){
+    private void teleportPlayer(@NotNull Player player, @NotNull Location location){
         Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
     }
 
@@ -185,24 +191,24 @@ public class Instance extends BukkitRunnable{
         this.players.removeIf(_player -> _player.equals(player));
         this.players.add(player);
         // Delete old player spawn and re-set it into playerSpawns list
-        for(APIPlayer _player : this.playerSpawns.keySet()){
-            if(_player.equals(player)){
-                Location spawnLocation = this.playerSpawns.get(_player);
-                this.playerSpawns.remove(_player);
-                this.playerSpawns.put(player, spawnLocation);
+        for(UUID uuid : this.playerSpawns.keySet()){
+            if(uuid.equals(player.getUUID())){
+                Location spawnLocation = this.playerSpawns.get(uuid);
+                this.playerSpawns.remove(uuid);
+                this.playerSpawns.put(uuid, spawnLocation);
                 break;
             }
         }
         // If instance is running, teleport player into it
         if(this.isRunning){
-            this.teleportPlayer(player.getPlayer(), this.playerSpawns.get(player));
+            this.teleportPlayer(Objects.requireNonNull(player.getPlayer()), this.playerSpawns.get(player.getUUID()));
         }
     }
 
     /**
      * Called when a player disconnect from the server
      */
-    public void onPlayerDisconnect(Player player){
+    public void onPlayerDisconnect(APIPlayer player){
 
     }
 
@@ -211,15 +217,15 @@ public class Instance extends BukkitRunnable{
      * Return a map with all players spawns locations
      * @return Hashmap with as key a Player and as value a Location
      */
-    private HashMap<APIPlayer, Location> getPlayerSpawnsList(){
-        HashMap<APIPlayer, Location> playerSpawns = new HashMap<>();
+    private HashMap<UUID, Location> getPlayerSpawnsList(){
+        HashMap<UUID, Location> playerSpawns = new HashMap<>();
         switch(this.instanceSettings.getGameType()) {
-            case SOLO -> playerSpawns.put(this.teams.get(0).getPlayers().get(0), this.getSpawnPoints().get(0));
+            case SOLO -> playerSpawns.put(this.teams.get(0).getPlayers().get(0).getUUID(), this.getSpawnPoints().get(0));
             case ONLY_TEAM -> {
                 List<Location> spawnPoints = this.getSpawnPoints();
                 int mod = spawnPoints.size();
                 for (int i = 0; i < this.getPlayerCount(); i++) {
-                    playerSpawns.put(this.teams.get(0).getPlayers().get(i), spawnPoints.get(i % mod));
+                    playerSpawns.put(this.teams.get(0).getPlayers().get(i).getUUID(), spawnPoints.get(i % mod));
                 }
             }
             case TEAM_VS_TEAM -> {
@@ -227,10 +233,10 @@ public class Instance extends BukkitRunnable{
                 List<Location> t1SpawnPoints = this.getSpawnPoints().subList(0, spawnPointsCount);
                 List<Location> t2SpawnPoints = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
                 for (int i = 0; i < this.teams.get(0).getTeamSize(); i++) {
-                    playerSpawns.put(this.teams.get(0).getPlayers().get(i), t1SpawnPoints.get(i % t1SpawnPoints.size()));
+                    playerSpawns.put(this.teams.get(0).getPlayers().get(i).getUUID(), t1SpawnPoints.get(i % t1SpawnPoints.size()));
                 }
                 for (int i = 0; i < this.teams.get(1).getTeamSize(); i++) {
-                    playerSpawns.put(this.teams.get(1).getPlayers().get(i), t2SpawnPoints.get(i % t2SpawnPoints.size()));
+                    playerSpawns.put(this.teams.get(1).getPlayers().get(i).getUUID(), t2SpawnPoints.get(i % t2SpawnPoints.size()));
                 }
             }
         }
