@@ -3,6 +3,8 @@ package fr.multimc.api.spigot.samplecode.teams;
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.spigot.managers.schematics.Schematic;
 import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
+import fr.multimc.api.spigot.managers.teams.APIPlayer;
+import fr.multimc.api.spigot.managers.teams.Team;
 import fr.multimc.api.spigot.managers.worlds.APIWorld;
 import fr.multimc.api.spigot.managers.worlds.WorldSettings;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
@@ -25,7 +27,6 @@ import java.util.List;
 
 public class TeamSampleCode implements SampleCode, Listener {
 
-    private TeamManager teamManager;
     private InstancesManager instancesManager;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -34,14 +35,14 @@ public class TeamSampleCode implements SampleCode, Listener {
         new File(plugin.getDataFolder().getPath() + "/database.db").delete();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
-        teamManager = new TeamManager(database);
+        TeamManager teamManager = new TeamManager(database);
         teamManager.addTeam("CODELA", "T1", "Xen0Xys");
 
         Schematic schematic = new Schematic(plugin, "instances_test");
         InstanceSettings settings = new InstanceSettings(schematic,
                 new SchematicOptions(),
                 GameType.SOLO,
-                15, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
+                120, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 new ArrayList<>(),
                 new HashMap<>(),
                 20,
@@ -68,13 +69,13 @@ public class TeamSampleCode implements SampleCode, Listener {
             e.setCancelled(true);
             try {
                 // Temp
-//                List<Team> teams = new ArrayList<>();
-//                Team team = new Team("T1", 0, Bukkit.getPlayer("Xen0Xys"));
-//                for(int i = 0; i < 32; i++){
-//                    teams.add(team);
-//                }
-//                instanceManager.start(teams);
-                instancesManager.start(teamManager.loadTeams());
+                List<Team> teams = new ArrayList<>();
+                Team team = new Team("T1", "CODELA", new APIPlayer("Xen0Xys"));
+                for(int i = 0; i < 32; i++){
+                    teams.add(team);
+                }
+                instancesManager.start(teams);
+//                instancesManager.start(teamManager.loadTeams());
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
                 throw new RuntimeException(ex);
             }

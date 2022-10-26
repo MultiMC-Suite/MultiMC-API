@@ -2,6 +2,7 @@ package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.customs.CustomEntity;
+import fr.multimc.api.spigot.managers.schematics.Schematic;
 import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
@@ -12,7 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -28,14 +29,16 @@ public class Instance extends BukkitRunnable{
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
     private final List<APIPlayer> players;
-    HashMap<UUID, Location> playerSpawns;
+    private final HashMap<UUID, Location> playerSpawns;
+    private InstanceState instanceState;
 
     private int remainingTime;
 
     public Instance(JavaPlugin plugin, InstancesManager instancesManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
-        this.plugin = plugin;
         this.instancesManager = instancesManager;
         this.instanceId = instanceId;
+        this.updateState(InstanceState.PRE_CREATE);
+        this.plugin = plugin;
         this.instanceSettings = settings;
         this.instanceLocation = instanceLocation;
         this.teams = new ArrayList<>(teams);
@@ -43,6 +46,7 @@ public class Instance extends BukkitRunnable{
         this.remainingTime = this.instanceSettings.getDuration();
         this.players = this.getInstancePlayers();
         this.playerSpawns = this.getPlayerSpawnsList();
+        this.updateState(InstanceState.CREATE);
     }
 
     // GAME ACTIONS
@@ -50,25 +54,11 @@ public class Instance extends BukkitRunnable{
      * Initialize game instance
      */
     public void init(){
+        this.updateState(InstanceState.PRE_INIT);
         // Place schematic
-        try {
-            SchematicOptions options = instanceSettings.getSchematicOptions();
-            options.setLocation(instanceLocation);
-            instanceSettings.getSchematic().paste(instanceSettings.getSchematicOptions());
-        } catch (WorldEditException e) {
-            throw new RuntimeException(e);
-        }
-        // Spawn entities
-        for(CustomEntity entity : instanceSettings.getEntities()){
-            instanceEntities.add(entity.spawn(instanceLocation, this.instanceId));
-        }
-    }
-
-    /**
-     * Start game instance
-     */
-    public void start(){
-        // Teleport players
+        SchematicOptions options = instanceSettings.getSchematicOptions();
+        options.setLocation(instanceLocation);
+        this.pasteSchematic(instanceSettings.getSchematic(), options);
         for(UUID uuid: this.playerSpawns.keySet()){
             for(APIPlayer apiPlayer : this.players){
                 if(apiPlayer.getUUID().equals(uuid)){
@@ -79,33 +69,47 @@ public class Instance extends BukkitRunnable{
                 }
             }
         }
-        this.isRunning = true;
-        this.runTaskAsynchronously(this.plugin);
-        // this.runTaskTimerAsynchronously(this.plugin, 0, 20);
+        // Spawn entities
+        for(CustomEntity entity : instanceSettings.getEntities()){
+            instanceEntities.add(entity.spawn(instanceLocation, this.instanceId));
+        }
+        this.updateState(InstanceState.INIT);
     }
 
     /**
-     * Stop instance
-     * @param teleportLobby True if player need to be teleported to the lobby at the end
+     * Start game instance
      */
-    public void stop(boolean teleportLobby){
-        this.isRunning = false;
-        if(teleportLobby){
-            for(APIPlayer apiPlayer : this.players){
-                Player player = apiPlayer.getPlayer();
-                if(player != null){
-                    this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
-                }
-            }
+    public void start(){
+        this.updateState(InstanceState.PRE_START);
+
+        this.isRunning = true;
+        this.runTaskAsynchronously(this.plugin);
+        this.updateState(InstanceState.START);
+    }
+
+    // TODO: Move
+    private void pasteSchematic(Schematic schematic, SchematicOptions schematicOptions){
+        try {
+            schematic.paste(schematicOptions);
+        } catch (WorldEditException e) {
+            throw new RuntimeException(e);
         }
-        this.cancel();
     }
 
     /**
      * Default instance stop (players will return to the lobby)
      */
     public void stop(){
-        this.stop(true);
+        this.updateState(InstanceState.PRE_STOP);
+        this.isRunning = false;
+        for(APIPlayer apiPlayer : this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
+            }
+        }
+        this.cancel();
+        this.updateState(InstanceState.STOP);
     }
 
     /**
@@ -167,7 +171,7 @@ public class Instance extends BukkitRunnable{
             }
         }
         if(remainingTime < 0){
-            this.stop(true);
+            this.stop();
         }
     }
 
@@ -176,8 +180,10 @@ public class Instance extends BukkitRunnable{
      * @param player Player to teleport
      * @param location Target location
      */
-    private void teleportPlayer(@NotNull Player player, @NotNull Location location){
-        Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
+    public void teleportPlayer(@Nullable Player player, @Nullable Location location){
+        if(player != null && location != null){
+            Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
+        }
     }
 
     /**
@@ -200,7 +206,7 @@ public class Instance extends BukkitRunnable{
         }
         // If instance is running, teleport player into it
         if(this.isRunning){
-            this.teleportPlayer(Objects.requireNonNull(player.getPlayer()), this.playerSpawns.get(player.getUUID()));
+            this.teleportPlayer(player.getPlayer(), this.playerSpawns.get(player.getUUID()));
         }
     }
 
@@ -209,6 +215,15 @@ public class Instance extends BukkitRunnable{
      */
     public void onPlayerDisconnect(APIPlayer player){
 
+    }
+
+    /**
+     * Called to update instance state for InstanceManager
+     * @param state New InstanceState
+     */
+    protected void updateState(InstanceState state){
+        this.instanceState = state;
+        this.instancesManager.updateInstanceState(this.instanceId, state);
     }
 
     // PRIVATE GETTERS
@@ -312,5 +327,8 @@ public class Instance extends BukkitRunnable{
     }
     public List<APIPlayer> getPlayers() {
         return players;
+    }
+    public InstanceState getInstanceState() {
+        return instanceState;
     }
 }

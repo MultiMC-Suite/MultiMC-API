@@ -4,18 +4,20 @@ import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.managers.teams.Team;
 import fr.multimc.api.spigot.managers.worlds.APIWorld;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,11 +27,13 @@ public class InstancesManager implements Listener {
     private final JavaPlugin plugin;
     private final List<Instance> instances;
     private List<Team> teams = new ArrayList<>();
+    private final HashMap<Integer, InstanceState> instancesState = new HashMap<>();
     private final GameType gameType;
     private final Class<? extends Instance> instanceClass;
     private final InstanceSettings settings;
     private final Logger logger;
     private boolean isStarted = false;
+
 
     private final APIWorld lobby;
     private final APIWorld game;
@@ -48,19 +52,16 @@ public class InstancesManager implements Listener {
     }
 
     public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                try {
-                    startAsync(teams);
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                startAsync(teams);
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        }.runTaskAsynchronously(this.plugin);
+        });
     }
 
-    private void startAsync(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    private void startAsync(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
         this.instances.clear();
         this.teams = new ArrayList<>(teams);
         List<List<Team>> gameTeams = new ArrayList<>();
@@ -91,10 +92,14 @@ public class InstancesManager implements Listener {
                         this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
             }
         }
+        this.awaitState(InstanceState.CREATE);
         // Init instances
         this.instances.forEach(this::initInstances);
+        this.awaitState(InstanceState.INIT);
+        Thread.sleep(5000);
         // Start instances
         this.instances.forEach(this::startInstances);
+        this.awaitState(InstanceState.START);
         this.isStarted = true;
     }
 
@@ -103,21 +108,28 @@ public class InstancesManager implements Listener {
     }
 
     private void initInstances(Instance instance){
-        this.logger.info(String.format("Initializing instance %d...", instance.getInstanceId()));
         instance.init();
-        this.logger.info(String.format("Instance %d initialized!", instance.getInstanceId()));
     }
 
     private void startInstances(Instance instance){
-        this.logger.info(String.format("Starting instance %d...", instance.getInstanceId()));
         instance.start();
-        this.logger.info(String.format("Instance %d started!", instance.getInstanceId()));
     }
 
     private void stopInstances(Instance instance){
-        this.logger.info(String.format("Stopping instance %d...", instance.getInstanceId()));
-        instance.stop();
-        this.logger.info(String.format("Instance %d stopped!", instance.getInstanceId()));
+       instance.stop();
+    }
+
+    // TODO: use methods
+    private void sendTeamMessage(String message){
+        for(Team team : this.teams){
+            team.sendMessage(message);
+        }
+    }
+
+    private void sendTeamTitle(Component title, Component subtitle){
+        for(Team team : this.teams){
+            team.sendTitle(title, subtitle);
+        }
     }
 
     private List<List<Team>> getTeamsTuple(List<Team> teams){
@@ -163,7 +175,6 @@ public class InstancesManager implements Listener {
         return teams;
     }
 
-
     public APIWorld getLobbyWorld(){
         return this.lobby;
     }
@@ -176,9 +187,44 @@ public class InstancesManager implements Listener {
         return this.isStarted;
     }
 
-    @Deprecated
-    public Location getLobbySpawnLocation(){
-        return this.lobby.getSpawnPoint();
+    protected void updateInstanceState(int instanceId, InstanceState state){
+        if(instancesState.containsKey(instanceId)){
+            this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
+            instancesState.replace(instanceId, state);
+        } else {
+            this.logger.info(String.format("Instance %d set state to %s", instanceId, state));
+            instancesState.put(instanceId, state);
+        }
+    }
+
+    private void awaitState(InstanceState state){
+        boolean isStateReached = false;
+        while(!isStateReached){
+            for(int instanceId : this.instancesState.keySet()){
+                if(this.instancesState.get(instanceId) != state){
+                    isStateReached = false;
+                    break;
+                }else{
+                    isStateReached = true;
+                }
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e){
+        if(e.getPlayer().getWorld().equals(this.game.getWorld())){
+            if(!this.isStarted){
+                if(e.getFrom().distance(e.getTo()) > 0){
+                    e.setCancelled(true);
+                }
+            }
+        }
     }
 
     @EventHandler

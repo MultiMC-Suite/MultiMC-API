@@ -33,7 +33,6 @@ public class APIPlayer {
     }
 
     private UUID fetchUUID(){
-        System.out.println("Fetching UUID for " + this.name);
         return Bukkit.getOfflinePlayer(this.name).getUniqueId();
     }
 

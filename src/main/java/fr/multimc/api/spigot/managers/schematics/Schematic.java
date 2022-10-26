@@ -30,8 +30,6 @@ public class Schematic {
         this.name = name;
         File pluginFile = new File("schematics/" + name + ".schem");
         this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
-        System.out.println(pluginFile);
-        System.out.println(schematicFile);
         if(!schematicFile.exists()) {
             plugin.saveResource(pluginFile.getPath(), false);
         }
@@ -67,10 +65,10 @@ public class Schematic {
     }
 
     public void paste(@Nonnull SchematicOptions options) throws WorldEditException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.LOCATION.getWorld()))) {
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.location.getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
             PasteBuilder pasteBuilder = clipboardHolder.createPaste(editSession)
-                    .to(BlockVector3.at(options.LOCATION.getX(), options.LOCATION.getY(), options.LOCATION.getZ()))
+                    .to(BlockVector3.at(options.location.getX(), options.location.getY(), options.location.getZ()))
                     .ignoreAirBlocks(options.IGNORE_AIR)
                     .copyEntities(options.COPY_ENTITIES)
                     .copyBiomes(options.COPY_BIOMES);
