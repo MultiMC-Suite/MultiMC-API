@@ -1,7 +1,6 @@
 package fr.multimc.api.spigot.tools.locations;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 
 @SuppressWarnings("unused")
 public class RelativeLocation {
