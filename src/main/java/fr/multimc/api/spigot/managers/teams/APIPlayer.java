@@ -98,7 +98,7 @@ public class APIPlayer {
 
         Location target = toCenter ? location.getBlock().getLocation().clone().add(.5, 0, .5) : location;
         this.getPlayer().teleport(target);
-        return new Success("%s has been teleported to %d, %d, %d.", this.name, target.getX(), target.getY(), target.getZ());
+        return new Success("%s has been teleported to %f, %f, %f.", this.name, target.getX(), target.getY(), target.getZ());
     }
 
     @Nonnull
