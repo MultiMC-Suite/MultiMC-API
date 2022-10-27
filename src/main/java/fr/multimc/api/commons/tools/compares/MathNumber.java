@@ -1,5 +1,6 @@
-package fr.multimc.api.commons.tools.numbers;
+package fr.multimc.api.commons.tools.compares;
 
+@SuppressWarnings("unused")
 public class MathNumber {
     public static boolean isDoubleBetween(double number, double min, double max) {
         return number >= min && number <= max;
