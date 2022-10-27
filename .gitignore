@@ -164,3 +164,4 @@ buildNumber.properties
 .idea
 
 src/main/java/fr/multimc/api/spigot/ServerApi.java
+src/main/java/Rename.java
