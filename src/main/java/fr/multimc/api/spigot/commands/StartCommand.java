@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class StartCommand implements CommandExecutor {
-
     private final InstancesManager instancesManager;
     private final TeamManager teamManager;
 

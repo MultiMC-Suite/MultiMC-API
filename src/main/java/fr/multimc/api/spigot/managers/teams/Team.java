@@ -5,6 +5,9 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,31 +46,28 @@ public class Team {
         return false;
     }
 
-    public void sendMessage(String message){
-        for(APIPlayer apiPlayer: this.players){
-            Player player = apiPlayer.getPlayer();
-            if(player != null){
-                player.sendMessage(message);
-            }
-        }
+    public void sendMessage(@Nonnull String message){
+        for (APIPlayer player: this.players) player.sendMessage(message);
     }
 
-    public void sendTitle(Component title, Component subtitle){
-        for(APIPlayer apiPlayer: this.players){
-            Player player = apiPlayer.getPlayer();
-            if(player != null){
-                player.showTitle(Title.title(title, subtitle));
-            }
-        }
+    public void sendMessage(@Nonnull Component message){
+        for (APIPlayer player: this.players) player.sendMessage(message);
     }
 
-    public void sendActionBar(Component actionBar){
-        for(APIPlayer apiPlayer: this.players){
-            Player player = apiPlayer.getPlayer();
-            if(player != null){
-                player.sendActionBar(actionBar);
-            }
-        }
+    public void sendTitle(@Nullable String title, @Nullable String subtitle){
+        for (APIPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
+    }
+
+    public void sendTitle(@Nullable Component title, @Nullable Component subtitle){
+        for (APIPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
+    }
+
+    public void sendActionBar(@Nonnull String bar){
+        for (APIPlayer player: this.players) player.sendActionBar(bar);
+    }
+
+    public void sendActionBar(@Nonnull Component bar){
+        for (APIPlayer player: this.players) player.sendActionBar(bar);
     }
 
     public void playSound(Sound sound){
