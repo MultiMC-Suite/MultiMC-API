@@ -13,12 +13,14 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
+import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class Schematic {
@@ -75,6 +77,19 @@ public class Schematic {
             Operation operation = pasteBuilder.build();
             Operations.complete(operation);
         }
+    }
+
+    public HashMap<Material, Integer> getBlockCount(){
+        HashMap<Material, Integer> blockCount = new HashMap<>();
+        for(BlockVector3 blockVector3: this.clipboard.getRegion()){
+            Material material = BukkitAdapter.adapt(this.clipboard.getBlock(blockVector3).getBlockType());
+            if(blockCount.containsKey(material)){
+                blockCount.put(material, blockCount.get(material) + 1);
+            }else{
+                blockCount.put(material, 1);
+            }
+        }
+        return blockCount;
     }
 
     public String getName() {

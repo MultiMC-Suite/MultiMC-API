@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
+import fr.multimc.api.commons.tools.times.TimeParsing;
 import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.managers.teams.Team;
@@ -7,6 +8,7 @@ import fr.multimc.api.spigot.managers.worlds.APIWorld;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -78,7 +80,7 @@ public class InstancesManager implements Listener {
         }
         // Create instances
         for(int i = 0; i < this.getInstanceCount(); i++){
-            this.logger.info(String.format("Creating instance %d/%d", i+1, this.getInstanceCount()));
+            this.logger.info(String.format("Creating instance %d/%d", i + 1, this.getInstanceCount()));
             Location location = new Location(this.game.getWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
@@ -94,32 +96,54 @@ public class InstancesManager implements Listener {
         }
         this.awaitState(InstanceState.CREATE);
         // Init instances
-        this.instances.forEach(this::initInstances);
+        long dt;
+        long dtAvg = 0;
+        for(int i = 0; i < this.instances.size(); i++){
+            dt = this.initInstance(this.instances.get(i));
+            if(dtAvg == 0){
+                dtAvg = dt;
+            }
+            dtAvg = (dtAvg + dt) / 2;
+            this.sendTeamActionBar(
+                    Component.text(
+                            String.format("Instance %d/%d initialized (%s remaining)",
+                                    i + 1,
+                                    this.instances.size(),
+                                    TimeParsing.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
+            System.out.println("----------------------");
+            System.out.println(TimeParsing.format(dt, "mm:ss:ms"));
+            System.out.println(TimeParsing.format(dtAvg, "mm:ss:ms"));
+        }
         this.awaitState(InstanceState.INIT);
-        Thread.sleep(5000);
+        for(int i = 0; i < 5; i++){
+            Thread.sleep(1000);
+            this.sendTeamTitle(Component.text(String.format("Game starts in %d", 4 - i)), Component.text(""));
+            this.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+        }
         // Start instances
-        this.instances.forEach(this::startInstances);
+        this.instances.forEach(this::startInstance);
         this.awaitState(InstanceState.START);
         this.isStarted = true;
     }
 
     public void stopInstances(){
-        instances.forEach(this::stopInstances);
+        instances.forEach(this::stopInstance);
     }
 
-    private void initInstances(Instance instance){
+    private long initInstance(Instance instance) {
+        long dt = System.currentTimeMillis();
         instance.init();
+        return System.currentTimeMillis() - dt;
     }
 
-    private void startInstances(Instance instance){
+    private void startInstance(Instance instance){
         instance.start();
     }
 
-    private void stopInstances(Instance instance){
+    private void stopInstance(Instance instance){
        instance.stop();
     }
 
-    // TODO: use methods
     private void sendTeamMessage(String message){
         for(Team team : this.teams){
             team.sendMessage(message);
@@ -129,6 +153,18 @@ public class InstancesManager implements Listener {
     private void sendTeamTitle(Component title, Component subtitle){
         for(Team team : this.teams){
             team.sendTitle(title, subtitle);
+        }
+    }
+
+    private void sendTeamActionBar(Component actionBar){
+        for(Team team : this.teams){
+            team.sendActionBar(actionBar);
+        }
+    }
+
+    private void playSound(Sound sound){
+        for(Team team : this.teams){
+            team.playSound(sound);
         }
     }
 

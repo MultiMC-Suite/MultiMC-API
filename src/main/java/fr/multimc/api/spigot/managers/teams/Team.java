@@ -1,6 +1,9 @@
 package fr.multimc.api.spigot.managers.teams;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,6 +68,15 @@ public class Team {
 
     public void sendActionBar(@Nonnull Component bar){
         for (APIPlayer player: this.players) player.sendActionBar(bar);
+    }
+
+    public void playSound(Sound sound){
+        for(APIPlayer apiPlayer: this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                player.playSound(player.getLocation(), sound, 1, 1);
+            }
+        }
     }
 
     public String getName() {

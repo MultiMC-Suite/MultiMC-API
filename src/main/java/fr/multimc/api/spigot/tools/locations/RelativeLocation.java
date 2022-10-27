@@ -1,7 +1,6 @@
 package fr.multimc.api.spigot.tools.locations;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 
 @SuppressWarnings("unused")
 public class RelativeLocation {
@@ -9,23 +8,23 @@ public class RelativeLocation {
     private final double x;
     private final double y;
     private final double z;
-    private final float pitch;
     private final float yaw;
+    private final float pitch;
 
     public RelativeLocation(double x, double y, double z, float yaw, float pitch) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.pitch = pitch;
         this.yaw = yaw;
+        this.pitch = pitch;
     }
 
     public RelativeLocation(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.pitch = 0;
         this.yaw = 0;
+        this.pitch = 0;
     }
 
     public static RelativeLocation getRelativeLocation(Location loc1, Location loc2){
