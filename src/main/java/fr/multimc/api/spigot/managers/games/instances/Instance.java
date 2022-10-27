@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -62,10 +63,7 @@ public class Instance extends BukkitRunnable{
         for(UUID uuid: this.playerSpawns.keySet()){
             for(APIPlayer apiPlayer : this.players){
                 if(apiPlayer.getUUID().equals(uuid)){
-                    Player player = apiPlayer.getPlayer();
-                    if(player != null){
-                        this.teleportPlayer(player, this.playerSpawns.get(uuid));
-                    }
+                    this.teleportPlayer(apiPlayer, this.playerSpawns.get(uuid));
                 }
             }
         }
@@ -93,10 +91,7 @@ public class Instance extends BukkitRunnable{
         this.updateState(InstanceState.PRE_STOP);
         this.isRunning = false;
         for(APIPlayer apiPlayer : this.players){
-            Player player = apiPlayer.getPlayer();
-            if(player != null){
-                this.teleportPlayer(player, this.instancesManager.getLobbyWorld().getSpawnPoint());
-            }
+            this.teleportPlayer(apiPlayer, this.instancesManager.getLobbyWorld().getSpawnPoint());
         }
         this.cancel();
         this.updateState(InstanceState.STOP);
@@ -167,12 +162,12 @@ public class Instance extends BukkitRunnable{
 
     /**
      * Asynchronously teleport a player to a location
-     * @param player Player to teleport
+     * @param apiPlayer Player to teleport
      * @param location Target location
      */
-    public void teleportPlayer(@Nullable Player player, @Nullable Location location){
-        if(player != null && location != null){
-            Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
+    public void teleportPlayer(@NotNull APIPlayer apiPlayer, @Nullable Location location){
+        if(location != null){
+            Bukkit.getScheduler().runTask(this.plugin, () -> apiPlayer.teleport(location));
         }
     }
 
@@ -180,7 +175,7 @@ public class Instance extends BukkitRunnable{
      * Called to reconnect a disconnected player
      * @param player Player to reconnect
      */
-    public void onPlayerReconnect(APIPlayer player){
+    public void onPlayerReconnect(@NotNull APIPlayer player){
         // Delete old player and add new one into players list
         // TODO: test without removing player
         this.players.removeIf(_player -> _player.equals(player));
@@ -196,14 +191,14 @@ public class Instance extends BukkitRunnable{
         }
         // If instance is running, teleport player into it
         if(this.isRunning){
-            this.teleportPlayer(player.getPlayer(), this.playerSpawns.get(player.getUUID()));
+            this.teleportPlayer(player, this.playerSpawns.get(player.getUUID()));
         }
     }
 
     /**
      * Called when a player disconnect from the server
      */
-    public void onPlayerDisconnect(APIPlayer player){
+    public void onPlayerDisconnect(@NotNull APIPlayer player){
 
     }
 
@@ -211,7 +206,7 @@ public class Instance extends BukkitRunnable{
      * Called to update instance state for InstanceManager
      * @param state New InstanceState
      */
-    protected void updateState(InstanceState state){
+    protected void updateState(@NotNull InstanceState state){
         this.instanceState = state;
         this.instancesManager.updateInstanceState(this.instanceId, state);
     }
@@ -221,7 +216,7 @@ public class Instance extends BukkitRunnable{
      * @param schematic Schematic object
      * @param schematicOptions SchematicOptions object
      */
-    private void pasteSchematic(Schematic schematic, SchematicOptions schematicOptions){
+    private void pasteSchematic(@NotNull Schematic schematic, @NotNull SchematicOptions schematicOptions){
         try {
             schematic.paste(schematicOptions);
         } catch (WorldEditException e) {

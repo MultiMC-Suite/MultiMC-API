@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -190,6 +191,11 @@ public class APIPlayer {
 
         this.getPlayer().showTitle(Title.title(new TextBuilder(title).build(), new TextBuilder(subtitle).build(), times));
         return new Success("%s received the title.", this.name);
+    }
+
+    @Nullable
+    public PlayerInventory getInventory() {
+        return this.isOnline() ? this.getPlayer().getInventory() : null;
     }
 
     // CHECKS \\

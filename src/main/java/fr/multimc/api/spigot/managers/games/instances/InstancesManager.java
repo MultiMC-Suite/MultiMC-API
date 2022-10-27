@@ -110,9 +110,6 @@ public class InstancesManager implements Listener {
                                     i + 1,
                                     this.instances.size(),
                                     TimeParsing.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
-            System.out.println("----------------------");
-            System.out.println(TimeParsing.format(dt, "mm:ss:ms"));
-            System.out.println(TimeParsing.format(dtAvg, "mm:ss:ms"));
         }
         this.awaitState(InstanceState.INIT);
         for(int i = 0; i < 5; i++){
@@ -144,24 +141,42 @@ public class InstancesManager implements Listener {
        instance.stop();
     }
 
-    private void sendTeamMessage(String message){
+    /**
+     * Send message to all teams
+     * @param message Message to send
+     */
+    private void sendTeamMessage(Component message){
         for(Team team : this.teams){
             team.sendMessage(message);
         }
     }
 
+    /**
+     * Send title to all teams
+     * @param title Title to send
+     * @param subtitle Subtitle to send
+     */
     private void sendTeamTitle(Component title, Component subtitle){
         for(Team team : this.teams){
             team.sendTitle(title, subtitle);
         }
     }
 
+    /**
+     * Send action bar to all teams
+     * @param actionBar Action bar to send
+     */
     private void sendTeamActionBar(Component actionBar){
         for(Team team : this.teams){
             team.sendActionBar(actionBar);
         }
     }
 
+    /**
+     * Play sound to all teams
+     * @param sound Sound to play
+     */
+    @SuppressWarnings("SameParameterValue")
     private void playSound(Sound sound){
         for(Team team : this.teams){
             team.playSound(sound);
