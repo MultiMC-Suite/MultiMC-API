@@ -1,11 +1,12 @@
 package fr.multimc.api.spigot.tools.locations;
 
-import fr.multimc.api.commons.tools.numbers.MathNumber;
+import fr.multimc.api.commons.tools.compares.MathNumber;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("unused")
 public class Zone {
     private final double minX, maxX, minY, maxY, minZ, maxZ;
 
