@@ -60,6 +60,15 @@ public class Team {
         }
     }
 
+    public void sendActionBar(Component actionBar){
+        for(APIPlayer apiPlayer: this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                player.sendActionBar(actionBar);
+            }
+        }
+    }
+
     public String getName() {
         return name;
     }

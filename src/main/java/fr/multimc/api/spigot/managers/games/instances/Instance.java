@@ -81,19 +81,9 @@ public class Instance extends BukkitRunnable{
      */
     public void start(){
         this.updateState(InstanceState.PRE_START);
-
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
         this.updateState(InstanceState.START);
-    }
-
-    // TODO: Move
-    private void pasteSchematic(Schematic schematic, SchematicOptions schematicOptions){
-        try {
-            schematic.paste(schematicOptions);
-        } catch (WorldEditException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -224,6 +214,19 @@ public class Instance extends BukkitRunnable{
     protected void updateState(InstanceState state){
         this.instanceState = state;
         this.instancesManager.updateInstanceState(this.instanceId, state);
+    }
+
+    /**
+     * Paste instance schematic
+     * @param schematic Schematic object
+     * @param schematicOptions SchematicOptions object
+     */
+    private void pasteSchematic(Schematic schematic, SchematicOptions schematicOptions){
+        try {
+            schematic.paste(schematicOptions);
+        } catch (WorldEditException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // PRIVATE GETTERS

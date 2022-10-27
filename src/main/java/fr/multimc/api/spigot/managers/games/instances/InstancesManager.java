@@ -51,7 +51,7 @@ public class InstancesManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void start(List<Team> teams){
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 startAsync(teams);
