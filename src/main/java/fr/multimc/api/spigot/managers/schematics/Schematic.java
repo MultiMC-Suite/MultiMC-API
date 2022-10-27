@@ -13,12 +13,14 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
+import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class Schematic {
@@ -30,8 +32,6 @@ public class Schematic {
         this.name = name;
         File pluginFile = new File("schematics/" + name + ".schem");
         this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
-        System.out.println(pluginFile);
-        System.out.println(schematicFile);
         if(!schematicFile.exists()) {
             plugin.saveResource(pluginFile.getPath(), false);
         }
@@ -67,16 +67,29 @@ public class Schematic {
     }
 
     public void paste(@Nonnull SchematicOptions options) throws WorldEditException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.LOCATION.getWorld()))) {
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.location.getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
             PasteBuilder pasteBuilder = clipboardHolder.createPaste(editSession)
-                    .to(BlockVector3.at(options.LOCATION.getX(), options.LOCATION.getY(), options.LOCATION.getZ()))
+                    .to(BlockVector3.at(options.location.getX(), options.location.getY(), options.location.getZ()))
                     .ignoreAirBlocks(options.IGNORE_AIR)
                     .copyEntities(options.COPY_ENTITIES)
                     .copyBiomes(options.COPY_BIOMES);
             Operation operation = pasteBuilder.build();
             Operations.complete(operation);
         }
+    }
+
+    public HashMap<Material, Integer> getBlockCount(){
+        HashMap<Material, Integer> blockCount = new HashMap<>();
+        for(BlockVector3 blockVector3: this.clipboard.getRegion()){
+            Material material = BukkitAdapter.adapt(this.clipboard.getBlock(blockVector3).getBlockType());
+            if(blockCount.containsKey(material)){
+                blockCount.put(material, blockCount.get(material) + 1);
+            }else{
+                blockCount.put(material, 1);
+            }
+        }
+        return blockCount;
     }
 
     public String getName() {

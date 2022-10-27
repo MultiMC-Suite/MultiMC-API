@@ -1,21 +1,25 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
+import fr.multimc.api.commons.tools.times.TimeParsing;
 import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.teams.APIPlayer;
 import fr.multimc.api.spigot.managers.teams.Team;
 import fr.multimc.api.spigot.managers.worlds.APIWorld;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,11 +29,13 @@ public class InstancesManager implements Listener {
     private final JavaPlugin plugin;
     private final List<Instance> instances;
     private List<Team> teams = new ArrayList<>();
+    private final HashMap<Integer, InstanceState> instancesState = new HashMap<>();
     private final GameType gameType;
     private final Class<? extends Instance> instanceClass;
     private final InstanceSettings settings;
     private final Logger logger;
     private boolean isStarted = false;
+
 
     private final APIWorld lobby;
     private final APIWorld game;
@@ -47,20 +53,17 @@ public class InstancesManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void start(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                try {
-                    startAsync(teams);
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+    public void start(List<Team> teams){
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                startAsync(teams);
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        }.runTaskAsynchronously(this.plugin);
+        });
     }
 
-    private void startAsync(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    private void startAsync(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
         this.instances.clear();
         this.teams = new ArrayList<>(teams);
         List<List<Team>> gameTeams = new ArrayList<>();
@@ -77,7 +80,7 @@ public class InstancesManager implements Listener {
         }
         // Create instances
         for(int i = 0; i < this.getInstanceCount(); i++){
-            this.logger.info(String.format("Creating instance %d/%d", i+1, this.getInstanceCount()));
+            this.logger.info(String.format("Creating instance %d/%d", i + 1, this.getInstanceCount()));
             Location location = new Location(this.game.getWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
@@ -91,33 +94,78 @@ public class InstancesManager implements Listener {
                         this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
             }
         }
+        this.awaitState(InstanceState.CREATE);
         // Init instances
-        this.instances.forEach(this::initInstances);
+        long dt;
+        long dtAvg = 0;
+        for(int i = 0; i < this.instances.size(); i++){
+            dt = this.initInstance(this.instances.get(i));
+            if(dtAvg == 0){
+                dtAvg = dt;
+            }
+            dtAvg = (dtAvg + dt) / 2;
+            this.sendTeamActionBar(
+                    Component.text(
+                            String.format("Instance %d/%d initialized (%s remaining)",
+                                    i + 1,
+                                    this.instances.size(),
+                                    TimeParsing.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
+            System.out.println("----------------------");
+            System.out.println(TimeParsing.format(dt, "mm:ss:ms"));
+            System.out.println(TimeParsing.format(dtAvg, "mm:ss:ms"));
+        }
+        this.awaitState(InstanceState.INIT);
+        for(int i = 0; i < 5; i++){
+            Thread.sleep(1000);
+            this.sendTeamTitle(Component.text(String.format("Game starts in %d", 4 - i)), Component.text(""));
+            this.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+        }
         // Start instances
-        this.instances.forEach(this::startInstances);
+        this.instances.forEach(this::startInstance);
+        this.awaitState(InstanceState.START);
         this.isStarted = true;
     }
 
     public void stopInstances(){
-        instances.forEach(this::stopInstances);
+        instances.forEach(this::stopInstance);
     }
 
-    private void initInstances(Instance instance){
-        this.logger.info(String.format("Initializing instance %d...", instance.getInstanceId()));
+    private long initInstance(Instance instance) {
+        long dt = System.currentTimeMillis();
         instance.init();
-        this.logger.info(String.format("Instance %d initialized!", instance.getInstanceId()));
+        return System.currentTimeMillis() - dt;
     }
 
-    private void startInstances(Instance instance){
-        this.logger.info(String.format("Starting instance %d...", instance.getInstanceId()));
+    private void startInstance(Instance instance){
         instance.start();
-        this.logger.info(String.format("Instance %d started!", instance.getInstanceId()));
     }
 
-    private void stopInstances(Instance instance){
-        this.logger.info(String.format("Stopping instance %d...", instance.getInstanceId()));
-        instance.stop();
-        this.logger.info(String.format("Instance %d stopped!", instance.getInstanceId()));
+    private void stopInstance(Instance instance){
+       instance.stop();
+    }
+
+    private void sendTeamMessage(String message){
+        for(Team team : this.teams){
+            team.sendMessage(message);
+        }
+    }
+
+    private void sendTeamTitle(Component title, Component subtitle){
+        for(Team team : this.teams){
+            team.sendTitle(title, subtitle);
+        }
+    }
+
+    private void sendTeamActionBar(Component actionBar){
+        for(Team team : this.teams){
+            team.sendActionBar(actionBar);
+        }
+    }
+
+    private void playSound(Sound sound){
+        for(Team team : this.teams){
+            team.playSound(sound);
+        }
     }
 
     private List<List<Team>> getTeamsTuple(List<Team> teams){
@@ -163,7 +211,6 @@ public class InstancesManager implements Listener {
         return teams;
     }
 
-
     public APIWorld getLobbyWorld(){
         return this.lobby;
     }
@@ -176,9 +223,44 @@ public class InstancesManager implements Listener {
         return this.isStarted;
     }
 
-    @Deprecated
-    public Location getLobbySpawnLocation(){
-        return this.lobby.getSpawnPoint();
+    protected void updateInstanceState(int instanceId, InstanceState state){
+        if(instancesState.containsKey(instanceId)){
+            this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
+            instancesState.replace(instanceId, state);
+        } else {
+            this.logger.info(String.format("Instance %d set state to %s", instanceId, state));
+            instancesState.put(instanceId, state);
+        }
+    }
+
+    private void awaitState(InstanceState state){
+        boolean isStateReached = false;
+        while(!isStateReached){
+            for(int instanceId : this.instancesState.keySet()){
+                if(this.instancesState.get(instanceId) != state){
+                    isStateReached = false;
+                    break;
+                }else{
+                    isStateReached = true;
+                }
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e){
+        if(e.getPlayer().getWorld().equals(this.game.getWorld())){
+            if(!this.isStarted){
+                if(e.getFrom().distance(e.getTo()) > 0){
+                    e.setCancelled(true);
+                }
+            }
+        }
     }
 
     @EventHandler

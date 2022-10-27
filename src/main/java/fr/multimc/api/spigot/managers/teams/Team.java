@@ -1,6 +1,14 @@
 package fr.multimc.api.spigot.managers.teams;
 
-import java.util.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class Team {
@@ -33,6 +41,42 @@ public class Team {
             }
         }
         return false;
+    }
+
+    public void sendMessage(String message){
+        for(APIPlayer apiPlayer: this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                player.sendMessage(message);
+            }
+        }
+    }
+
+    public void sendTitle(Component title, Component subtitle){
+        for(APIPlayer apiPlayer: this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                player.showTitle(Title.title(title, subtitle));
+            }
+        }
+    }
+
+    public void sendActionBar(Component actionBar){
+        for(APIPlayer apiPlayer: this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                player.sendActionBar(actionBar);
+            }
+        }
+    }
+
+    public void playSound(Sound sound){
+        for(APIPlayer apiPlayer: this.players){
+            Player player = apiPlayer.getPlayer();
+            if(player != null){
+                player.playSound(player.getLocation(), sound, 1, 1);
+            }
+        }
     }
 
     public String getName() {
