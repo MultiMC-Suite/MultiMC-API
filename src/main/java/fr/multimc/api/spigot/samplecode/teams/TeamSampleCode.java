@@ -20,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,18 +66,14 @@ public class TeamSampleCode implements SampleCode, Listener {
         String message = PlainTextComponentSerializer.plainText().serialize(e.message());
         if(message.contains("start")){
             e.setCancelled(true);
-            try {
-                // Temp
-                List<Team> teams = new ArrayList<>();
-                Team team = new Team("T1", "CODELA", new APIPlayer("Xen0Xys"));
-                for(int i = 0; i < 32; i++){
-                    teams.add(team);
-                }
-                instancesManager.start(teams);
-//                instancesManager.start(teamManager.loadTeams());
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
+            // Temp
+            List<Team> teams = new ArrayList<>();
+            Team team = new Team("T1", "CODELA", new APIPlayer("Xen0Xys"));
+            for(int i = 0; i < 32; i++){
+                teams.add(team);
             }
+            instancesManager.start(teams);
+//            instancesManager.start(teamManager.loadTeams());
         }else if(message.contains("stop")){
             e.setCancelled(true);
             instancesManager.stopInstances();
