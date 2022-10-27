@@ -7,48 +7,116 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class WorldSettings {
 
-    public final String WORLD_NAME;
-    public final boolean PREVENT_PVP, PREVENT_DAMAGES, PREVENT_BUILD, PREVENT_FOOD_LOSS;
-    public final Schematic SCHEMATIC;
-    public final RelativeLocation SPAWN;
+    private String worldName;
+    private boolean preventPvp, preventDamages, PreventBuild, PreventFoodLoss, preventTimeFlow;
+    private Schematic schematic;
+    private RelativeLocation spawn;
 
     public WorldSettings(@NotNull String worldName) {
-        this.WORLD_NAME = worldName;
-        this.SCHEMATIC = null;
-        this.PREVENT_DAMAGES = false;
-        this.PREVENT_PVP = false;
-        this.PREVENT_BUILD = false;
-        this.PREVENT_FOOD_LOSS = false;
-        this.SPAWN = new RelativeLocation(0.5, 100, 0.5);
+        this.worldName = worldName;
+        this.schematic = null;
+        this.preventDamages = false;
+        this.preventPvp = false;
+        this.PreventBuild = false;
+        this.PreventFoodLoss = false;
+        this.preventTimeFlow = false;
+        this.spawn = new RelativeLocation(0.5, 100, 0.5);
     }
 
     public WorldSettings(@NotNull String worldName, Schematic schematic) {
-        this.WORLD_NAME = worldName;
-        this.SCHEMATIC = schematic;
-        this.PREVENT_DAMAGES = false;
-        this.PREVENT_PVP = false;
-        this.PREVENT_BUILD = false;
-        this.PREVENT_FOOD_LOSS = false;
-        this.SPAWN = new RelativeLocation(0.5, 100, 0.5);
+        this.worldName = worldName;
+        this.schematic = schematic;
+        this.preventDamages = false;
+        this.preventPvp = false;
+        this.PreventBuild = false;
+        this.PreventFoodLoss = false;
+        this.preventTimeFlow = false;
+        this.spawn = new RelativeLocation(0.5, 100, 0.5);
     }
 
-    public WorldSettings(@NotNull String world_name, Schematic schematic, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food) {
-        this.WORLD_NAME = world_name;
-        this.PREVENT_DAMAGES = prevent_damages;
-        this.SCHEMATIC = schematic;
-        this.PREVENT_PVP = prevent_pvp;
-        this.PREVENT_BUILD = prevent_build;
-        this.PREVENT_FOOD_LOSS = prevent_food;
-        this.SPAWN = new RelativeLocation(0.5, 100, 0.5);
+    public WorldSettings(@NotNull String world_name, Schematic schematic, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food, boolean preventTimeFlow) {
+        this.worldName = world_name;
+        this.preventDamages = prevent_damages;
+        this.schematic = schematic;
+        this.preventPvp = prevent_pvp;
+        this.PreventBuild = prevent_build;
+        this.PreventFoodLoss = prevent_food;
+        this.preventTimeFlow = preventTimeFlow;
+        this.spawn = new RelativeLocation(0.5, 100, 0.5);
     }
 
-    public WorldSettings(@NotNull String world_name, Schematic schematic, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food, RelativeLocation spawn) {
-        this.WORLD_NAME = world_name;
-        this.PREVENT_DAMAGES = prevent_damages;
-        this.SCHEMATIC = schematic;
-        this.PREVENT_PVP = prevent_pvp;
-        this.PREVENT_BUILD = prevent_build;
-        this.PREVENT_FOOD_LOSS = prevent_food;
-        this.SPAWN = spawn;
+    public WorldSettings(@NotNull String world_name, Schematic schematic, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food, boolean preventTimeFlow, RelativeLocation spawn) {
+        this.worldName = world_name;
+        this.preventDamages = prevent_damages;
+        this.schematic = schematic;
+        this.preventPvp = prevent_pvp;
+        this.PreventBuild = prevent_build;
+        this.PreventFoodLoss = prevent_food;
+        this.preventTimeFlow = preventTimeFlow;
+        this.spawn = spawn;
+    }
+
+    public boolean isPreventTimeFlow() {
+        return preventTimeFlow;
+    }
+
+    public void setPreventTimeFlow(boolean preventTimeFlow) {
+        this.preventTimeFlow = preventTimeFlow;
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public void setWorldName(String worldName) {
+        this.worldName = worldName;
+    }
+
+    public boolean isPreventPvp() {
+        return preventPvp;
+    }
+
+    public void setPreventPvp(boolean preventPvp) {
+        this.preventPvp = preventPvp;
+    }
+
+    public boolean isPreventDamages() {
+        return preventDamages;
+    }
+
+    public void setPreventDamages(boolean preventDamages) {
+        this.preventDamages = preventDamages;
+    }
+
+    public boolean isPreventBuild() {
+        return PreventBuild;
+    }
+
+    public void setPreventBuild(boolean preventBuild) {
+        PreventBuild = preventBuild;
+    }
+
+    public boolean isPreventFoodLoss() {
+        return PreventFoodLoss;
+    }
+
+    public void setPreventFoodLoss(boolean preventFoodLoss) {
+        PreventFoodLoss = preventFoodLoss;
+    }
+
+    public Schematic getSchematic() {
+        return schematic;
+    }
+
+    public void setSchematic(Schematic schematic) {
+        this.schematic = schematic;
+    }
+
+    public RelativeLocation getSpawn() {
+        return spawn;
+    }
+
+    public void setSpawn(RelativeLocation spawn) {
+        this.spawn = spawn;
     }
 }
