@@ -13,6 +13,7 @@ import fr.multimc.api.spigot.managers.teams.TeamManager;
 import fr.multimc.api.spigot.samplecode.SampleCode;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Difficulty;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,22 +46,13 @@ public class TeamSampleCode implements SampleCode, Listener {
                 20);
         WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
                 schematic,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
                 true);
         WorldSettings gameWorldSettings = new WorldSettings("multimc_game",
                 null,
-                false,
-                true,
-                true,
-                true,
-                true,
-                true,
                 true);
+        lobbyWorldSettings.setDifficulty(Difficulty.PEACEFUL);
+        gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
+        gameWorldSettings.setPreventDamages(false);
         instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
     }
 

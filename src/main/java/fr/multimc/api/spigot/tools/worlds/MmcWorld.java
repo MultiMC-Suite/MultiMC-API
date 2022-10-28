@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -38,6 +39,7 @@ public class MmcWorld implements Listener {
             this.world.setStorm(false);
             this.world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         }
+        this.world.setDifficulty(this.worldSettings.getDifficulty());
     }
 
     private World generateWorld(){
@@ -127,6 +129,16 @@ public class MmcWorld implements Listener {
         if (player.getWorld().equals(this.world)) {
             if(this.worldSettings.isPreventPortalUse()){
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e){
+        Player player = e.getPlayer();
+        if (player.getWorld().equals(this.world)) {
+            if(this.worldSettings.getGameMode() != null){
+                player.setGameMode(this.worldSettings.getGameMode());
             }
         }
     }
