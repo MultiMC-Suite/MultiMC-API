@@ -60,10 +60,10 @@ public class Instance extends BukkitRunnable{
         options.setLocation(instanceLocation);
         this.pasteSchematic(instanceSettings.schematic(), options);
         for(UUID uuid: this.playerSpawns.keySet()){
-            for(MmcPlayer mmcPlayer : this.players){
-                if(mmcPlayer.getUUID().equals(uuid)){
-                    this.teleportPlayer(mmcPlayer, this.playerSpawns.get(uuid));
-                }
+            MmcPlayer mmcPlayer = this.players.stream().filter(p -> p.getUUID().equals(uuid)).findFirst().orElse(null);
+            if(mmcPlayer != null){
+                this.teleportPlayer(mmcPlayer, this.playerSpawns.get(uuid));
+                this.setPlayerSpawn(mmcPlayer, this.playerSpawns.get(uuid));
             }
         }
         // Spawn entities
@@ -167,6 +167,12 @@ public class Instance extends BukkitRunnable{
     public void teleportPlayer(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
         if(location != null){
             Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.teleport(location));
+        }
+    }
+
+    public void setPlayerSpawn(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
+        if(location != null){
+            Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.setSpawnPoint(location));
         }
     }
 

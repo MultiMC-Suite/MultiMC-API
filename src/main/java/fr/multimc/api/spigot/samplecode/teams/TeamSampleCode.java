@@ -54,7 +54,7 @@ public class TeamSampleCode implements SampleCode, Listener {
                 true);
         WorldSettings gameWorldSettings = new WorldSettings("multimc_game",
                 null,
-                true,
+                false,
                 true,
                 true,
                 true,

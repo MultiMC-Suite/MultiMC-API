@@ -253,6 +253,13 @@ public class MmcPlayer {
         return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
     }
 
+    @NotNull
+    public Status setSpawnPoint(@NotNull Location location){
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setBedSpawnLocation(location, true);
+        return new Success("%s's spawn point has been set!", this.name);
+    }
+
     // CHECKS \\
     @Override
     public boolean equals(Object obj) {
