@@ -64,10 +64,6 @@ public class WorldSettings {
         this.preventPortalUse = preventPortalUse;
     }
 
-
-
-
-
     public String getWorldName() {
         return worldName;
     }
@@ -98,8 +94,6 @@ public class WorldSettings {
     public boolean isPreventPortalUse() {
         return preventPortalUse;
     }
-
-
 
     public void setWorldName(String worldName) {
         this.worldName = worldName;
