@@ -329,4 +329,7 @@ public class Instance extends BukkitRunnable{
     public InstanceState getInstanceState() {
         return instanceState;
     }
+    public HashMap<UUID, Location> getPlayerSpawns() {
+        return playerSpawns;
+    }
 }
