@@ -1,8 +1,8 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
-import fr.multimc.api.spigot.customs.CustomEntity;
-import fr.multimc.api.spigot.managers.schematics.Schematic;
-import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
+import fr.multimc.api.spigot.tools.entities.MmcEntity;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
+import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.games.GameType;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public record InstanceSettings(Schematic schematic, SchematicOptions schematicOptions, GameType gameType, int duration,
-                               List<RelativeLocation> spawnPoints, List<CustomEntity> entities,
+                               List<RelativeLocation> spawnPoints, List<MmcEntity> entities,
                                HashMap<String, Object> customSettings, int tickDelay) {
 
     /**
@@ -33,7 +33,7 @@ public record InstanceSettings(Schematic schematic, SchematicOptions schematicOp
                             @NotNull GameType gameType,
                             int duration,
                             @NotNull List<RelativeLocation> spawnPoints,
-                            @Nullable List<CustomEntity> entities,
+                            @Nullable List<MmcEntity> entities,
                             @Nullable HashMap<String, Object> customSettings,
                             int tickDelay) {
         this.schematic = schematic;

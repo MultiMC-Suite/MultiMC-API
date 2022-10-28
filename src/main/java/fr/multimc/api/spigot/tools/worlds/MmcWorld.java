@@ -1,7 +1,7 @@
-package fr.multimc.api.spigot.managers.worlds;
+package fr.multimc.api.spigot.tools.worlds;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
+import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -17,13 +17,14 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class APIWorld implements Listener {
+@SuppressWarnings("unused")
+public class MmcWorld implements Listener {
 
     private final WorldSettings worldSettings;
     private final JavaPlugin plugin;
     private World world;
 
-    public APIWorld(JavaPlugin plugin, WorldSettings worldSettings) {
+    public MmcWorld(JavaPlugin plugin, WorldSettings worldSettings) {
         this.plugin = plugin;
         this.worldSettings = worldSettings;
         this.world = this.getWorld();
@@ -40,7 +41,7 @@ public class APIWorld implements Listener {
     }
 
     private World generateWorld(){
-        VoidWorldCreator worldCreator = new VoidWorldCreator();
+        VoidWorld worldCreator = new VoidWorld();
         this.world = worldCreator.generate(this.worldSettings.getWorldName());
         if(this.worldSettings.getSchematic() != null){
             try {

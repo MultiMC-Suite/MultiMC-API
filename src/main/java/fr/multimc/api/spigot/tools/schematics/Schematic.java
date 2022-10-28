@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.managers.schematics;
+package fr.multimc.api.spigot.tools.schematics;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;

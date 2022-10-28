@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.managers.teams;
+package fr.multimc.api.spigot.tools.entities.player;
 
 import fr.multimc.api.commons.tools.compares.StringFormatter;
 import fr.multimc.api.commons.tools.enums.Status;
@@ -8,7 +8,6 @@ import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.tools.players.PlayerSpeed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -26,21 +25,21 @@ import java.util.Objects;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions", "UnusedReturnValue"})
-public class APIPlayer {
+public class MmcPlayer {
     private final UUID uuid;
     private final String name;
 
-    public APIPlayer(@Nonnull UUID uuid){
+    public MmcPlayer(@Nonnull UUID uuid){
         this.uuid = uuid;
         this.name = this.fetchName();
     }
 
-    public APIPlayer(@Nonnull String name){
+    public MmcPlayer(@Nonnull String name){
         this.name = name;
         this.uuid = this.fetchUUID();
     }
 
-    public APIPlayer(@Nonnull Player player){
+    public MmcPlayer(@Nonnull Player player){
         this.uuid = player.getUniqueId();
         this.name = player.getName();
     }
@@ -79,7 +78,7 @@ public class APIPlayer {
     }
 
     @Nonnull
-    public Status teleport(@Nonnull APIPlayer target) {
+    public Status teleport(@Nonnull MmcPlayer target) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         if (!target.isOnline()) return new Error("%s is not online!", target.getName());
 
@@ -201,7 +200,7 @@ public class APIPlayer {
     // CHECKS \\
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof APIPlayer player){
+        if(obj instanceof MmcPlayer player){
             return player.getUUID() == this.uuid;
         }
         return false;

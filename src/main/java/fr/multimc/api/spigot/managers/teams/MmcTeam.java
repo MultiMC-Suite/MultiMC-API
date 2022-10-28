@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot.managers.teams;
 
+import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -14,14 +15,14 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public class Team {
+public class MmcTeam {
 
     private final String name;
     private final String teamCode;
-    private final List<APIPlayer> players;
+    private final List<MmcPlayer> players;
 
 
-    public Team(@NotNull String name, @NotNull String teamCode, @NotNull APIPlayer... localPlayers){
+    public MmcTeam(@NotNull String name, @NotNull String teamCode, @NotNull MmcPlayer... localPlayers){
         this.name = name;
         this.teamCode = teamCode;
         this.players = new ArrayList<>();
@@ -29,7 +30,7 @@ public class Team {
     }
 
     public boolean isPlayerInTeam(@NotNull UUID uuid){
-        for(APIPlayer player: this.players){
+        for(MmcPlayer player: this.players){
             if(player.getUUID() == uuid){
                 return true;
             }
@@ -37,8 +38,8 @@ public class Team {
         return false;
     }
 
-    public boolean isPlayerInTeam(@NotNull APIPlayer player){
-        for(APIPlayer _player: this.players){
+    public boolean isPlayerInTeam(@NotNull MmcPlayer player){
+        for(MmcPlayer _player: this.players){
             if(_player.equals(player)){
                 return true;
             }
@@ -47,32 +48,32 @@ public class Team {
     }
 
     public void sendMessage(@Nonnull String message){
-        for (APIPlayer player: this.players) player.sendMessage(message);
+        for (MmcPlayer player: this.players) player.sendMessage(message);
     }
 
     public void sendMessage(@Nonnull Component message){
-        for (APIPlayer player: this.players) player.sendMessage(message);
+        for (MmcPlayer player: this.players) player.sendMessage(message);
     }
 
     public void sendTitle(@Nullable String title, @Nullable String subtitle){
-        for (APIPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
+        for (MmcPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
     }
 
     public void sendTitle(@Nullable Component title, @Nullable Component subtitle){
-        for (APIPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
+        for (MmcPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
     }
 
     public void sendActionBar(@Nonnull String bar){
-        for (APIPlayer player: this.players) player.sendActionBar(bar);
+        for (MmcPlayer player: this.players) player.sendActionBar(bar);
     }
 
     public void sendActionBar(@Nonnull Component bar){
-        for (APIPlayer player: this.players) player.sendActionBar(bar);
+        for (MmcPlayer player: this.players) player.sendActionBar(bar);
     }
 
     public void playSound(@NotNull Sound sound){
-        for(APIPlayer apiPlayer: this.players){
-            Player player = apiPlayer.getPlayer();
+        for(MmcPlayer mmcPlayer : this.players){
+            Player player = mmcPlayer.getPlayer();
             if(player != null){
                 player.playSound(player.getLocation(), sound, 1, 1);
             }
@@ -88,7 +89,7 @@ public class Team {
     public int getTeamSize() {
         return players.size();
     }
-    public List<APIPlayer> getPlayers() {
+    public List<MmcPlayer> getPlayers() {
         return players;
     }
 }

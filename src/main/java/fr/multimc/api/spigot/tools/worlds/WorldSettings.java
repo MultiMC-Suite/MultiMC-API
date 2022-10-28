@@ -1,6 +1,6 @@
-package fr.multimc.api.spigot.managers.worlds;
+package fr.multimc.api.spigot.tools.worlds;
 
-import fr.multimc.api.spigot.managers.schematics.Schematic;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import org.jetbrains.annotations.NotNull;
 

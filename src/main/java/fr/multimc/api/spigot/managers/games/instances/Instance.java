@@ -1,12 +1,12 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.spigot.customs.CustomEntity;
-import fr.multimc.api.spigot.managers.schematics.Schematic;
-import fr.multimc.api.spigot.managers.teams.APIPlayer;
+import fr.multimc.api.spigot.tools.entities.MmcEntity;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
+import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
-import fr.multimc.api.spigot.managers.teams.Team;
+import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
+import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -25,23 +25,23 @@ public class Instance extends BukkitRunnable{
     private final InstanceSettings instanceSettings;
     private final Location instanceLocation;
     private final int instanceId;
-    private final List<Team> teams;
+    private final List<MmcTeam> mmcTeams;
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
-    private final List<APIPlayer> players;
+    private final List<MmcPlayer> players;
     private final HashMap<UUID, Location> playerSpawns;
     private InstanceState instanceState;
 
     private int remainingTime;
 
-    public Instance(JavaPlugin plugin, InstancesManager instancesManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<Team> teams) {
+    public Instance(JavaPlugin plugin, InstancesManager instancesManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams) {
         this.instancesManager = instancesManager;
         this.instanceId = instanceId;
         this.updateState(InstanceState.PRE_CREATE);
         this.plugin = plugin;
         this.instanceSettings = settings;
         this.instanceLocation = instanceLocation;
-        this.teams = new ArrayList<>(teams);
+        this.mmcTeams = new ArrayList<>(mmcTeams);
         this.instanceEntities = new ArrayList<>();
         this.remainingTime = this.instanceSettings.duration();
         this.players = this.getInstancePlayers();
@@ -60,14 +60,14 @@ public class Instance extends BukkitRunnable{
         options.setLocation(instanceLocation);
         this.pasteSchematic(instanceSettings.schematic(), options);
         for(UUID uuid: this.playerSpawns.keySet()){
-            for(APIPlayer apiPlayer : this.players){
-                if(apiPlayer.getUUID().equals(uuid)){
-                    this.teleportPlayer(apiPlayer, this.playerSpawns.get(uuid));
+            for(MmcPlayer mmcPlayer : this.players){
+                if(mmcPlayer.getUUID().equals(uuid)){
+                    this.teleportPlayer(mmcPlayer, this.playerSpawns.get(uuid));
                 }
             }
         }
         // Spawn entities
-        for(CustomEntity entity : instanceSettings.entities()){
+        for(MmcEntity entity : instanceSettings.entities()){
             instanceEntities.add(entity.spawn(instanceLocation, this.instanceId));
         }
         this.updateState(InstanceState.INIT);
@@ -89,8 +89,8 @@ public class Instance extends BukkitRunnable{
     public void stop(){
         this.updateState(InstanceState.PRE_STOP);
         this.isRunning = false;
-        for(APIPlayer apiPlayer : this.players){
-            this.teleportPlayer(apiPlayer, this.instancesManager.getLobbyWorld().getSpawnPoint());
+        for(MmcPlayer mmcPlayer : this.players){
+            this.teleportPlayer(mmcPlayer, this.instancesManager.getLobbyWorld().getSpawnPoint());
         }
         this.cancel();
         this.updateState(InstanceState.STOP);
@@ -161,12 +161,12 @@ public class Instance extends BukkitRunnable{
 
     /**
      * Asynchronously teleport a player to a location
-     * @param apiPlayer Player to teleport
+     * @param mmcPlayer Player to teleport
      * @param location Target location
      */
-    public void teleportPlayer(@NotNull APIPlayer apiPlayer, @Nullable Location location){
+    public void teleportPlayer(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
         if(location != null){
-            Bukkit.getScheduler().runTask(this.plugin, () -> apiPlayer.teleport(location));
+            Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.teleport(location));
         }
     }
 
@@ -174,7 +174,7 @@ public class Instance extends BukkitRunnable{
      * Called to reconnect a disconnected player
      * @param player Player to reconnect
      */
-    public void onPlayerReconnect(@NotNull APIPlayer player){
+    public void onPlayerReconnect(@NotNull MmcPlayer player){
         // If instance is running, teleport player into it
         if(this.isRunning){
             this.teleportPlayer(player, this.playerSpawns.get(player.getUUID()));
@@ -184,7 +184,7 @@ public class Instance extends BukkitRunnable{
     /**
      * Called when a player disconnect from the server
      */
-    public void onPlayerDisconnect(@NotNull APIPlayer player){}
+    public void onPlayerDisconnect(@NotNull MmcPlayer player){}
 
     /**
      * Called to update instance state for InstanceManager
@@ -216,23 +216,23 @@ public class Instance extends BukkitRunnable{
     private HashMap<UUID, Location> getPlayerSpawnsList(){
         HashMap<UUID, Location> playerSpawns = new HashMap<>();
         switch(this.instanceSettings.gameType()) {
-            case SOLO -> playerSpawns.put(this.teams.get(0).getPlayers().get(0).getUUID(), this.getSpawnPoints().get(0));
+            case SOLO -> playerSpawns.put(this.mmcTeams.get(0).getPlayers().get(0).getUUID(), this.getSpawnPoints().get(0));
             case ONLY_TEAM -> {
                 List<Location> spawnPoints = this.getSpawnPoints();
                 int mod = spawnPoints.size();
                 for (int i = 0; i < this.getPlayerCount(); i++) {
-                    playerSpawns.put(this.teams.get(0).getPlayers().get(i).getUUID(), spawnPoints.get(i % mod));
+                    playerSpawns.put(this.mmcTeams.get(0).getPlayers().get(i).getUUID(), spawnPoints.get(i % mod));
                 }
             }
             case TEAM_VS_TEAM -> {
                 int spawnPointsCount = this.getSpawnPoints().size() % 2 == 0 ? this.getSpawnPoints().size() / 2 : ((this.getSpawnPoints().size() - 1) / 2);
                 List<Location> t1SpawnPoints = this.getSpawnPoints().subList(0, spawnPointsCount);
                 List<Location> t2SpawnPoints = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
-                for (int i = 0; i < this.teams.get(0).getTeamSize(); i++) {
-                    playerSpawns.put(this.teams.get(0).getPlayers().get(i).getUUID(), t1SpawnPoints.get(i % t1SpawnPoints.size()));
+                for (int i = 0; i < this.mmcTeams.get(0).getTeamSize(); i++) {
+                    playerSpawns.put(this.mmcTeams.get(0).getPlayers().get(i).getUUID(), t1SpawnPoints.get(i % t1SpawnPoints.size()));
                 }
-                for (int i = 0; i < this.teams.get(1).getTeamSize(); i++) {
-                    playerSpawns.put(this.teams.get(1).getPlayers().get(i).getUUID(), t2SpawnPoints.get(i % t2SpawnPoints.size()));
+                for (int i = 0; i < this.mmcTeams.get(1).getTeamSize(); i++) {
+                    playerSpawns.put(this.mmcTeams.get(1).getPlayers().get(i).getUUID(), t2SpawnPoints.get(i % t2SpawnPoints.size()));
                 }
             }
         }
@@ -243,10 +243,10 @@ public class Instance extends BukkitRunnable{
      * Get all players in this instance
      * @return List of players
      */
-    private List<APIPlayer> getInstancePlayers(){
-        List<APIPlayer> localPlayers = new ArrayList<>();
-        for(Team team: this.getTeams()){
-            localPlayers.addAll(team.getPlayers());
+    private List<MmcPlayer> getInstancePlayers(){
+        List<MmcPlayer> localPlayers = new ArrayList<>();
+        for(MmcTeam mmcTeam : this.getTeams()){
+            localPlayers.addAll(mmcTeam.getPlayers());
         }
         return localPlayers;
     }
@@ -273,11 +273,11 @@ public class Instance extends BukkitRunnable{
 
     /**
      * Check if the player is on this instance
-     * @param apiPlayer Target player
+     * @param mmcPlayer Target player
      * @return True if the player is on this instance
      */
-    public boolean isPlayerOnInstance(APIPlayer apiPlayer){
-        return this.players.contains(apiPlayer);
+    public boolean isPlayerOnInstance(MmcPlayer mmcPlayer){
+        return this.players.contains(mmcPlayer);
     }
 
     // PUBLIC GETTERS
@@ -287,8 +287,8 @@ public class Instance extends BukkitRunnable{
     public Location getInstanceLocation() {
         return instanceLocation;
     }
-    public List<Team> getTeams() {
-        return teams;
+    public List<MmcTeam> getTeams() {
+        return mmcTeams;
     }
     public int getInstanceId() {
         return instanceId;
@@ -302,7 +302,7 @@ public class Instance extends BukkitRunnable{
     public boolean isRunning() {
         return isRunning;
     }
-    public List<APIPlayer> getPlayers() {
+    public List<MmcPlayer> getPlayers() {
         return players;
     }
     public InstanceState getInstanceState() {

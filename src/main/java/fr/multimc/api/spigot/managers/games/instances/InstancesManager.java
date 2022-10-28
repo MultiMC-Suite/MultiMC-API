@@ -1,10 +1,10 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
-import fr.multimc.api.commons.tools.times.TimeParsing;
+import fr.multimc.api.commons.tools.times.MmcTime;
 import fr.multimc.api.spigot.managers.games.GameType;
-import fr.multimc.api.spigot.managers.teams.APIPlayer;
-import fr.multimc.api.spigot.managers.teams.Team;
-import fr.multimc.api.spigot.managers.worlds.APIWorld;
+import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.managers.teams.MmcTeam;
+import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,7 +29,7 @@ public class InstancesManager implements Listener {
 
     private final JavaPlugin plugin;
     private final List<Instance> instances;
-    private List<Team> teams = new ArrayList<>();
+    private List<MmcTeam> mmcTeams = new ArrayList<>();
     private final HashMap<Integer, InstanceState> instancesState = new HashMap<>();
     private final GameType gameType;
     private final Class<? extends Instance> instanceClass;
@@ -38,14 +38,14 @@ public class InstancesManager implements Listener {
     private boolean isStarted = false;
 
 
-    private final APIWorld lobby;
-    private final APIWorld game;
+    private final MmcWorld lobby;
+    private final MmcWorld game;
 
     public InstancesManager(@NotNull JavaPlugin plugin,
                             @NotNull Class<? extends Instance> instanceClass,
                             @NotNull InstanceSettings settings,
-                            @NotNull APIWorld lobby,
-                            @NotNull APIWorld game) {
+                            @NotNull MmcWorld lobby,
+                            @NotNull MmcWorld game) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.gameType();
@@ -58,30 +58,30 @@ public class InstancesManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void start(@NotNull List<Team> teams){
+    public void start(@NotNull List<MmcTeam> mmcTeams){
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                startAsync(teams);
+                startAsync(mmcTeams);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    private void startAsync(@NotNull List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
+    private void startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
         this.instances.clear();
-        this.teams = new ArrayList<>(teams);
-        List<List<Team>> gameTeams = new ArrayList<>();
+        this.mmcTeams = new ArrayList<>(mmcTeams);
+        List<List<MmcTeam>> gameTeams = new ArrayList<>();
         switch (this.gameType) {
             case SOLO -> {
-                List<Team> localTeams1 = this.getOnePlayerTeams();
+                List<MmcTeam> localTeams1 = this.getOnePlayerTeams();
                 gameTeams.add(localTeams1);
             }
             case ONLY_TEAM -> {
-                List<Team> localTeams2 = new ArrayList<>(teams);
+                List<MmcTeam> localTeams2 = new ArrayList<>(mmcTeams);
                 gameTeams.add(localTeams2);
             }
-            case TEAM_VS_TEAM -> gameTeams = this.getTeamsTuple(this.teams);
+            case TEAM_VS_TEAM -> gameTeams = this.getTeamsTuple(this.mmcTeams);
         }
         // Create instances
         for(int i = 0; i < this.getInstanceCount(); i++){
@@ -89,9 +89,9 @@ public class InstancesManager implements Listener {
             Location location = new Location(this.game.getWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
-                    List<Team> instanceTeams = new ArrayList<>();
-                    instanceTeams.add(gameTeams.get(0).get(i));
-                    this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, instanceTeams));
+                    List<MmcTeam> instanceMmcTeams = new ArrayList<>();
+                    instanceMmcTeams.add(gameTeams.get(0).get(i));
+                    this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, instanceMmcTeams));
                 }
                 case ONLY_TEAM ->
                         this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, List.of(gameTeams.get(0).get(i))));
@@ -114,7 +114,7 @@ public class InstancesManager implements Listener {
                             String.format("Instance %d/%d initialized (%s remaining)",
                                     i + 1,
                                     this.instances.size(),
-                                    TimeParsing.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
+                                    MmcTime.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
         }
         this.awaitState(InstanceState.INIT);
         for(int i = 0; i < 5; i++){
@@ -152,8 +152,8 @@ public class InstancesManager implements Listener {
      * @param message Message to send
      */
     private void sendTeamMessage(@NotNull Component message){
-        for(Team team : this.teams){
-            team.sendMessage(message);
+        for(MmcTeam mmcTeam : this.mmcTeams){
+            mmcTeam.sendMessage(message);
         }
     }
 
@@ -163,8 +163,8 @@ public class InstancesManager implements Listener {
      * @param subtitle Subtitle to send
      */
     private void sendTeamTitle(@NotNull Component title, @NotNull Component subtitle){
-        for(Team team : this.teams){
-            team.sendTitle(title, subtitle);
+        for(MmcTeam mmcTeam : this.mmcTeams){
+            mmcTeam.sendTitle(title, subtitle);
         }
     }
 
@@ -173,8 +173,8 @@ public class InstancesManager implements Listener {
      * @param actionBar Action bar to send
      */
     private void sendTeamActionBar(@NotNull Component actionBar){
-        for(Team team : this.teams){
-            team.sendActionBar(actionBar);
+        for(MmcTeam mmcTeam : this.mmcTeams){
+            mmcTeam.sendActionBar(actionBar);
         }
     }
 
@@ -184,19 +184,19 @@ public class InstancesManager implements Listener {
      */
     @SuppressWarnings("SameParameterValue")
     private void playSound(@NotNull Sound sound){
-        for(Team team : this.teams){
-            team.playSound(sound);
+        for(MmcTeam mmcTeam : this.mmcTeams){
+            mmcTeam.playSound(sound);
         }
     }
 
-    private List<List<Team>> getTeamsTuple(@NotNull List<Team> teams){
-        List<List<Team>> teamsTuple = new ArrayList<>();
-        if(teams.size() % 2 == 0){
-            for(int i = 0; i < teams.size(); i += 2){
-                List<Team> teamTuple = new ArrayList<>();
-                teamTuple.add(teams.get(i));
-                teamTuple.add(teams.get(i+1));
-                teamsTuple.add(teamTuple);
+    private List<List<MmcTeam>> getTeamsTuple(@NotNull List<MmcTeam> mmcTeams){
+        List<List<MmcTeam>> teamsTuple = new ArrayList<>();
+        if(mmcTeams.size() % 2 == 0){
+            for(int i = 0; i < mmcTeams.size(); i += 2){
+                List<MmcTeam> mmcTeamTuple = new ArrayList<>();
+                mmcTeamTuple.add(mmcTeams.get(i));
+                mmcTeamTuple.add(mmcTeams.get(i+1));
+                teamsTuple.add(mmcTeamTuple);
             }
         }
         return teamsTuple;
@@ -206,37 +206,37 @@ public class InstancesManager implements Listener {
         switch (this.gameType){
             case SOLO:
                 int count = 0;
-                for(Team team : this.teams){
-                    count += team.getTeamSize();
+                for(MmcTeam mmcTeam : this.mmcTeams){
+                    count += mmcTeam.getTeamSize();
                 }
                 return count;
             case ONLY_TEAM:
-                return this.teams.size();
+                return this.mmcTeams.size();
             case TEAM_VS_TEAM:
-                if(this.teams.size() % 2 == 0) {
-                    return this.teams.size() / 2;
+                if(this.mmcTeams.size() % 2 == 0) {
+                    return this.mmcTeams.size() / 2;
                 }
             default:
                 return -1;
         }
     }
 
-    private List<Team> getOnePlayerTeams(){
-        List<Team> teams = new ArrayList<>();
-        for(Team team : this.teams){
-            for(APIPlayer player: team.getPlayers()){
-                Team onePlayerTeam = new Team(team.getName(), team.getTeamCode(), player);
-                teams.add(onePlayerTeam);
+    private List<MmcTeam> getOnePlayerTeams(){
+        List<MmcTeam> mmcTeams = new ArrayList<>();
+        for(MmcTeam mmcTeam : this.mmcTeams){
+            for(MmcPlayer player: mmcTeam.getPlayers()){
+                MmcTeam onePlayerMmcTeam = new MmcTeam(mmcTeam.getName(), mmcTeam.getTeamCode(), player);
+                mmcTeams.add(onePlayerMmcTeam);
             }
         }
-        return teams;
+        return mmcTeams;
     }
 
-    public APIWorld getLobbyWorld(){
+    public MmcWorld getLobbyWorld(){
         return this.lobby;
     }
 
-    public APIWorld getGameWorld(){
+    public MmcWorld getGameWorld(){
         return this.game;
     }
 
@@ -287,36 +287,36 @@ public class InstancesManager implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
-        APIPlayer apiPlayer = new APIPlayer(player);
+        MmcPlayer mmcPlayer = new MmcPlayer(player);
         if(this.isStarted){
             for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(apiPlayer)){
+                if(instance.isPlayerOnInstance(mmcPlayer)){
                     if(instance.isRunning()){
-                        this.logger.info(String.format("Reconnecting player %s to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
-                        instance.onPlayerReconnect(apiPlayer);
-                        this.logger.info(String.format("Player %s reconnected to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
+                        this.logger.info(String.format("Reconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
+                        instance.onPlayerReconnect(mmcPlayer);
+                        this.logger.info(String.format("Player %s reconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
                     }else{
-                        apiPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
+                        mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
                         player.getInventory().clear();
                     }
                 }
             }
         }else{
-            apiPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
+            mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
             player.getInventory().clear();
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        APIPlayer apiPlayer = new APIPlayer(e.getPlayer());
+        MmcPlayer mmcPlayer = new MmcPlayer(e.getPlayer());
         if(this.isStarted){
             for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(apiPlayer)){
+                if(instance.isPlayerOnInstance(mmcPlayer)){
                     if(instance.isRunning()){
-                        this.logger.info(String.format("Disconnecting player %s to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
-                        instance.onPlayerDisconnect(apiPlayer);
-                        this.logger.info(String.format("Player %s disconnected to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
+                        this.logger.info(String.format("Disconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
+                        instance.onPlayerDisconnect(mmcPlayer);
+                        this.logger.info(String.format("Player %s disconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
                     }
                 }
             }

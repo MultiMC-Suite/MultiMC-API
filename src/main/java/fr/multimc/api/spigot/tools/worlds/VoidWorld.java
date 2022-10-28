@@ -1,15 +1,15 @@
-package fr.multimc.api.spigot.managers.worlds;
+package fr.multimc.api.spigot.tools.worlds;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
 
-public class VoidWorldCreator extends ChunkGenerator {
+public class VoidWorld extends ChunkGenerator {
 
     public World generate(String name){
         WorldCreator wc = new WorldCreator(name);
-        wc.generator(new VoidWorldCreator());
+        wc.generator(new VoidWorld());
         wc.createWorld();
         return Bukkit.getWorld(name);
     }

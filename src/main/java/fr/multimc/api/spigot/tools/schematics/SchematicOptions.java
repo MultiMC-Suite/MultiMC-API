@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.managers.schematics;
+package fr.multimc.api.spigot.tools.schematics;
 
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;

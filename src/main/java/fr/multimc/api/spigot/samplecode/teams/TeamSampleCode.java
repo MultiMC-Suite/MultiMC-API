@@ -1,10 +1,10 @@
 package fr.multimc.api.spigot.samplecode.teams;
 
 import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.spigot.managers.schematics.Schematic;
-import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
-import fr.multimc.api.spigot.managers.worlds.APIWorld;
-import fr.multimc.api.spigot.managers.worlds.WorldSettings;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
+import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
+import fr.multimc.api.spigot.tools.worlds.MmcWorld;
+import fr.multimc.api.spigot.tools.worlds.WorldSettings;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.games.instances.InstancesManager;
@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class TeamSampleCode implements SampleCode, Listener {
 
     private InstancesManager instancesManager;
@@ -60,7 +61,7 @@ public class TeamSampleCode implements SampleCode, Listener {
                 true,
                 true,
                 true);
-        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new APIWorld(plugin, lobbyWorldSettings), new APIWorld(plugin, gameWorldSettings));
+        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
     }
 
     @EventHandler

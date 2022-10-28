@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.customs;
+package fr.multimc.api.spigot.tools.entities;
 
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
@@ -7,7 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
-public record CustomEntity(@NotNull EntityType entityType, @NotNull RelativeLocation location) {
+public record MmcEntity(@NotNull EntityType entityType, @NotNull RelativeLocation location) {
     public Entity spawn(@NotNull Location instanceLocation, int instanceId) {
         Location spawnLocation = new Location(instanceLocation.getWorld(),
                 instanceLocation.getX() + location.getX(),
