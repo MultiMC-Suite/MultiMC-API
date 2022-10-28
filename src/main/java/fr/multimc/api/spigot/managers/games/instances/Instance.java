@@ -176,19 +176,6 @@ public class Instance extends BukkitRunnable{
      * @param player Player to reconnect
      */
     public void onPlayerReconnect(@NotNull APIPlayer player){
-        // Delete old player and add new one into players list
-        // TODO: test without removing player
-        this.players.removeIf(_player -> _player.equals(player));
-        this.players.add(player);
-        // Delete old player spawn and re-set it into playerSpawns list
-        for(UUID uuid : this.playerSpawns.keySet()){
-            if(uuid.equals(player.getUUID())){
-                Location spawnLocation = this.playerSpawns.get(uuid);
-                this.playerSpawns.remove(uuid);
-                this.playerSpawns.put(uuid, spawnLocation);
-                break;
-            }
-        }
         // If instance is running, teleport player into it
         if(this.isRunning){
             this.teleportPlayer(player, this.playerSpawns.get(player.getUUID()));
