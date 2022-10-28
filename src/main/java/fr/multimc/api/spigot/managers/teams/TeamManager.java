@@ -3,6 +3,8 @@ package fr.multimc.api.spigot.managers.teams;
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.commons.database.tables.PlayersTable;
 import fr.multimc.api.commons.database.tables.TeamsTable;
+import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,61 +15,61 @@ public class TeamManager {
 
     private final TeamsTable teamsTable;
     private final PlayersTable playersTable;
-    private List<Team> teams = new ArrayList<>();
+    private List<MmcTeam> mmcTeams = new ArrayList<>();
 
-    public TeamManager(Database database) {
+    public TeamManager(@NotNull Database database) {
         this.teamsTable = new TeamsTable(database);
         this.playersTable = teamsTable.getPlayersTable();
     }
 
-    public void addTeam(String teamCode, String name, String... players){
+    public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
         teamsTable.addTeam(teamCode, name, players);
     }
 
-    public List<Team> loadTeams(){
+    public List<MmcTeam> loadTeams(){
         // Create teams
-        teams = new ArrayList<>();
+        mmcTeams = new ArrayList<>();
         HashMap<String, List<String>> playersByTeam = playersTable.getPlayersByTeam();
         HashMap<String, String> teamNames = teamsTable.getTeamNames();
         // Iterate by team code
         for(String teamCode: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamCode);
-            List<APIPlayer> players = new ArrayList<>();
+            List<MmcPlayer> players = new ArrayList<>();
             // Add all players to team
             for(String playerName: playersName){
-                APIPlayer player = new APIPlayer(playerName);
+                MmcPlayer player = new MmcPlayer(playerName);
                 players.add(player);
             }
             // Add team object to list
-            Team team = new Team(teamNames.get(teamCode), teamCode, players.toArray(new APIPlayer[0]));
-            teams.add(team);
+            MmcTeam mmcTeam = new MmcTeam(teamNames.get(teamCode), teamCode, players.toArray(new MmcPlayer[0]));
+            mmcTeams.add(mmcTeam);
         }
-        return teams;
+        return mmcTeams;
     }
 
-    public List<Team> getTeams() {
-        return teams;
+    public List<MmcTeam> getTeams() {
+        return mmcTeams;
     }
 
-    public Team getTeamFromCode(String teamCode){
-        for(Team team: teams){
-            if(team.getTeamCode().equals(teamCode)){
-                return team;
+    public MmcTeam getTeamFromCode(@NotNull String teamCode){
+        for(MmcTeam mmcTeam : mmcTeams){
+            if(mmcTeam.getTeamCode().equals(teamCode)){
+                return mmcTeam;
             }
         }
         return null;
     }
 
-    public Team getTeamFromPlayer(APIPlayer player){
-        for(Team team: teams){
-            if(team.isPlayerInTeam(player)){
-                return team;
+    public MmcTeam getTeamFromPlayer(@NotNull MmcPlayer player){
+        for(MmcTeam mmcTeam : mmcTeams){
+            if(mmcTeam.isPlayerInTeam(player)){
+                return mmcTeam;
             }
         }
         return null;
     }
 
-    public void pushScores(HashMap<String, Integer> localScores){
+    public void pushScores(@NotNull HashMap<String, Integer> localScores){
         HashMap<String, Integer> currentScores = this.teamsTable.getCurrentScores();
         HashMap<String, Integer> newScores = new HashMap<>();
         for(String teamCode: localScores.keySet()){

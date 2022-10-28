@@ -2,7 +2,7 @@ package fr.multimc.api.spigot.samplecode.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.advancement.Advancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
-import fr.multimc.api.spigot.advancements.TriggeredAdvancement;
+import fr.multimc.api.spigot.managers.advancements.TriggeredAdvancement;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityPickupItemEvent;

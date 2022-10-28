@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.advancements;
+package fr.multimc.api.spigot.managers.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
 import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;

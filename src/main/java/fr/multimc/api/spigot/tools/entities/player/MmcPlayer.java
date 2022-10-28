@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.managers.teams;
+package fr.multimc.api.spigot.tools.entities.player;
 
 import fr.multimc.api.commons.tools.compares.StringFormatter;
 import fr.multimc.api.commons.tools.enums.Status;
@@ -7,8 +7,8 @@ import fr.multimc.api.commons.tools.status.Success;
 import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
+import fr.multimc.api.spigot.tools.items.ItemBuilder;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.tools.players.PlayerSpeed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -16,6 +16,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,21 +27,21 @@ import java.util.Objects;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions", "UnusedReturnValue"})
-public class APIPlayer {
+public class MmcPlayer {
     private final UUID uuid;
     private final String name;
 
-    public APIPlayer(@Nonnull UUID uuid){
+    public MmcPlayer(@Nonnull UUID uuid){
         this.uuid = uuid;
         this.name = this.fetchName();
     }
 
-    public APIPlayer(@Nonnull String name){
+    public MmcPlayer(@Nonnull String name){
         this.name = name;
         this.uuid = this.fetchUUID();
     }
 
-    public APIPlayer(@Nonnull Player player){
+    public MmcPlayer(@Nonnull Player player){
         this.uuid = player.getUniqueId();
         this.name = player.getName();
     }
@@ -78,7 +80,7 @@ public class APIPlayer {
     }
 
     @Nonnull
-    public Status teleport(@Nonnull APIPlayer target) {
+    public Status teleport(@Nonnull MmcPlayer target) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         if (!target.isOnline()) return new Error("%s is not online!", target.getName());
 
@@ -97,7 +99,7 @@ public class APIPlayer {
 
         Location target = toCenter ? location.getBlock().getLocation().clone().add(.5, 0, .5) : location;
         this.getPlayer().teleport(target);
-        return new Success("%s has been teleported to %d, %d, %d.", this.name, target.getX(), target.getY(), target.getZ());
+        return new Success("%s has been teleported to %f, %f, %f.", this.name, target.getX(), target.getY(), target.getZ());
     }
 
     @Nonnull
@@ -192,10 +194,69 @@ public class APIPlayer {
         return new Success("%s received the title.", this.name);
     }
 
+    @Nonnull
+    public Status clear() {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().clear();
+        this.getPlayer().updateInventory();
+        return new Success("%s's inventory has been cleared!", this.name);
+    }
+
+    @Nonnull
+    public Status clearInventory() {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setStorageContents(new ItemStack[9*4]);
+        this.getPlayer().updateInventory();
+        return new Success("%s's inventory has been cleared!", this.name);
+    }
+
+    @Nonnull
+    public Status clearArmor() {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setArmorContents(new ItemStack[4]);
+        this.getPlayer().updateInventory();
+        return new Success("%s's armor has been cleared!", this.name);
+    }
+
+    @Nonnull
+    public Status setArmor(@Nonnull ItemStack[] armorContent) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        if (armorContent.length != 4) return new Error("%s is not a valid size!", "" + armorContent.length);
+        this.getInventory().setArmorContents(armorContent);
+        this.getPlayer().updateInventory();
+        return new Success("%s's armor has been updated!", this.name);
+    }
+
+    @Nonnull
+    public Status giveItem(@Nonnull ItemBuilder item) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().addItem(item.build());
+        this.getPlayer().updateInventory();
+        return new Success("%s received the item.", this.name);
+    }
+
+    @Nonnull
+    public Status giveItems(@Nonnull ItemBuilder... items) {
+        for (ItemBuilder item : items) {
+            Status result = this.giveItem(item);
+            if (!(result instanceof Success)) return result;
+        }
+        return new Success("%s received %s items.", this.name, "" + items.length);
+    }
+
+    @Nonnull
+    public Status setItem(@Nonnull ItemBuilder item, int slot) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        if (slot >= 36) return new Error("%s is not a valid slot!", "" + slot);
+        this.getInventory().setItem(slot, item.build());
+        this.getPlayer().updateInventory();
+        return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
+    }
+
     // CHECKS \\
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof APIPlayer player){
+        if(obj instanceof MmcPlayer player){
             return player.getUUID() == this.uuid;
         }
         return false;
@@ -244,5 +305,10 @@ public class APIPlayer {
     @Nonnull
     public PlayerSpeed getFlySpeed() {
         return PlayerSpeed.fromFlySpeed(this.getPlayer().getFlySpeed()).orElse(PlayerSpeed.LEVEL_1);
+    }
+
+    @Nullable
+    public PlayerInventory getInventory() {
+        return this.isOnline() ? this.getPlayer().getInventory() : null;
     }
 }

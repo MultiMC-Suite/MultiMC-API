@@ -6,9 +6,9 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import com.fren_gor.ultimateAdvancementAPI.advancement.multiParents.MultiParentsAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.events.advancement.ProgressionUpdateEvent;
-import fr.multimc.api.spigot.advancements.AdvancementBuilder;
-import fr.multimc.api.spigot.advancements.AdvancementsManager;
-import fr.multimc.api.spigot.advancements.TriggeredAdvancement;
+import fr.multimc.api.spigot.managers.advancements.AdvancementBuilder;
+import fr.multimc.api.spigot.managers.advancements.AdvancementsManager;
+import fr.multimc.api.spigot.managers.advancements.TriggeredAdvancement;
 import fr.multimc.api.spigot.samplecode.SampleCode;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class AdvancementSampleCode implements SampleCode, Listener {
 
     private static AdvancementsManager advancementsManager;

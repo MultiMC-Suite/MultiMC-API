@@ -1,12 +1,10 @@
 package fr.multimc.api.spigot.samplecode.teams;
 
 import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.spigot.managers.schematics.Schematic;
-import fr.multimc.api.spigot.managers.schematics.SchematicOptions;
-import fr.multimc.api.spigot.managers.teams.APIPlayer;
-import fr.multimc.api.spigot.managers.teams.Team;
-import fr.multimc.api.spigot.managers.worlds.APIWorld;
-import fr.multimc.api.spigot.managers.worlds.WorldSettings;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
+import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
+import fr.multimc.api.spigot.tools.worlds.MmcWorld;
+import fr.multimc.api.spigot.tools.worlds.WorldSettings;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.games.instances.InstancesManager;
@@ -20,13 +18,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class TeamSampleCode implements SampleCode, Listener {
 
     private InstancesManager instancesManager;
+    private TeamManager teamManager;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -34,20 +32,22 @@ public class TeamSampleCode implements SampleCode, Listener {
         new File(plugin.getDataFolder().getPath() + "/database.db").delete();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
-        TeamManager teamManager = new TeamManager(database);
-        teamManager.addTeam("CODELA", "T1", "Xen0Xys");
+        teamManager = new TeamManager(database);
+        teamManager.addTeam("", "T1", "Xen0Xys");
 
         Schematic schematic = new Schematic(plugin, "instances_test");
         InstanceSettings settings = new InstanceSettings(schematic,
                 new SchematicOptions(),
                 GameType.SOLO,
                 120, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
-                new ArrayList<>(),
-                new HashMap<>(),
-                20,
-                "multimc");
+                null,
+                null,
+                20);
         WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
                 schematic,
+                true,
+                true,
+                true,
                 true,
                 true,
                 true,
@@ -57,8 +57,11 @@ public class TeamSampleCode implements SampleCode, Listener {
                 true,
                 true,
                 true,
+                true,
+                true,
+                true,
                 true);
-        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new APIWorld(plugin, lobbyWorldSettings), new APIWorld(plugin, gameWorldSettings));
+        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
     }
 
     @EventHandler
@@ -67,13 +70,13 @@ public class TeamSampleCode implements SampleCode, Listener {
         if(message.contains("start")){
             e.setCancelled(true);
             // Temp
-            List<Team> teams = new ArrayList<>();
-            Team team = new Team("T1", "CODELA", new APIPlayer("Xen0Xys"));
-            for(int i = 0; i < 32; i++){
-                teams.add(team);
-            }
-            instancesManager.start(teams);
-//            instancesManager.start(teamManager.loadTeams());
+//            List<Team> teams = new ArrayList<>();
+//            Team team = new Team("T1", "CODELA", new APIPlayer("Xen0Xys"));
+//            for(int i = 0; i < 32; i++){
+//                teams.add(team);
+//            }
+//            instancesManager.start(teams);
+            instancesManager.start(teamManager.loadTeams());
         }else if(message.contains("stop")){
             e.setCancelled(true);
             instancesManager.stopInstances();

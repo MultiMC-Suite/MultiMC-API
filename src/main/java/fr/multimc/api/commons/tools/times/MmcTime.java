@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class TimeParsing {
+public class MmcTime {
     public static String format(long time, @Nonnull String format) {
         long timeFormat = time;
         Map<TimeUnit, Integer> mapped = new HashMap<>();

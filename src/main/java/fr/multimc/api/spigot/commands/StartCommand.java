@@ -12,7 +12,7 @@ public class StartCommand implements CommandExecutor {
     private final InstancesManager instancesManager;
     private final TeamManager teamManager;
 
-    public StartCommand(InstancesManager instancesManager, TeamManager teamManager){
+    public StartCommand(@NotNull InstancesManager instancesManager, @NotNull TeamManager teamManager){
         this.instancesManager = instancesManager;
         this.teamManager = teamManager;
     }

@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.managers.schematics;
+package fr.multimc.api.spigot.tools.schematics;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -15,8 +15,8 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class Schematic {
     private final String name;
     private final File schematicFile;
 
-    public Schematic(@Nonnull Plugin plugin, @Nonnull String name) {
+    public Schematic(@NotNull Plugin plugin, @NotNull String name) {
         this.name = name;
         File pluginFile = new File("schematics/" + name + ".schem");
         this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
@@ -43,7 +43,7 @@ public class Schematic {
         }
     }
 
-    public Schematic(File schematicFile) {
+    public Schematic(@NotNull File schematicFile) {
         this.name = schematicFile.getName().replace(".schem", "");
         this.schematicFile = schematicFile;
 
@@ -66,11 +66,11 @@ public class Schematic {
         return localClipboard;
     }
 
-    public void paste(@Nonnull SchematicOptions options) throws WorldEditException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.location.getWorld()))) {
+    public void paste(@NotNull SchematicOptions options) throws WorldEditException {
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.LOCATION.getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
             PasteBuilder pasteBuilder = clipboardHolder.createPaste(editSession)
-                    .to(BlockVector3.at(options.location.getX(), options.location.getY(), options.location.getZ()))
+                    .to(BlockVector3.at(options.LOCATION.getX(), options.LOCATION.getY(), options.LOCATION.getZ()))
                     .ignoreAirBlocks(options.IGNORE_AIR)
                     .copyEntities(options.COPY_ENTITIES)
                     .copyBiomes(options.COPY_BIOMES);
