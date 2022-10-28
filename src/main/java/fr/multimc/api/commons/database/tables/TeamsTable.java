@@ -115,7 +115,7 @@ public class TeamsTable extends Table {
     public void updateScores(HashMap<String, Integer> scores){
         StringBuilder playersQueryString = new StringBuilder();
         for(String teamCode : scores.keySet()){
-            playersQueryString.append(String.format("UPDATE %s SET score=%d WHERE code=%s;", this.getTableName(), scores.get(teamCode), teamCode));
+            playersQueryString.append(String.format("UPDATE %s SET score=%d WHERE code='%s';", this.getTableName(), scores.get(teamCode), teamCode));
         }
         Query playerQuery = new QueryBuilder()
                 .setQueryType(QueryType.UPDATE)
