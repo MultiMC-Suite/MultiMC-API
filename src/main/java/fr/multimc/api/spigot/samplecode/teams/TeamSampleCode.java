@@ -14,6 +14,7 @@ import fr.multimc.api.spigot.samplecode.SampleCode;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -47,11 +48,13 @@ public class TeamSampleCode implements SampleCode, Listener {
         WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
                 schematic,
                 true);
+        lobbyWorldSettings.setDifficulty(Difficulty.PEACEFUL);
+        lobbyWorldSettings.setGameMode(GameMode.ADVENTURE);
         WorldSettings gameWorldSettings = new WorldSettings("multimc_game",
                 null,
                 true);
-        lobbyWorldSettings.setDifficulty(Difficulty.PEACEFUL);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
+        gameWorldSettings.setGameMode(GameMode.CREATIVE);
         gameWorldSettings.setPreventDamages(false);
         instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
     }

@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
@@ -136,8 +137,16 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
-        if (player.getWorld().equals(this.world)) {
-            if(this.worldSettings.getGameMode() != null){
+        if (player.getWorld().equals(this.world) && this.worldSettings.getGameMode() != null) {
+            player.setGameMode(this.worldSettings.getGameMode());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e){
+        Player player = e.getPlayer();
+        if(!e.getFrom().getWorld().equals(this.world)){
+            if(e.getTo().getWorld().equals(this.world) && this.worldSettings.getGameMode() != null){
                 player.setGameMode(this.worldSettings.getGameMode());
             }
         }
