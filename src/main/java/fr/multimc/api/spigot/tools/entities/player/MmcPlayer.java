@@ -257,7 +257,7 @@ public class MmcPlayer {
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof MmcPlayer player){
-            return player.getUUID() == this.uuid;
+            return player.getUUID().equals(this.uuid);
         }
         return false;
     }
