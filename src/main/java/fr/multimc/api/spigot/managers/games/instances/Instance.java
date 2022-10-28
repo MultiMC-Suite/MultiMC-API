@@ -277,7 +277,12 @@ public class Instance extends BukkitRunnable{
      * @return True if the player is on this instance
      */
     public boolean isPlayerOnInstance(MmcPlayer mmcPlayer){
-        return this.players.contains(mmcPlayer);
+        for(MmcPlayer gamePlayer : this.players){
+            if(gamePlayer.equals(mmcPlayer)){
+                return true;
+            }
+        }
+        return false;
     }
 
     // PUBLIC GETTERS
