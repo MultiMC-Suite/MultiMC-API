@@ -10,7 +10,6 @@ import fr.multimc.api.spigot.managers.teams.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -23,9 +22,9 @@ public class Instance extends BukkitRunnable{
 
     private final JavaPlugin plugin;
     private final InstancesManager instancesManager;
-    private final int instanceId;
     private final InstanceSettings instanceSettings;
     private final Location instanceLocation;
+    private final int instanceId;
     private final List<Team> teams;
     private boolean isRunning = false;
     private final List<Entity> instanceEntities;
@@ -185,9 +184,7 @@ public class Instance extends BukkitRunnable{
     /**
      * Called when a player disconnect from the server
      */
-    public void onPlayerDisconnect(@NotNull APIPlayer player){
-
-    }
+    public void onPlayerDisconnect(@NotNull APIPlayer player){}
 
     /**
      * Called to update instance state for InstanceManager
@@ -276,16 +273,11 @@ public class Instance extends BukkitRunnable{
 
     /**
      * Check if the player is on this instance
-     * @param player Target player
+     * @param apiPlayer Target player
      * @return True if the player is on this instance
      */
-    public boolean isPlayerOnInstance(Player player){
-        for(APIPlayer _player: this.players){
-            if(_player.getName().equals(player.getName())){
-                return true;
-            }
-        }
-        return false;
+    public boolean isPlayerOnInstance(APIPlayer apiPlayer){
+        return this.players.contains(apiPlayer);
     }
 
     // PUBLIC GETTERS

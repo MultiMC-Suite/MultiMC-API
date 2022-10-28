@@ -281,35 +281,36 @@ public class InstancesManager implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
+        APIPlayer apiPlayer = new APIPlayer(player);
         if(this.isStarted){
             for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(player)){
+                if(instance.isPlayerOnInstance(apiPlayer)){
                     if(instance.isRunning()){
-                        this.logger.info(String.format("Reconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
-                        instance.onPlayerReconnect(new APIPlayer(player));
-                        this.logger.info(String.format("Player %s reconnected to instance %d...", player.getName(), instance.getInstanceId()));
+                        this.logger.info(String.format("Reconnecting player %s to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
+                        instance.onPlayerReconnect(apiPlayer);
+                        this.logger.info(String.format("Player %s reconnected to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
                     }else{
-                        player.teleport(this.getLobbyWorld().getSpawnPoint());
+                        apiPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
                         player.getInventory().clear();
                     }
                 }
             }
         }else{
-            player.teleport(this.getLobbyWorld().getSpawnPoint());
+            apiPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
             player.getInventory().clear();
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        Player player = e.getPlayer();
+        APIPlayer apiPlayer = new APIPlayer(e.getPlayer());
         if(this.isStarted){
             for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(player)){
+                if(instance.isPlayerOnInstance(apiPlayer)){
                     if(instance.isRunning()){
-                        this.logger.info(String.format("Disconnecting player %s to instance %d...", player.getName(), instance.getInstanceId()));
-                        instance.onPlayerDisconnect(new APIPlayer(player));
-                        this.logger.info(String.format("Player %s disconnected to instance %d...", player.getName(), instance.getInstanceId()));
+                        this.logger.info(String.format("Disconnecting player %s to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
+                        instance.onPlayerDisconnect(apiPlayer);
+                        this.logger.info(String.format("Player %s disconnected to instance %d...", apiPlayer.getName(), instance.getInstanceId()));
                     }
                 }
             }
