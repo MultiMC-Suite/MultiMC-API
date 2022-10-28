@@ -13,26 +13,20 @@ import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class InstanceSettings {
-
-    private final Schematic schematic;
-    private final SchematicOptions schematicOptions;
-    private final GameType gameType;
-    private final int duration;
-    private final List<RelativeLocation> spawnPoints;
-    private final List<CustomEntity> entities;
-    private final HashMap<String, Object> customSettings;
-    private final int tickDelay;
+public record InstanceSettings(Schematic schematic, SchematicOptions schematicOptions, GameType gameType, int duration,
+                               List<RelativeLocation> spawnPoints, List<CustomEntity> entities,
+                               HashMap<String, Object> customSettings, int tickDelay) {
 
     /**
      * Constructor of InstanceSettings
-     * @param schematic File for the game schematic
-     * @param gameType GameType of the game
-     * @param duration Duration of the game
-     * @param spawnPoints List of spawn points
-     * @param entities List of entities to spawn
+     *
+     * @param schematic      File for the game schematic
+     * @param gameType       GameType of the game
+     * @param duration       Duration of the game
+     * @param spawnPoints    List of spawn points
+     * @param entities       List of entities to spawn
      * @param customSettings Custom settings
-     * @param tickDelay Delay in game tick between two calls of Instance's tick method
+     * @param tickDelay      Delay in game tick between two calls of Instance's tick method
      */
     public InstanceSettings(@NotNull Schematic schematic,
                             @NotNull SchematicOptions schematicOptions,
@@ -52,28 +46,5 @@ public class InstanceSettings {
         this.tickDelay = tickDelay;
     }
 
-    public Schematic getSchematic() {
-        return schematic;
-    }
-    public SchematicOptions getSchematicOptions() {
-        return schematicOptions;
-    }
-    public GameType getGameType() {
-        return gameType;
-    }
-    public int getDuration() {
-        return duration;
-    }
-    public List<RelativeLocation> getSpawnPoints() {
-        return spawnPoints;
-    }
-    public List<CustomEntity> getEntities() {
-        return entities;
-    }
-    public HashMap<String, Object> getCustomSettings() {
-        return customSettings;
-    }
-    public int getTickDelay() {
-        return tickDelay;
-    }
+
 }

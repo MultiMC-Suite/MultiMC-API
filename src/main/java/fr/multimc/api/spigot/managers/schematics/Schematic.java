@@ -67,10 +67,10 @@ public class Schematic {
     }
 
     public void paste(@NotNull SchematicOptions options) throws WorldEditException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.location.getWorld()))) {
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.LOCATION.getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
             PasteBuilder pasteBuilder = clipboardHolder.createPaste(editSession)
-                    .to(BlockVector3.at(options.location.getX(), options.location.getY(), options.location.getZ()))
+                    .to(BlockVector3.at(options.LOCATION.getX(), options.LOCATION.getY(), options.LOCATION.getZ()))
                     .ignoreAirBlocks(options.IGNORE_AIR)
                     .copyEntities(options.COPY_ENTITIES)
                     .copyBiomes(options.COPY_BIOMES);

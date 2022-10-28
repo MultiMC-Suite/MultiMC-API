@@ -48,7 +48,7 @@ public class InstancesManager implements Listener {
                             @NotNull APIWorld game) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
-        this.gameType = settings.getGameType();
+        this.gameType = settings.gameType();
         this.instanceClass = instanceClass;
         this.settings = settings;
         this.logger = plugin.getLogger();

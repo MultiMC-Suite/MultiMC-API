@@ -43,7 +43,7 @@ public class Instance extends BukkitRunnable{
         this.instanceLocation = instanceLocation;
         this.teams = new ArrayList<>(teams);
         this.instanceEntities = new ArrayList<>();
-        this.remainingTime = this.instanceSettings.getDuration();
+        this.remainingTime = this.instanceSettings.duration();
         this.players = this.getInstancePlayers();
         this.playerSpawns = this.getPlayerSpawnsList();
         this.updateState(InstanceState.CREATE);
@@ -56,9 +56,9 @@ public class Instance extends BukkitRunnable{
     public void init(){
         this.updateState(InstanceState.PRE_INIT);
         // Place schematic
-        SchematicOptions options = instanceSettings.getSchematicOptions();
+        SchematicOptions options = instanceSettings.schematicOptions();
         options.setLocation(instanceLocation);
-        this.pasteSchematic(instanceSettings.getSchematic(), options);
+        this.pasteSchematic(instanceSettings.schematic(), options);
         for(UUID uuid: this.playerSpawns.keySet()){
             for(APIPlayer apiPlayer : this.players){
                 if(apiPlayer.getUUID().equals(uuid)){
@@ -67,7 +67,7 @@ public class Instance extends BukkitRunnable{
             }
         }
         // Spawn entities
-        for(CustomEntity entity : instanceSettings.getEntities()){
+        for(CustomEntity entity : instanceSettings.entities()){
             instanceEntities.add(entity.spawn(instanceLocation, this.instanceId));
         }
         this.updateState(InstanceState.INIT);
@@ -118,7 +118,7 @@ public class Instance extends BukkitRunnable{
         this.instanceEntities.forEach(Entity::remove);
         this.instanceEntities.clear();
         // Reset time
-        this.remainingTime = this.instanceSettings.getDuration();
+        this.remainingTime = this.instanceSettings.duration();
     }
 
     /**
@@ -132,7 +132,7 @@ public class Instance extends BukkitRunnable{
     @SuppressWarnings("BusyWait")
     @Override
     public void run(){
-        double deltaTick = 0.05 * this.instanceSettings.getTickDelay();
+        double deltaTick = 0.05 * this.instanceSettings.tickDelay();
         long lastTickTime;
         long lastSecondTime;
         long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
@@ -215,7 +215,7 @@ public class Instance extends BukkitRunnable{
      */
     private HashMap<UUID, Location> getPlayerSpawnsList(){
         HashMap<UUID, Location> playerSpawns = new HashMap<>();
-        switch(this.instanceSettings.getGameType()) {
+        switch(this.instanceSettings.gameType()) {
             case SOLO -> playerSpawns.put(this.teams.get(0).getPlayers().get(0).getUUID(), this.getSpawnPoints().get(0));
             case ONLY_TEAM -> {
                 List<Location> spawnPoints = this.getSpawnPoints();
@@ -257,7 +257,7 @@ public class Instance extends BukkitRunnable{
      */
     private List<Location> getSpawnPoints(){
         List<Location> spawnPoints = new ArrayList<>();
-        for(RelativeLocation customLocation : this.instanceSettings.getSpawnPoints()){
+        for(RelativeLocation customLocation : this.instanceSettings.spawnPoints()){
             spawnPoints.add(customLocation.toAbsolute(this.instanceLocation));
         }
         return spawnPoints;
