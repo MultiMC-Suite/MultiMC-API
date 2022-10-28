@@ -7,6 +7,7 @@ import fr.multimc.api.commons.tools.status.Success;
 import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
+import fr.multimc.api.spigot.tools.items.ItemBuilder;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -15,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -192,9 +194,63 @@ public class MmcPlayer {
         return new Success("%s received the title.", this.name);
     }
 
-    @Nullable
-    public PlayerInventory getInventory() {
-        return this.isOnline() ? this.getPlayer().getInventory() : null;
+    @Nonnull
+    public Status clear() {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().clear();
+        this.getPlayer().updateInventory();
+        return new Success("%s's inventory has been cleared!", this.name);
+    }
+
+    @Nonnull
+    public Status clearInventory() {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setStorageContents(new ItemStack[9*4]);
+        this.getPlayer().updateInventory();
+        return new Success("%s's inventory has been cleared!", this.name);
+    }
+
+    @Nonnull
+    public Status clearArmor() {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setArmorContents(new ItemStack[4]);
+        this.getPlayer().updateInventory();
+        return new Success("%s's armor has been cleared!", this.name);
+    }
+
+    @Nonnull
+    public Status setArmor(@Nonnull ItemStack[] armorContent) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        if (armorContent.length != 4) return new Error("%s is not a valid size!", "" + armorContent.length);
+        this.getInventory().setArmorContents(armorContent);
+        this.getPlayer().updateInventory();
+        return new Success("%s's armor has been updated!", this.name);
+    }
+
+    @Nonnull
+    public Status giveItem(@Nonnull ItemBuilder item) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().addItem(item.build());
+        this.getPlayer().updateInventory();
+        return new Success("%s received the item.", this.name);
+    }
+
+    @Nonnull
+    public Status giveItems(@Nonnull ItemBuilder... items) {
+        for (ItemBuilder item : items) {
+            Status result = this.giveItem(item);
+            if (!(result instanceof Success)) return result;
+        }
+        return new Success("%s received %s items.", this.name, "" + items.length);
+    }
+
+    @Nonnull
+    public Status setItem(@Nonnull ItemBuilder item, int slot) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        if (slot >= 36) return new Error("%s is not a valid slot!", "" + slot);
+        this.getInventory().setItem(slot, item.build());
+        this.getPlayer().updateInventory();
+        return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
     }
 
     // CHECKS \\
@@ -249,5 +305,10 @@ public class MmcPlayer {
     @Nonnull
     public PlayerSpeed getFlySpeed() {
         return PlayerSpeed.fromFlySpeed(this.getPlayer().getFlySpeed()).orElse(PlayerSpeed.LEVEL_1);
+    }
+
+    @Nullable
+    public PlayerInventory getInventory() {
+        return this.isOnline() ? this.getPlayer().getInventory() : null;
     }
 }
