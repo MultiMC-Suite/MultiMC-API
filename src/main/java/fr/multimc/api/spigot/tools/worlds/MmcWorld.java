@@ -30,7 +30,7 @@ public class MmcWorld implements Listener {
         this.plugin = plugin;
         this.worldSettings = worldSettings;
         this.world = this.getWorld();
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
         // Game rules
         if(this.worldSettings.isPreventTimeFlow()){
             this.world.setTime(6000);
