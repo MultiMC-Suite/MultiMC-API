@@ -11,7 +11,7 @@ public class StopCommand implements CommandExecutor {
 
     private final InstancesManager instancesManager;
 
-    public StopCommand(InstancesManager instancesManager) {
+    public StopCommand(@NotNull InstancesManager instancesManager) {
         this.instancesManager = instancesManager;
     }
 

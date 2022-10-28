@@ -3,6 +3,7 @@ package fr.multimc.api.spigot.managers.teams;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,14 +21,14 @@ public class Team {
     private final List<APIPlayer> players;
 
 
-    public Team(String name, String teamCode, APIPlayer... localPlayers){
+    public Team(@NotNull String name, @NotNull String teamCode, @NotNull APIPlayer... localPlayers){
         this.name = name;
         this.teamCode = teamCode;
         this.players = new ArrayList<>();
         this.players.addAll(Arrays.asList(localPlayers));
     }
 
-    public boolean isPlayerInTeam(UUID uuid){
+    public boolean isPlayerInTeam(@NotNull UUID uuid){
         for(APIPlayer player: this.players){
             if(player.getUUID() == uuid){
                 return true;
@@ -36,7 +37,7 @@ public class Team {
         return false;
     }
 
-    public boolean isPlayerInTeam(APIPlayer player){
+    public boolean isPlayerInTeam(@NotNull APIPlayer player){
         for(APIPlayer _player: this.players){
             if(_player.equals(player)){
                 return true;
@@ -69,7 +70,7 @@ public class Team {
         for (APIPlayer player: this.players) player.sendActionBar(bar);
     }
 
-    public void playSound(Sound sound){
+    public void playSound(@NotNull Sound sound){
         for(APIPlayer apiPlayer: this.players){
             Player player = apiPlayer.getPlayer();
             if(player != null){
@@ -81,15 +82,12 @@ public class Team {
     public String getName() {
         return name;
     }
-
     public String getTeamCode() {
         return teamCode;
     }
-
     public int getTeamSize() {
         return players.size();
     }
-
     public List<APIPlayer> getPlayers() {
         return players;
     }

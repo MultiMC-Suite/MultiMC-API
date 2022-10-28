@@ -3,6 +3,7 @@ package fr.multimc.api.spigot.managers.teams;
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.commons.database.tables.PlayersTable;
 import fr.multimc.api.commons.database.tables.TeamsTable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +16,12 @@ public class TeamManager {
     private final PlayersTable playersTable;
     private List<Team> teams = new ArrayList<>();
 
-    public TeamManager(Database database) {
+    public TeamManager(@NotNull Database database) {
         this.teamsTable = new TeamsTable(database);
         this.playersTable = teamsTable.getPlayersTable();
     }
 
-    public void addTeam(String teamCode, String name, String... players){
+    public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
         teamsTable.addTeam(teamCode, name, players);
     }
 
@@ -49,7 +50,7 @@ public class TeamManager {
         return teams;
     }
 
-    public Team getTeamFromCode(String teamCode){
+    public Team getTeamFromCode(@NotNull String teamCode){
         for(Team team: teams){
             if(team.getTeamCode().equals(teamCode)){
                 return team;
@@ -58,7 +59,7 @@ public class TeamManager {
         return null;
     }
 
-    public Team getTeamFromPlayer(APIPlayer player){
+    public Team getTeamFromPlayer(@NotNull APIPlayer player){
         for(Team team: teams){
             if(team.isPlayerInTeam(player)){
                 return team;
@@ -67,7 +68,7 @@ public class TeamManager {
         return null;
     }
 
-    public void pushScores(HashMap<String, Integer> localScores){
+    public void pushScores(@NotNull HashMap<String, Integer> localScores){
         HashMap<String, Integer> currentScores = this.teamsTable.getCurrentScores();
         HashMap<String, Integer> newScores = new HashMap<>();
         for(String teamCode: localScores.keySet()){

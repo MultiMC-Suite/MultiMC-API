@@ -15,8 +15,8 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class Schematic {
     private final String name;
     private final File schematicFile;
 
-    public Schematic(@Nonnull Plugin plugin, @Nonnull String name) {
+    public Schematic(@NotNull Plugin plugin, @NotNull String name) {
         this.name = name;
         File pluginFile = new File("schematics/" + name + ".schem");
         this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
@@ -43,7 +43,7 @@ public class Schematic {
         }
     }
 
-    public Schematic(File schematicFile) {
+    public Schematic(@NotNull File schematicFile) {
         this.name = schematicFile.getName().replace(".schem", "");
         this.schematicFile = schematicFile;
 
@@ -66,7 +66,7 @@ public class Schematic {
         return localClipboard;
     }
 
-    public void paste(@Nonnull SchematicOptions options) throws WorldEditException {
+    public void paste(@NotNull SchematicOptions options) throws WorldEditException {
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.location.getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
             PasteBuilder pasteBuilder = clipboardHolder.createPaste(editSession)

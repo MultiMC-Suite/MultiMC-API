@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -40,7 +41,11 @@ public class InstancesManager implements Listener {
     private final APIWorld lobby;
     private final APIWorld game;
 
-    public InstancesManager(JavaPlugin plugin, Class<? extends Instance> instanceClass, InstanceSettings settings, APIWorld lobby, APIWorld game) {
+    public InstancesManager(@NotNull JavaPlugin plugin,
+                            @NotNull Class<? extends Instance> instanceClass,
+                            @NotNull InstanceSettings settings,
+                            @NotNull APIWorld lobby,
+                            @NotNull APIWorld game) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.getGameType();
@@ -53,7 +58,7 @@ public class InstancesManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void start(List<Team> teams){
+    public void start(@NotNull List<Team> teams){
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 startAsync(teams);
@@ -63,7 +68,7 @@ public class InstancesManager implements Listener {
         });
     }
 
-    private void startAsync(List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
+    private void startAsync(@NotNull List<Team> teams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
         this.instances.clear();
         this.teams = new ArrayList<>(teams);
         List<List<Team>> gameTeams = new ArrayList<>();
@@ -125,19 +130,20 @@ public class InstancesManager implements Listener {
 
     public void stopInstances(){
         instances.forEach(this::stopInstance);
+        this.awaitState(InstanceState.STOP);
     }
 
-    private long initInstance(Instance instance) {
+    private long initInstance(@NotNull Instance instance) {
         long dt = System.currentTimeMillis();
         instance.init();
         return System.currentTimeMillis() - dt;
     }
 
-    private void startInstance(Instance instance){
+    private void startInstance(@NotNull Instance instance){
         instance.start();
     }
 
-    private void stopInstance(Instance instance){
+    private void stopInstance(@NotNull Instance instance){
        instance.stop();
     }
 
@@ -145,7 +151,7 @@ public class InstancesManager implements Listener {
      * Send message to all teams
      * @param message Message to send
      */
-    private void sendTeamMessage(Component message){
+    private void sendTeamMessage(@NotNull Component message){
         for(Team team : this.teams){
             team.sendMessage(message);
         }
@@ -156,7 +162,7 @@ public class InstancesManager implements Listener {
      * @param title Title to send
      * @param subtitle Subtitle to send
      */
-    private void sendTeamTitle(Component title, Component subtitle){
+    private void sendTeamTitle(@NotNull Component title, @NotNull Component subtitle){
         for(Team team : this.teams){
             team.sendTitle(title, subtitle);
         }
@@ -166,7 +172,7 @@ public class InstancesManager implements Listener {
      * Send action bar to all teams
      * @param actionBar Action bar to send
      */
-    private void sendTeamActionBar(Component actionBar){
+    private void sendTeamActionBar(@NotNull Component actionBar){
         for(Team team : this.teams){
             team.sendActionBar(actionBar);
         }
@@ -177,13 +183,13 @@ public class InstancesManager implements Listener {
      * @param sound Sound to play
      */
     @SuppressWarnings("SameParameterValue")
-    private void playSound(Sound sound){
+    private void playSound(@NotNull Sound sound){
         for(Team team : this.teams){
             team.playSound(sound);
         }
     }
 
-    private List<List<Team>> getTeamsTuple(List<Team> teams){
+    private List<List<Team>> getTeamsTuple(@NotNull List<Team> teams){
         List<List<Team>> teamsTuple = new ArrayList<>();
         if(teams.size() % 2 == 0){
             for(int i = 0; i < teams.size(); i += 2){
@@ -238,7 +244,7 @@ public class InstancesManager implements Listener {
         return this.isStarted;
     }
 
-    protected void updateInstanceState(int instanceId, InstanceState state){
+    protected void updateInstanceState(int instanceId, @NotNull InstanceState state){
         if(instancesState.containsKey(instanceId)){
             this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
             instancesState.replace(instanceId, state);
@@ -248,7 +254,7 @@ public class InstancesManager implements Listener {
         }
     }
 
-    private void awaitState(InstanceState state){
+    private void awaitState(@NotNull InstanceState state){
         boolean isStateReached = false;
         while(!isStateReached){
             for(int instanceId : this.instancesState.keySet()){

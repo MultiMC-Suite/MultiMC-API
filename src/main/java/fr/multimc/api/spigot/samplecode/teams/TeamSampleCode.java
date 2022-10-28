@@ -18,8 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class TeamSampleCode implements SampleCode, Listener {
@@ -34,17 +32,16 @@ public class TeamSampleCode implements SampleCode, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
-        teamManager.addTeam("CODELA", "T1", "Xen0Xys");
+        teamManager.addTeam("", "T1", "Xen0Xys");
 
         Schematic schematic = new Schematic(plugin, "instances_test");
         InstanceSettings settings = new InstanceSettings(schematic,
                 new SchematicOptions(),
                 GameType.SOLO,
                 120, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
-                new ArrayList<>(),
-                new HashMap<>(),
-                20,
-                "multimc");
+                null,
+                null,
+                20);
         WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
                 schematic,
                 true,
