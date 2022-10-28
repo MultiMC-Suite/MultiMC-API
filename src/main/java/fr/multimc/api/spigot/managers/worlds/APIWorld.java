@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class APIWorld implements Listener {
@@ -31,6 +32,10 @@ public class APIWorld implements Listener {
         if(this.worldSettings.isPreventTimeFlow()){
             this.world.setTime(6000);
             this.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        }
+        if(this.worldSettings.isPreventWeather()){
+            this.world.setStorm(false);
+            this.world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         }
     }
 
@@ -111,6 +116,16 @@ public class APIWorld implements Listener {
                     e.setCancelled(true);
                     player.setFoodLevel(20);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerPortal(PlayerPortalEvent e){
+        Player player = e.getPlayer();
+        if (player.getWorld().equals(this.world)) {
+            if(this.worldSettings.isPreventPortalUse()){
+                e.setCancelled(true);
             }
         }
     }
