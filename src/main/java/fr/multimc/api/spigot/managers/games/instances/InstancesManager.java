@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -77,30 +78,39 @@ public class InstancesManager implements Listener {
         List<List<MmcTeam>> gameTeams = new ArrayList<>();
         switch (this.gameType) {
             case SOLO -> {
-                List<MmcTeam> localTeams1 = this.getOnePlayerTeams();
-                gameTeams.add(localTeams1);
+                List<MmcTeam> onePlayerTeams = this.getOnePlayerTeams();
+                for(MmcTeam onePlayerTeam : onePlayerTeams){
+                    List<MmcTeam> tempTeamList = new ArrayList<>();
+                    tempTeamList.add(onePlayerTeam);
+                    gameTeams.add(tempTeamList);
+                }
             }
             case ONLY_TEAM -> {
                 List<MmcTeam> localTeams2 = new ArrayList<>(mmcTeams);
-                gameTeams.add(localTeams2);
+                for(MmcTeam team: localTeams2){
+                    List<MmcTeam> tempTeamList = new ArrayList<>();
+                    tempTeamList.add(team);
+                    gameTeams.add(tempTeamList);
+                }
             }
             case TEAM_VS_TEAM -> gameTeams = this.getTeamsTuple(this.mmcTeams);
         }
         // Create instances
-        for(int i = 0; i < this.getInstanceCount(); i++){
-            this.logger.info(String.format("Creating instance %d/%d", i + 1, this.getInstanceCount()));
+        for(int i = 0; i < gameTeams.size(); i++){
+            this.logger.info(String.format("Creating instance %d/%d", i + 1, gameTeams.size()));
             Location location = new Location(this.gameWorld.getWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
-                case SOLO -> {
-                    List<MmcTeam> instanceMmcTeams = new ArrayList<>();
-                    instanceMmcTeams.add(gameTeams.get(0).get(i));
-                    this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, instanceMmcTeams));
-                }
+                case SOLO ->
+                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
                 case ONLY_TEAM ->
-                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, List.of(gameTeams.get(0).get(i))));
+                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
                 case TEAM_VS_TEAM ->
                         this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
             }
+        }
+        if(this.instances.size() == 0){
+            this.logger.warning("No instance created");
+            return;
         }
         this.awaitState(InstanceState.CREATE);
         // Init instances
@@ -329,7 +339,7 @@ public class InstancesManager implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
         MmcPlayer mmcPlayer = new MmcPlayer(player);
@@ -341,18 +351,25 @@ public class InstancesManager implements Listener {
                         instance.onPlayerReconnect(mmcPlayer);
                         this.logger.info(String.format("Player %s reconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
                     }else{
+                        this.logger.info(String.format("Instance %d not running, teleporting player %s to lobby...", instance.getInstanceId(), mmcPlayer.getName()));
                         mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
+                        this.logger.info(String.format("Player %s teleported to lobby...", mmcPlayer.getName()));
                         player.getInventory().clear();
                     }
+                    return;
                 }
             }
+            this.logger.info(String.format("No instance found for player %s, make him a spectator", mmcPlayer.getName()));
+            player.setGameMode(GameMode.SPECTATOR);
         }else{
+            this.logger.info(String.format("Instance manager not started, teleporting player %s to lobby", mmcPlayer.getName()));
             mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
             player.getInventory().clear();
+            this.logger.info(String.format("Player %s teleported to lobby...", mmcPlayer.getName()));
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent e){
         MmcPlayer mmcPlayer = new MmcPlayer(e.getPlayer());
         if(this.isStarted){

@@ -131,12 +131,12 @@ public class MmcPlayer {
         return this.teleportSync(plugin, location, false, PlayerTeleportEvent.TeleportCause.UNKNOWN);
     }
 
+    // TODO
     @Nonnull
     public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter, @NotNull PlayerTeleportEvent.TeleportCause cause) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        Location target = toCenter ? location.getBlock().getLocation().clone().add(.5, 0, .5) : location;
-        Bukkit.getScheduler().runTask(plugin, () -> this.getPlayer().teleport(location, cause));
-        return new Success("%s has been teleported to %f, %f, %f.", this.name, target.getX(), target.getY(), target.getZ());
+        Bukkit.getScheduler().runTask(plugin, () -> this.teleport(location, toCenter));
+        return new Success("%s has been teleported to %f, %f, %f.", this.name, location.getX(), location.getY(), location.getZ());
     }
 
     @Nonnull
