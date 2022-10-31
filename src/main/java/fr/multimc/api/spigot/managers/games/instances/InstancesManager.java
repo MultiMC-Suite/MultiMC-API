@@ -99,20 +99,13 @@ public class InstancesManager implements Listener {
         for(int i = 0; i < gameTeams.size(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i + 1, gameTeams.size()));
             Location location = new Location(this.gameWorld.getWorld(), i * 1000, 100, 0);
-            switch(this.gameType) {
-                case SOLO ->
-                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
-                case ONLY_TEAM ->
-                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
-                case TEAM_VS_TEAM ->
-                        this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
-            }
+            this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
         }
         if(this.instances.size() == 0){
             this.logger.warning("No instance created");
             return;
         }
-        this.awaitState(InstanceState.CREATE);
+//        this.awaitState(InstanceState.CREATE);
         // Init instances
         long dt;
         long dtAvg = 0;
@@ -129,7 +122,7 @@ public class InstancesManager implements Listener {
                                     this.instances.size(),
                                     MmcTime.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
         }
-        this.awaitState(InstanceState.INIT);
+//        this.awaitState(InstanceState.INIT);
         for(MmcPlayer player: this.getSpectators()){
             Bukkit.getScheduler().runTask(plugin, () -> {
                 player.teleport(this.gameWorld.getSpawnPoint());
@@ -143,13 +136,13 @@ public class InstancesManager implements Listener {
         }
         // Start instances
         this.instances.forEach(this::startInstance);
-        this.awaitState(InstanceState.START);
+//        this.awaitState(InstanceState.START);
         this.isStarted = true;
     }
 
     public void stopInstances(){
         instances.forEach(this::stopInstance);
-        this.awaitState(InstanceState.STOP);
+//        this.awaitState(InstanceState.STOP);
     }
 
     private long initInstance(@NotNull Instance instance) {
@@ -189,6 +182,7 @@ public class InstancesManager implements Listener {
     private void resetManager(){
         for(MmcPlayer player: this.getSpectators()){
             player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
+            player.setGameModeSync(this.plugin, GameMode.SURVIVAL);
         }
     }
 
@@ -307,8 +301,14 @@ public class InstancesManager implements Listener {
         return this.isStarted;
     }
 
+    public boolean isSpectator(MmcPlayer player){
+        return this.getSpectators().contains(player);
+    }
 
 
+
+    // TODO: recode this shit
+    @Deprecated
     private void awaitState(@NotNull InstanceState targetState){
         boolean isStateReached = false;
         while(!isStateReached){
