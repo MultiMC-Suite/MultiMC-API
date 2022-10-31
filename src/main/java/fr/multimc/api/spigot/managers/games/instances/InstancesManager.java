@@ -2,11 +2,12 @@ package fr.multimc.api.spigot.managers.games.instances;
 
 import fr.multimc.api.commons.tools.times.MmcTime;
 import fr.multimc.api.spigot.managers.games.GameType;
-import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
+import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -38,22 +39,23 @@ public class InstancesManager implements Listener {
     private boolean isStarted = false;
 
 
-    private final MmcWorld lobby;
-    private final MmcWorld game;
+    private final MmcWorld lobbyWorld;
+    private final MmcWorld gameWorld;
 
     public InstancesManager(@NotNull JavaPlugin plugin,
                             @NotNull Class<? extends Instance> instanceClass,
                             @NotNull InstanceSettings settings,
-                            @NotNull MmcWorld lobby,
-                            @NotNull MmcWorld game) {
+                            @NotNull MmcWorld lobbyWorld,
+                            @NotNull MmcWorld gameWorld) {
         this.plugin = plugin;
         this.instances = new ArrayList<>();
         this.gameType = settings.gameType();
         this.instanceClass = instanceClass;
         this.settings = settings;
         this.logger = plugin.getLogger();
-        this.lobby = lobby;
-        this.game = game;
+        this.lobbyWorld = lobbyWorld;
+        this.gameWorld = gameWorld;
+        this.gameWorld.getWorldSettings().setGameMode(null); // Disable game mode changing for game world
         // Register local events handlers
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -86,7 +88,7 @@ public class InstancesManager implements Listener {
         // Create instances
         for(int i = 0; i < this.getInstanceCount(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i + 1, this.getInstanceCount()));
-            Location location = new Location(this.game.getWorld(), i * 1000, 100, 0);
+            Location location = new Location(this.gameWorld.getWorld(), i * 1000, 100, 0);
             switch(this.gameType) {
                 case SOLO -> {
                     List<MmcTeam> instanceMmcTeams = new ArrayList<>();
@@ -117,6 +119,12 @@ public class InstancesManager implements Listener {
                                     MmcTime.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
         }
         this.awaitState(InstanceState.INIT);
+        for(MmcPlayer player: this.getSpectators()){
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                player.teleport(this.gameWorld.getSpawnPoint());
+                player.setGameMode(GameMode.SPECTATOR);
+            });
+        }
         for(int i = 0; i < 5; i++){
             Thread.sleep(1000);
             this.sendTeamTitle(Component.text(String.format("Game starts in %d", 4 - i)), Component.text(""));
@@ -202,6 +210,24 @@ public class InstancesManager implements Listener {
         return teamsTuple;
     }
 
+    private List<MmcPlayer> getSpectators(){
+        List<MmcPlayer> nonPlayerPlayers = new ArrayList<>();
+        for(Player player : Bukkit.getOnlinePlayers()){
+            MmcPlayer mmcPlayer = new MmcPlayer(player);
+            boolean isPlayer = false;
+            for(Instance instance : this.instances){
+                if(instance.isPlayerOnInstance(mmcPlayer)){
+                    isPlayer = true;
+                    break;
+                }
+            }
+            if(!isPlayer){
+                nonPlayerPlayers.add(mmcPlayer);
+            }
+        }
+        return nonPlayerPlayers;
+    }
+
     private int getInstanceCount(){
         switch (this.gameType){
             case SOLO:
@@ -233,11 +259,11 @@ public class InstancesManager implements Listener {
     }
 
     public MmcWorld getLobbyWorld(){
-        return this.lobby;
+        return this.lobbyWorld;
     }
 
     public MmcWorld getGameWorld(){
-        return this.game;
+        return this.gameWorld;
     }
 
     public boolean isStarted() {
@@ -252,6 +278,25 @@ public class InstancesManager implements Listener {
             this.logger.info(String.format("Instance %d set state to %s", instanceId, state));
             instancesState.put(instanceId, state);
         }
+        boolean isAllStopped = true;
+        for(int _instanceId: this.instancesState.keySet()){
+            if(this.instancesState.get(_instanceId) != InstanceState.STOP){
+                isAllStopped = false;
+                break;
+            }
+        }
+        if(isAllStopped){
+            this.stopManager();
+        }
+    }
+
+    private void stopManager(){
+        this.isStarted = false;
+        for(MmcPlayer player: this.getSpectators()){
+            player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
+        }
+        this.instances.clear();
+        this.instancesState.clear();
     }
 
     private void awaitState(@NotNull InstanceState state){
@@ -275,7 +320,7 @@ public class InstancesManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e){
-        if(e.getPlayer().getWorld().equals(this.game.getWorld())){
+        if(e.getPlayer().getWorld().equals(this.gameWorld.getWorld())){
             if(!this.isStarted){
                 if(e.getFrom().distance(e.getTo()) > 0){
                     e.setCancelled(true);

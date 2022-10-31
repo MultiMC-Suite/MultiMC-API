@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.tools.worlds;
 
-import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public class WorldSettings {
         this.schematic = null;
         this.spawn = new RelativeLocation(0.5, 100, 0.5);
         this.difficulty = Difficulty.NORMAL;
-        this.gameMode = GameMode.SURVIVAL;
+        this.gameMode = null;
         this.preventDamages = defaultSettingsValue;
         this.preventPvp = defaultSettingsValue;
         this.PreventBuild = defaultSettingsValue;
@@ -37,7 +37,7 @@ public class WorldSettings {
         this.schematic = schematic;
         this.spawn = new RelativeLocation(0.5, 100, 0.5);
         this.difficulty = Difficulty.NORMAL;
-        this.gameMode = GameMode.SURVIVAL;
+        this.gameMode = null;
         this.preventDamages = defaultSettingsValue;
         this.preventPvp = defaultSettingsValue;
         this.PreventBuild = defaultSettingsValue;
@@ -52,7 +52,7 @@ public class WorldSettings {
         this.schematic = schematic;
         this.spawn = spawn == null ? new RelativeLocation(0.5, 100, 0.5) : spawn;
         this.difficulty = Difficulty.NORMAL;
-        this.gameMode = GameMode.SURVIVAL;
+        this.gameMode = null;
         this.preventDamages = defaultSettingsValue;
         this.preventPvp = defaultSettingsValue;
         this.PreventBuild = defaultSettingsValue;

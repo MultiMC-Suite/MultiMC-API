@@ -2,9 +2,9 @@ package fr.multimc.api.spigot.tools.entities.player;
 
 import fr.multimc.api.commons.tools.compares.StringFormatter;
 import fr.multimc.api.commons.tools.enums.Status;
+import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.commons.tools.status.SameValue;
 import fr.multimc.api.commons.tools.status.Success;
-import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import fr.multimc.api.spigot.tools.items.ItemBuilder;
@@ -16,8 +16,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,9 +51,16 @@ public class MmcPlayer {
     // SETTERS & FUNCTIONS \\
     @Nonnull
     public Status setGameMode(@Nonnull GameMode mode) {
-        if (this.isOnline()) return new Error("%s is not online!", this.name);
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
         if (this.getPlayer().getGameMode().equals(mode)) return new SameValue("%s's game mode is already %s.", this.name, StringFormatter.capitalize(mode.name()));
         this.getPlayer().setGameMode(mode);
+        return new Success("%s's game mode has been updated to %s.", this.name, StringFormatter.capitalize(mode.name()));
+    }
+    @Nonnull
+    public Status setGameModeSync(@NotNull JavaPlugin plugin, @Nonnull GameMode mode) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        if (this.getPlayer().getGameMode().equals(mode)) return new SameValue("%s's game mode is already %s.", this.name, StringFormatter.capitalize(mode.name()));
+        Bukkit.getScheduler().runTask(plugin, () -> this.getPlayer().setGameMode(mode));
         return new Success("%s's game mode has been updated to %s.", this.name, StringFormatter.capitalize(mode.name()));
     }
 
@@ -110,6 +119,24 @@ public class MmcPlayer {
     @Nonnull
     public Status teleport(@Nonnull RelativeLocation location, boolean toCenter) {
         return this.teleport(location.toAbsolute(this.getPlayer().getLocation()), toCenter);
+    }
+
+    @Nonnull
+    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter) {
+        return this.teleportSync(plugin, location, toCenter, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    }
+
+    @Nonnull
+    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location) {
+        return this.teleportSync(plugin, location, false, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    }
+
+    @Nonnull
+    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter, @NotNull PlayerTeleportEvent.TeleportCause cause) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        Location target = toCenter ? location.getBlock().getLocation().clone().add(.5, 0, .5) : location;
+        Bukkit.getScheduler().runTask(plugin, () -> this.getPlayer().teleport(location, cause));
+        return new Success("%s has been teleported to %f, %f, %f.", this.name, target.getX(), target.getY(), target.getZ());
     }
 
     @Nonnull

@@ -75,6 +75,9 @@ public class MmcWorld implements Listener {
     public Location getSpawnPoint(){
         return this.worldSettings.getSpawn().toAbsolute(new Location(this.world, 0, 0, 0));
     }
+    public WorldSettings getWorldSettings() {
+        return worldSettings;
+    }
 
     @EventHandler
     public void onEntityDamaged(EntityDamageEvent e){
@@ -145,9 +148,11 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e){
         Player player = e.getPlayer();
-        if(!e.getFrom().getWorld().equals(this.world)){
-            if(e.getTo().getWorld().equals(this.world) && this.worldSettings.getGameMode() != null){
-                player.setGameMode(this.worldSettings.getGameMode());
+        if(e.getCause() != PlayerTeleportEvent.TeleportCause.SPECTATE){
+            if(!e.getFrom().getWorld().equals(this.world)){
+                if(e.getTo().getWorld().equals(this.world) && this.worldSettings.getGameMode() != null){
+                    player.setGameMode(this.worldSettings.getGameMode());
+                }
             }
         }
     }

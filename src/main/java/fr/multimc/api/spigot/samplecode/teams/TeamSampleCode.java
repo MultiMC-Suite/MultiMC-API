@@ -1,16 +1,16 @@
 package fr.multimc.api.spigot.samplecode.teams;
 
 import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.spigot.managers.games.GameType;
+import fr.multimc.api.spigot.managers.games.instances.InstanceSettings;
+import fr.multimc.api.spigot.managers.games.instances.InstancesManager;
+import fr.multimc.api.spigot.managers.teams.TeamManager;
+import fr.multimc.api.spigot.samplecode.SampleCode;
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import fr.multimc.api.spigot.tools.worlds.WorldSettings;
-import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.managers.games.GameType;
-import fr.multimc.api.spigot.managers.games.instances.InstancesManager;
-import fr.multimc.api.spigot.managers.games.instances.InstanceSettings;
-import fr.multimc.api.spigot.managers.teams.TeamManager;
-import fr.multimc.api.spigot.samplecode.SampleCode;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Difficulty;
@@ -54,7 +54,6 @@ public class TeamSampleCode implements SampleCode, Listener {
                 null,
                 true);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
-        gameWorldSettings.setGameMode(GameMode.CREATIVE);
         gameWorldSettings.setPreventDamages(false);
         instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
     }

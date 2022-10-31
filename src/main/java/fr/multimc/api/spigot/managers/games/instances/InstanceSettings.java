@@ -1,10 +1,10 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
+import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.tools.entities.MmcEntity;
+import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
-import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.managers.games.GameType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,13 +1,14 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
+import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.entities.MmcEntity;
-import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
-import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +16,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class Instance extends BukkitRunnable{
@@ -64,6 +68,7 @@ public class Instance extends BukkitRunnable{
             if(mmcPlayer != null){
                 this.teleportPlayer(mmcPlayer, this.playerSpawns.get(uuid));
                 this.setPlayerSpawn(mmcPlayer, this.playerSpawns.get(uuid));
+                mmcPlayer.setGameModeSync(this.plugin, GameMode.SURVIVAL);
             }
         }
         // Spawn entities
@@ -166,6 +171,7 @@ public class Instance extends BukkitRunnable{
      */
     public void teleportPlayer(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
         if(location != null){
+            mmcPlayer.teleportSync(this.plugin, location);
             Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.teleport(location));
         }
     }
@@ -178,19 +184,20 @@ public class Instance extends BukkitRunnable{
 
     /**
      * Called to reconnect a disconnected player
-     * @param player Player to reconnect
+     * @param mmcPlayer Player to reconnect
      */
-    public void onPlayerReconnect(@NotNull MmcPlayer player){
+    public void onPlayerReconnect(@NotNull MmcPlayer mmcPlayer){
         // If instance is running, teleport player into it
         if(this.isRunning){
-            this.teleportPlayer(player, this.playerSpawns.get(player.getUUID()));
+            this.teleportPlayer(mmcPlayer, this.playerSpawns.get(mmcPlayer.getUUID()));
+            mmcPlayer.setGameModeSync(this.plugin, GameMode.SURVIVAL);
         }
     }
 
     /**
      * Called when a player disconnect from the server
      */
-    public void onPlayerDisconnect(@NotNull MmcPlayer player){}
+    public void onPlayerDisconnect(@NotNull MmcPlayer mmcPlayer){}
 
     /**
      * Called to update instance state for InstanceManager
