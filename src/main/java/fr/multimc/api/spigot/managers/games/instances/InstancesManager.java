@@ -172,12 +172,11 @@ public class InstancesManager implements Listener {
             }
         }
         if(isAllStopped){
-            this.stopManager();
+            this.resetManager();
         }
     }
 
-    private void stopManager(){
-        this.isStarted = false;
+    private void resetManager(){
         for(MmcPlayer player: this.getSpectators()){
             player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
         }
@@ -300,11 +299,11 @@ public class InstancesManager implements Listener {
 
 
 
-    private void awaitState(@NotNull InstanceState state){
+    private void awaitState(@NotNull InstanceState targetState){
         boolean isStateReached = false;
         while(!isStateReached){
             for(int instanceId : this.instancesState.keySet()){
-                if(this.instancesState.get(instanceId) != state){
+                if(this.instancesState.get(instanceId) != targetState){
                     isStateReached = false;
                     break;
                 }else{

@@ -58,6 +58,7 @@ public class Instance extends BukkitRunnable{
      * Initialize game instance
      */
     public void init(){
+        if(this.instanceState == InstanceState.PRE_INIT || this.instanceState == InstanceState.INIT) return;
         this.updateState(InstanceState.PRE_INIT);
         // Place schematic
         SchematicOptions options = instanceSettings.schematicOptions();
@@ -82,6 +83,7 @@ public class Instance extends BukkitRunnable{
      * Start game instance
      */
     public void start(){
+        if(this.instanceState == InstanceState.PRE_START || this.instanceState == InstanceState.START) return;
         this.updateState(InstanceState.PRE_START);
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
@@ -92,6 +94,7 @@ public class Instance extends BukkitRunnable{
      * Default instance stop (players will return to the lobby)
      */
     public void stop(){
+        if(this.instanceState == InstanceState.PRE_STOP || this.instanceState == InstanceState.STOP) return;
         this.updateState(InstanceState.PRE_STOP);
         this.isRunning = false;
         for(MmcPlayer mmcPlayer : this.players){
