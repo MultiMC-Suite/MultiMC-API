@@ -72,6 +72,7 @@ public class InstancesManager implements Listener {
 
     private void startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
         this.instances.clear();
+        this.instancesState.clear();
         this.mmcTeams = new ArrayList<>(mmcTeams);
         List<List<MmcTeam>> gameTeams = new ArrayList<>();
         switch (this.gameType) {
@@ -153,6 +154,33 @@ public class InstancesManager implements Listener {
 
     private void stopInstance(@NotNull Instance instance){
        instance.stop();
+    }
+
+    protected void updateInstanceState(int instanceId, @NotNull InstanceState state){
+        if(instancesState.containsKey(instanceId)){
+            this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
+            instancesState.replace(instanceId, state);
+        } else {
+            this.logger.info(String.format("Instance %d set state to %s", instanceId, state));
+            instancesState.put(instanceId, state);
+        }
+        boolean isAllStopped = true;
+        for(int _instanceId: this.instancesState.keySet()){
+            if(this.instancesState.get(_instanceId) != InstanceState.STOP){
+                isAllStopped = false;
+                break;
+            }
+        }
+        if(isAllStopped){
+            this.stopManager();
+        }
+    }
+
+    private void stopManager(){
+        this.isStarted = false;
+        for(MmcPlayer player: this.getSpectators()){
+            player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
+        }
     }
 
     /**
@@ -270,34 +298,7 @@ public class InstancesManager implements Listener {
         return this.isStarted;
     }
 
-    protected void updateInstanceState(int instanceId, @NotNull InstanceState state){
-        if(instancesState.containsKey(instanceId)){
-            this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
-            instancesState.replace(instanceId, state);
-        } else {
-            this.logger.info(String.format("Instance %d set state to %s", instanceId, state));
-            instancesState.put(instanceId, state);
-        }
-        boolean isAllStopped = true;
-        for(int _instanceId: this.instancesState.keySet()){
-            if(this.instancesState.get(_instanceId) != InstanceState.STOP){
-                isAllStopped = false;
-                break;
-            }
-        }
-        if(isAllStopped){
-            this.stopManager();
-        }
-    }
 
-    private void stopManager(){
-        this.isStarted = false;
-        for(MmcPlayer player: this.getSpectators()){
-            player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
-        }
-        this.instances.clear();
-        this.instancesState.clear();
-    }
 
     private void awaitState(@NotNull InstanceState state){
         boolean isStateReached = false;
