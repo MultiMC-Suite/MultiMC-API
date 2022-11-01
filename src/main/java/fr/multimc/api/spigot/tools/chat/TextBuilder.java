@@ -1,13 +1,14 @@
 package fr.multimc.api.spigot.tools.chat;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.ChatColor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TextBuilder {
-    private final Component rs;
+    private Component rs;
 
     public TextBuilder() {
         this.rs = Component.empty();
@@ -18,11 +19,11 @@ public class TextBuilder {
     }
 
     public TextBuilder(@Nullable String text) {
-        this.rs = Objects.isNull(text) ? new TextBuilder().build() : Component.text(text);
+        this.rs = Objects.isNull(text) ? new TextBuilder().build() : Component.text(ChatColor.translateAlternateColorCodes('&', text));
     }
 
     public TextBuilder text(@Nonnull String text) {
-        this.rs.append(Component.text(text));
+        this.rs = this.rs.append(Component.text(ChatColor.translateAlternateColorCodes('&', text)));
         return this;
     }
 

@@ -2,9 +2,9 @@ package fr.multimc.api.spigot.tools.entities.player;
 
 import fr.multimc.api.commons.tools.compares.StringFormatter;
 import fr.multimc.api.commons.tools.enums.Status;
+import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.commons.tools.status.SameValue;
 import fr.multimc.api.commons.tools.status.Success;
-import fr.multimc.api.commons.tools.status.Error;
 import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import fr.multimc.api.spigot.tools.items.ItemBuilder;
@@ -15,9 +15,12 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,9 +52,16 @@ public class MmcPlayer {
     // SETTERS & FUNCTIONS \\
     @Nonnull
     public Status setGameMode(@Nonnull GameMode mode) {
-        if (this.isOnline()) return new Error("%s is not online!", this.name);
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
         if (this.getPlayer().getGameMode().equals(mode)) return new SameValue("%s's game mode is already %s.", this.name, StringFormatter.capitalize(mode.name()));
         this.getPlayer().setGameMode(mode);
+        return new Success("%s's game mode has been updated to %s.", this.name, StringFormatter.capitalize(mode.name()));
+    }
+    @Nonnull
+    public Status setGameModeSync(@NotNull JavaPlugin plugin, @Nonnull GameMode mode) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        if (this.getPlayer().getGameMode().equals(mode)) return new SameValue("%s's game mode is already %s.", this.name, StringFormatter.capitalize(mode.name()));
+        Bukkit.getScheduler().runTask(plugin, () -> this.getPlayer().setGameMode(mode));
         return new Success("%s's game mode has been updated to %s.", this.name, StringFormatter.capitalize(mode.name()));
     }
 
@@ -110,6 +120,24 @@ public class MmcPlayer {
     @Nonnull
     public Status teleport(@Nonnull RelativeLocation location, boolean toCenter) {
         return this.teleport(location.toAbsolute(this.getPlayer().getLocation()), toCenter);
+    }
+
+    @Nonnull
+    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter) {
+        return this.teleportSync(plugin, location, toCenter, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    }
+
+    @Nonnull
+    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location) {
+        return this.teleportSync(plugin, location, false, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    }
+
+    // TODO
+    @Nonnull
+    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter, @NotNull PlayerTeleportEvent.TeleportCause cause) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        Bukkit.getScheduler().runTask(plugin, () -> this.teleport(location, toCenter));
+        return new Success("%s has been teleported to %f, %f, %f.", this.name, location.getX(), location.getY(), location.getZ());
     }
 
     @Nonnull
@@ -187,10 +215,9 @@ public class MmcPlayer {
     }
 
     @Nonnull
-    private Status sendTitle(@Nullable Component title, @Nonnull Component subtitle, @Nullable Title.Times times) {
+    private Status sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nullable Title.Times times) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
-
-        this.getPlayer().showTitle(Title.title(new TextBuilder(title).build(), new TextBuilder(subtitle).build(), times));
+        this.getPlayer().showTitle(Title.title(Objects.nonNull(title) ? title : new TextBuilder().build(), Objects.nonNull(subtitle) ? subtitle : new TextBuilder().build(), times));
         return new Success("%s received the title.", this.name);
     }
 
@@ -253,11 +280,18 @@ public class MmcPlayer {
         return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
     }
 
+    @NotNull
+    public Status setSpawnPoint(@NotNull Location location) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setBedSpawnLocation(location, true);
+        return new Success("%s's spawn point has been set!", this.name);
+    }
+
     // CHECKS \\
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof MmcPlayer player){
-            return player.getUUID() == this.uuid;
+            return player.getUUID().equals(this.uuid);
         }
         return false;
     }
@@ -310,5 +344,15 @@ public class MmcPlayer {
     @Nullable
     public PlayerInventory getInventory() {
         return this.isOnline() ? this.getPlayer().getInventory() : null;
+    }
+
+    @Nullable
+    public Location getLocation() {
+        return this.isOnline() ? this.getPlayer().getLocation() : null;
+    }
+
+    @Nullable
+    public World getWorld() {
+        return this.isOnline() ? this.getLocation().getWorld() : null;
     }
 }

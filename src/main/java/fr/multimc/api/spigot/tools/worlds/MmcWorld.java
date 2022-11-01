@@ -14,7 +14,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
@@ -28,7 +30,7 @@ public class MmcWorld implements Listener {
         this.plugin = plugin;
         this.worldSettings = worldSettings;
         this.world = this.getWorld();
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
         // Game rules
         if(this.worldSettings.isPreventTimeFlow()){
             this.world.setTime(6000);
@@ -38,6 +40,7 @@ public class MmcWorld implements Listener {
             this.world.setStorm(false);
             this.world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         }
+        this.world.setDifficulty(this.worldSettings.getDifficulty());
     }
 
     private World generateWorld(){
@@ -71,6 +74,9 @@ public class MmcWorld implements Listener {
 
     public Location getSpawnPoint(){
         return this.worldSettings.getSpawn().toAbsolute(new Location(this.world, 0, 0, 0));
+    }
+    public WorldSettings getWorldSettings() {
+        return worldSettings;
     }
 
     @EventHandler
@@ -127,6 +133,26 @@ public class MmcWorld implements Listener {
         if (player.getWorld().equals(this.world)) {
             if(this.worldSettings.isPreventPortalUse()){
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e){
+        Player player = e.getPlayer();
+        if (player.getWorld().equals(this.world) && this.worldSettings.getGameMode() != null) {
+            player.setGameMode(this.worldSettings.getGameMode());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e){
+        Player player = e.getPlayer();
+        if(e.getCause() != PlayerTeleportEvent.TeleportCause.SPECTATE){
+            if(!e.getFrom().getWorld().equals(this.world)){
+                if(e.getTo().getWorld().equals(this.world) && this.worldSettings.getGameMode() != null){
+                    player.setGameMode(this.worldSettings.getGameMode());
+                }
             }
         }
     }

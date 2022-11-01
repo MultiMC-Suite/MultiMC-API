@@ -1,13 +1,14 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import com.sk89q.worldedit.WorldEditException;
+import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.entities.MmcEntity;
-import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
+import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
-import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +16,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class Instance extends BukkitRunnable{
@@ -54,16 +59,18 @@ public class Instance extends BukkitRunnable{
      * Initialize game instance
      */
     public void init(){
+        if(this.instanceState == InstanceState.PRE_INIT || this.instanceState == InstanceState.INIT) return;
         this.updateState(InstanceState.PRE_INIT);
         // Place schematic
         SchematicOptions options = instanceSettings.schematicOptions();
         options.setLocation(instanceLocation);
         this.pasteSchematic(instanceSettings.schematic(), options);
         for(UUID uuid: this.playerSpawns.keySet()){
-            for(MmcPlayer mmcPlayer : this.players){
-                if(mmcPlayer.getUUID().equals(uuid)){
-                    this.teleportPlayer(mmcPlayer, this.playerSpawns.get(uuid));
-                }
+            MmcPlayer mmcPlayer = this.players.stream().filter(p -> p.getUUID().equals(uuid)).findFirst().orElse(null);
+            if(mmcPlayer != null){
+                this.teleportPlayer(mmcPlayer, this.playerSpawns.get(uuid));
+                this.setPlayerSpawn(mmcPlayer, this.playerSpawns.get(uuid));
+                mmcPlayer.setGameModeSync(this.plugin, GameMode.SURVIVAL);
             }
         }
         // Spawn entities
@@ -77,6 +84,7 @@ public class Instance extends BukkitRunnable{
      * Start game instance
      */
     public void start(){
+        if(this.instanceState == InstanceState.PRE_START || this.instanceState == InstanceState.START) return;
         this.updateState(InstanceState.PRE_START);
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
@@ -87,6 +95,7 @@ public class Instance extends BukkitRunnable{
      * Default instance stop (players will return to the lobby)
      */
     public void stop(){
+        if(this.instanceState == InstanceState.PRE_STOP || this.instanceState == InstanceState.STOP) return;
         this.updateState(InstanceState.PRE_STOP);
         this.isRunning = false;
         for(MmcPlayer mmcPlayer : this.players){
@@ -166,25 +175,37 @@ public class Instance extends BukkitRunnable{
      */
     public void teleportPlayer(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
         if(location != null){
+            mmcPlayer.teleportSync(this.plugin, location);
             Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.teleport(location));
         }
     }
 
+    public void setPlayerSpawn(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
+        if(location != null){
+            Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.setSpawnPoint(location));
+        }
+    }
+
+    public void broadcast(@Nonnull String message) {
+        this.getPlayers().forEach(player -> player.sendMessage(message));
+    }
+
     /**
      * Called to reconnect a disconnected player
-     * @param player Player to reconnect
+     * @param mmcPlayer Player to reconnect
      */
-    public void onPlayerReconnect(@NotNull MmcPlayer player){
+    public void onPlayerReconnect(@NotNull MmcPlayer mmcPlayer){
         // If instance is running, teleport player into it
         if(this.isRunning){
-            this.teleportPlayer(player, this.playerSpawns.get(player.getUUID()));
+            this.teleportPlayer(mmcPlayer, this.playerSpawns.get(mmcPlayer.getUUID()));
+            mmcPlayer.setGameModeSync(this.plugin, GameMode.SURVIVAL);
         }
     }
 
     /**
      * Called when a player disconnect from the server
      */
-    public void onPlayerDisconnect(@NotNull MmcPlayer player){}
+    public void onPlayerDisconnect(@NotNull MmcPlayer mmcPlayer){}
 
     /**
      * Called to update instance state for InstanceManager
@@ -277,7 +298,12 @@ public class Instance extends BukkitRunnable{
      * @return True if the player is on this instance
      */
     public boolean isPlayerOnInstance(MmcPlayer mmcPlayer){
-        return this.players.contains(mmcPlayer);
+        for(MmcPlayer gamePlayer : this.players){
+            if(gamePlayer.equals(mmcPlayer)){
+                return true;
+            }
+        }
+        return false;
     }
 
     // PUBLIC GETTERS

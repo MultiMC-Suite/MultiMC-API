@@ -72,11 +72,13 @@ public class TeamManager {
     public void pushScores(@NotNull HashMap<String, Integer> localScores){
         HashMap<String, Integer> currentScores = this.teamsTable.getCurrentScores();
         HashMap<String, Integer> newScores = new HashMap<>();
-        for(String teamCode: localScores.keySet()){
-            int remoteScore = localScores.get(teamCode);
-            int currentScore = currentScores.get(teamCode);
-            newScores.put(teamCode, currentScore + remoteScore);
-        }
+        localScores.forEach((teamCode, score) -> newScores.put(teamCode, currentScores.getOrDefault(teamCode, 0) + score));
         this.teamsTable.updateScores(newScores);
+    }
+
+    public void pushTeamScores(@NotNull HashMap<MmcTeam, Integer> localScores){
+        HashMap<String, Integer> currentScores = new HashMap<>();
+        localScores.forEach((team, score) -> currentScores.put(team.getTeamCode(), score));
+        this.pushScores(currentScores);
     }
 }

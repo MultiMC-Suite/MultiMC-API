@@ -1,8 +1,8 @@
 package fr.multimc.api.spigot.commands;
 
-import net.kyori.adventure.text.Component;
+import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
+import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,14 +25,21 @@ public class RelativeToCommand implements CommandExecutor {
                 double z = playerLocation.getZ() - Double.parseDouble(strings[2]);
                 DecimalFormat formatter = new DecimalFormat();
                 formatter.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-                Component message = Component
-                        .text(String.format("Relative location: %.1f %.1f %.1f", x, y, z)).color(TextColor.color(0x00FF00))
-                        .clickEvent(ClickEvent.copyToClipboard(String.format("new RelativeLocation(%s, %s, %s)",
-                                formatter.format(x),
-                                formatter.format(y),
-                                formatter.format(z))))
-                        .hoverEvent(Component.text("Click to copy code").color(TextColor.color(0xFF8000)));
-                commandSender.sendMessage(message);
+
+                commandSender.sendMessage(
+                        new ClickableMessageBuilder(String.format("Relative location: %.1f ; %.1f ; %.1f", x, y, z))
+                                .addExtras(
+                                        "\n\n",
+                                        new ClickableMessageBuilder("&bConfiguration")
+                                                .setClick(ClickEvent.copyToClipboard(String.format("%s:%s:%s", formatter.format(x), formatter.format(y), formatter.format(z))))
+                                                .setHover(new TextBuilder("&eCopy configuration\nto clipboard").build()),
+                                        "&6   ",
+                                        new ClickableMessageBuilder("&cCode")
+                                                .setClick(ClickEvent.copyToClipboard(String.format("new RelativeLocation(%s, %s, %s)", formatter.format(x), formatter.format(y), formatter.format(z))))
+                                                .setHover(new TextBuilder("&eCopy code\nto clipboard").build())
+                                )
+                                .build()
+                );
             }
         }
         return true;
