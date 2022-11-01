@@ -15,6 +15,7 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
@@ -281,7 +282,7 @@ public class MmcPlayer {
     }
 
     @NotNull
-    public Status setSpawnPoint(@NotNull Location location){
+    public Status setSpawnPoint(@NotNull Location location) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         this.getPlayer().setBedSpawnLocation(location, true);
         return new Success("%s's spawn point has been set!", this.name);
@@ -344,5 +345,15 @@ public class MmcPlayer {
     @Nullable
     public PlayerInventory getInventory() {
         return this.isOnline() ? this.getPlayer().getInventory() : null;
+    }
+
+    @Nullable
+    public Location getLocation() {
+        return this.isOnline() ? this.getPlayer().getLocation() : null;
+    }
+
+    @Nullable
+    public World getWorld() {
+        return this.isOnline() ? this.getLocation().getWorld() : null;
     }
 }

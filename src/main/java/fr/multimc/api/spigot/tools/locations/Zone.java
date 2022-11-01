@@ -36,4 +36,10 @@ public class Zone {
                 && MathNumber.isDoubleBetween(player.getLocation().getBlockY(), minY, maxY)
                 && MathNumber.isDoubleBetween(player.getLocation().getBlockZ(), minZ, maxZ);
     }
+
+    public boolean isIn(@Nonnull Location location) {
+        return MathNumber.isDoubleBetween(location.getX(), minX, maxX)
+                && MathNumber.isDoubleBetween(location.getY(), minY, maxY)
+                && MathNumber.isDoubleBetween(location.getZ(), minZ, maxZ);
+    }
 }

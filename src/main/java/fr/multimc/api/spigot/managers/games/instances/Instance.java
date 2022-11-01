@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -183,6 +184,10 @@ public class Instance extends BukkitRunnable{
         if(location != null){
             Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.setSpawnPoint(location));
         }
+    }
+
+    public void broadcast(@Nonnull String message) {
+        this.getPlayers().forEach(player -> player.sendMessage(message));
     }
 
     /**

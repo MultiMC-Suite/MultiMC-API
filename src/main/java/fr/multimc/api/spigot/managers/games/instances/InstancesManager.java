@@ -3,6 +3,7 @@ package fr.multimc.api.spigot.managers.games.instances;
 import fr.multimc.api.commons.tools.times.MmcTime;
 import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
+import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import net.kyori.adventure.text.Component;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -115,12 +117,10 @@ public class InstancesManager implements Listener {
                 dtAvg = dt;
             }
             dtAvg = (dtAvg + dt) / 2;
-            this.sendTeamActionBar(
-                    Component.text(
-                            String.format("Instance %d/%d initialized (%s remaining)",
-                                    i + 1,
-                                    this.instances.size(),
-                                    MmcTime.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))));
+            this.sendTeamActionBar(new TextBuilder(String.format("&bInstance &6%d/%d &binitialized (&e%s&3 remaining)",
+                                                    i + 1,
+                                                    this.instances.size(),
+                                                    MmcTime.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))).build());
         }
 //        this.awaitState(InstanceState.INIT);
         for(MmcPlayer player: this.getSpectators()){
@@ -129,9 +129,10 @@ public class InstancesManager implements Listener {
                 player.setGameMode(GameMode.SPECTATOR);
             });
         }
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i <= 5; i++){
             Thread.sleep(1000);
-            this.sendTeamTitle(Component.text(String.format("Game starts in %d", 4 - i)), Component.text(""));
+            if (i != 5) this.sendTeamTitle(new TextBuilder(String.format("&6%d", 5 - i)).build(), new TextBuilder("&7Get ready...").build());
+            else this.sendTeamTitle(new TextBuilder("&fLet's &bGO!").build(), null);
             this.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
         }
         // Start instances
@@ -190,10 +191,8 @@ public class InstancesManager implements Listener {
      * Send message to all teams
      * @param message Message to send
      */
-    private void sendTeamMessage(@NotNull Component message){
-        for(MmcTeam mmcTeam : this.mmcTeams){
-            mmcTeam.sendMessage(message);
-        }
+    private void broadcast(@NotNull Component message) {
+        for(MmcTeam mmcTeam : this.mmcTeams) mmcTeam.sendMessage(message);
     }
 
     /**
@@ -201,20 +200,16 @@ public class InstancesManager implements Listener {
      * @param title Title to send
      * @param subtitle Subtitle to send
      */
-    private void sendTeamTitle(@NotNull Component title, @NotNull Component subtitle){
-        for(MmcTeam mmcTeam : this.mmcTeams){
-            mmcTeam.sendTitle(title, subtitle);
-        }
+    private void sendTeamTitle(@Nullable Component title, @Nullable Component subtitle) {
+        for(MmcTeam mmcTeam : this.mmcTeams) mmcTeam.sendTitle(title, subtitle);
     }
 
     /**
      * Send action bar to all teams
      * @param actionBar Action bar to send
      */
-    private void sendTeamActionBar(@NotNull Component actionBar){
-        for(MmcTeam mmcTeam : this.mmcTeams){
-            mmcTeam.sendActionBar(actionBar);
-        }
+    private void sendTeamActionBar(@NotNull Component actionBar) {
+        for(MmcTeam mmcTeam : this.mmcTeams) mmcTeam.sendActionBar(actionBar);
     }
 
     /**
@@ -222,13 +217,13 @@ public class InstancesManager implements Listener {
      * @param sound Sound to play
      */
     @SuppressWarnings("SameParameterValue")
-    private void playSound(@NotNull Sound sound){
+    private void playSound(@NotNull Sound sound) {
         for(MmcTeam mmcTeam : this.mmcTeams){
             mmcTeam.playSound(sound);
         }
     }
 
-    private List<List<MmcTeam>> getTeamsTuple(@NotNull List<MmcTeam> mmcTeams){
+    private List<List<MmcTeam>> getTeamsTuple(@NotNull List<MmcTeam> mmcTeams) {
         List<List<MmcTeam>> teamsTuple = new ArrayList<>();
         if(mmcTeams.size() % 2 == 0){
             for(int i = 0; i < mmcTeams.size(); i += 2){
@@ -241,7 +236,7 @@ public class InstancesManager implements Listener {
         return teamsTuple;
     }
 
-    private List<MmcPlayer> getSpectators(){
+    private List<MmcPlayer> getSpectators() {
         List<MmcPlayer> nonPlayerPlayers = new ArrayList<>();
         for(Player player : Bukkit.getOnlinePlayers()){
             MmcPlayer mmcPlayer = new MmcPlayer(player);
