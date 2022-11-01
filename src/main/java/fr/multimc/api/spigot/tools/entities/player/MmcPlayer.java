@@ -217,7 +217,7 @@ public class MmcPlayer {
     @Nonnull
     private Status sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nullable Title.Times times) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        this.getPlayer().showTitle(Title.title(Objects.nonNull(title) ? new TextBuilder(title).build() : null, Objects.nonNull(subtitle) ? new TextBuilder(subtitle).build() : null, times));
+        this.getPlayer().showTitle(Title.title(Objects.nonNull(title) ? title : new TextBuilder().build(), Objects.nonNull(subtitle) ? subtitle : new TextBuilder().build(), times));
         return new Success("%s received the title.", this.name);
     }
 
