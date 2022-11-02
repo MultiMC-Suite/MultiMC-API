@@ -255,6 +255,38 @@ public class MmcPlayer {
     }
 
     @Nonnull
+    public Status setHelmet(@Nonnull ItemStack item) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setHelmet(item);
+        this.getPlayer().updateInventory();
+        return new Success("%s's helmet has been replaced!", this.name);
+    }
+
+    @Nonnull
+    public Status setChestPlate(@Nonnull ItemStack item) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setChestplate(item);
+        this.getPlayer().updateInventory();
+        return new Success("%s's chest plate has been replaced!", this.name);
+    }
+
+    @Nonnull
+    public Status setLeggings(@Nonnull ItemStack item) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setLeggings(item);
+        this.getPlayer().updateInventory();
+        return new Success("%s's leggings has been replaced!", this.name);
+    }
+
+    @Nonnull
+    public Status setBoots(@Nonnull ItemStack item) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getInventory().setBoots(item);
+        this.getPlayer().updateInventory();
+        return new Success("%s's boots has been replaced!", this.name);
+    }
+
+    @Nonnull
     public Status giveItem(@Nonnull ItemBuilder item) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         this.getInventory().addItem(item.build());
@@ -285,6 +317,46 @@ public class MmcPlayer {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         this.getPlayer().setBedSpawnLocation(location, true);
         return new Success("%s's spawn point has been set!", this.name);
+    }
+
+    @Nonnull
+    public Status setFoodLevel(int level) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setFoodLevel(level);
+        return new Success("%s's food level has been set to %s.", this.name, "" + level);
+    }
+
+    @Nonnull
+    public Status setHealth(double health) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setHealth(health);
+        return new Success("%s's health has been set to %sHP.", this.name, "" + health);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Nonnull
+    public Status setMaxHealth(double maxHealth) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setMaxHealth(maxHealth);
+        return new Success("%s's max health has been set to %sHP.", this.name, "" + maxHealth);
+    }
+
+    @Nonnull
+    public Status feed() {
+        return this.setFoodLevel(20);
+    }
+
+    @Nonnull
+    public Status heal() {
+        return this.heal(true);
+    }
+
+    @Nonnull
+    public Status heal(boolean feed) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.setHealth(this.getMaxHealth());
+        if (feed) this.feed();
+        return new Success("%s has been healed!", this.name);
     }
 
     // CHECKS \\
@@ -354,5 +426,18 @@ public class MmcPlayer {
     @Nullable
     public World getWorld() {
         return this.isOnline() ? this.getLocation().getWorld() : null;
+    }
+
+    public double getHealth() {
+        return this.isOnline() ? this.getPlayer().getHealth() : -1;
+    }
+
+    @SuppressWarnings("deprecation")
+    public double getMaxHealth() {
+        return this.isOnline() ? this.getPlayer().getMaxHealth() : -1;
+    }
+
+    public int getFoodLevel() {
+        return this.isOnline() ? this.getPlayer().getFoodLevel() : -1;
     }
 }
