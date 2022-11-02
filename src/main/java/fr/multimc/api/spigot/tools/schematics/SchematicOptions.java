@@ -17,6 +17,13 @@ public class SchematicOptions {
         this.COPY_ENTITIES = false;
     }
 
+    public SchematicOptions(boolean ignoreAir, boolean copyBiomes, boolean copyEntities) {
+        this.LOCATION = null;
+        this.IGNORE_AIR = ignoreAir;
+        this.COPY_BIOMES = copyBiomes;
+        this.COPY_ENTITIES = copyEntities;
+    }
+
     public SchematicOptions(@Nullable Location location) {
         this.LOCATION = location;
         this.IGNORE_AIR = true;
