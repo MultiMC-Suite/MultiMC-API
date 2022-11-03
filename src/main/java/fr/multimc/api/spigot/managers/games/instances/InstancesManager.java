@@ -76,6 +76,7 @@ public class InstancesManager implements Listener {
     }
 
     private void startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
+        this.isStarted = false;
         this.instances.clear();
         this.instancesState.clear();
         this.mmcTeams = new ArrayList<>(mmcTeams);
@@ -124,6 +125,7 @@ public class InstancesManager implements Listener {
                     MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
             // Instance loading
             dt = this.initInstance(this.instances.get(i));
+            System.out.println(dt); // TODO: remove
             if(dtAvg == 0){
                 dtAvg = dt;
             }
@@ -156,7 +158,7 @@ public class InstancesManager implements Listener {
 
     private long initInstance(@NotNull Instance instance) {
         long dt = System.currentTimeMillis();
-        instance.init();
+        instance.init(false);
         return System.currentTimeMillis() - dt;
     }
 
