@@ -17,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class Instance extends BukkitRunnable{
@@ -36,6 +33,7 @@ public class Instance extends BukkitRunnable{
     private final List<MmcPlayer> players;
     private final HashMap<UUID, Location> playerSpawns;
     private InstanceState instanceState;
+    private final Map<Long, InstanceState> instanceStateUpdates = new HashMap<>();
 
     private int remainingTime;
 
@@ -217,6 +215,7 @@ public class Instance extends BukkitRunnable{
      * @param state New InstanceState
      */
     protected void updateState(@NotNull InstanceState state){
+        this.instanceStateUpdates.put(System.currentTimeMillis(), state);
         this.instanceState = state;
         this.instancesManager.updateInstanceState(this.instanceId, state);
     }
@@ -341,5 +340,8 @@ public class Instance extends BukkitRunnable{
     }
     public HashMap<UUID, Location> getPlayerSpawns() {
         return playerSpawns;
+    }
+    public Map<Long, InstanceState> getInstanceStateUpdates() {
+        return instanceStateUpdates;
     }
 }
