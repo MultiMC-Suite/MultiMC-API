@@ -85,6 +85,11 @@ public class Instance extends BukkitRunnable{
      */
     public void start(){
         if(this.instanceState == InstanceState.PRE_START || this.instanceState == InstanceState.START) return;
+        for(MmcPlayer player : this.players){
+            player.setHealth(20);
+            player.setFoodLevel(20);
+            player.setSaturation(20);
+        }
         this.updateState(InstanceState.PRE_START);
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);

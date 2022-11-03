@@ -332,6 +332,13 @@ public class MmcPlayer {
     }
 
     @Nonnull
+    public Status setSaturation(int level) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setSaturation(level);
+        return new Success("%s's saturation level has been set to %s.", this.name, "" + level);
+    }
+
+    @Nonnull
     public Status setHealth(double health) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         this.getPlayer().setHealth(health);
