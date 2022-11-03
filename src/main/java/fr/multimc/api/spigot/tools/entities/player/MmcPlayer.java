@@ -305,9 +305,14 @@ public class MmcPlayer {
 
     @Nonnull
     public Status setItem(@Nonnull ItemBuilder item, int slot) {
+        return this.setItem(item.build(), slot);
+    }
+
+    @Nonnull
+    public Status setItem(@Nonnull ItemStack item, int slot) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         if (slot >= 36) return new Error("%s is not a valid slot!", "" + slot);
-        this.getInventory().setItem(slot, item.build());
+        this.getInventory().setItem(slot, item);
         this.getPlayer().updateInventory();
         return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
     }
