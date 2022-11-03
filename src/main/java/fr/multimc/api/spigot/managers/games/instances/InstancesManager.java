@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -376,6 +378,24 @@ public class InstancesManager implements Listener {
                         this.logger.info(String.format("Player %s disconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e){
+        if(e.getPlayer().getWorld().equals(this.gameWorld.getWorld())){
+            if(!this.isStarted){
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamaged(EntityDamageEvent e){
+        if(e.getEntity().getWorld().equals(this.gameWorld.getWorld())){
+            if(!this.isStarted){
+                e.setCancelled(true);
             }
         }
     }
