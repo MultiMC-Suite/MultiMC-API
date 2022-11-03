@@ -114,15 +114,21 @@ public class InstancesManager implements Listener {
         long dt;
         long dtAvg = 0;
         for(int i = 0; i < this.instances.size(); i++){
+            // Runnable
+            int finalI = i;
+            long finalDtAvg = dtAvg;
+            int taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, () ->
+                    this.sendTeamActionBar(new TextBuilder(String.format("&bInstance &6%d/%d &binitialized (&e%s&3 remaining)",
+                    finalI + 1,
+                    this.instances.size(),
+                    MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
+            // Instance loading
             dt = this.initInstance(this.instances.get(i));
             if(dtAvg == 0){
                 dtAvg = dt;
             }
             dtAvg = (dtAvg + dt) / 2;
-            this.sendTeamActionBar(new TextBuilder(String.format("&bInstance &6%d/%d &binitialized (&e%s&3 remaining)",
-                                                    i + 1,
-                                                    this.instances.size(),
-                                                    MmcTime.format(dtAvg * (this.instances.size() - i - 1), "mm:ss"))).build());
+            Bukkit.getScheduler().cancelTask(taskID);
         }
 //        this.awaitState(InstanceState.INIT);
         for(MmcPlayer player: this.getSpectators()){

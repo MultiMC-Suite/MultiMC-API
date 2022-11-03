@@ -40,7 +40,7 @@ public class TeamSampleCode implements SampleCode, Listener {
         Schematic schematic = new Schematic(plugin, "instances_test");
         InstanceSettings settings = new InstanceSettings(schematic,
                 new SchematicOptions(),
-                GameType.TEAM_VS_TEAM,
+                GameType.SOLO,
                 120, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 null,
                 null,
@@ -64,8 +64,8 @@ public class TeamSampleCode implements SampleCode, Listener {
         if(message.contains("start")){
             e.setCancelled(true);
             // Temp
-//            List<Team> teams = new ArrayList<>();
-//            Team team = new Team("T1", "CODELA", new APIPlayer("Xen0Xys"));
+//            List<MmcTeam> teams = new ArrayList<>();
+//            MmcTeam team = new MmcTeam("T1", "CODELA", new MmcPlayer("Xen0Xys"));
 //            for(int i = 0; i < 32; i++){
 //                teams.add(team);
 //            }
