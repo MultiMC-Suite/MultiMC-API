@@ -102,7 +102,7 @@ public class InstancesManager implements Listener {
         // Create instances
         for(int i = 0; i < gameTeams.size(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i + 1, gameTeams.size()));
-            Location location = new Location(this.gameWorld.getWorld(), i * 1000, 100, 0);
+            Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
             this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
         }
         if(this.instances.size() == 0){
