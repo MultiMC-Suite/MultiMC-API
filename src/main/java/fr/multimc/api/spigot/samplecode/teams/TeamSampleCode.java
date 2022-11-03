@@ -56,6 +56,7 @@ public class TeamSampleCode implements SampleCode, Listener {
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
         gameWorldSettings.setPreventDamages(false);
         instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
+        instancesManager.preAllocate(32);
     }
 
     @EventHandler

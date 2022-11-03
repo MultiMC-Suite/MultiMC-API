@@ -42,6 +42,7 @@ public class InstancesManager implements Listener {
     private final InstanceSettings settings;
     private final Logger logger;
     private boolean isStarted = false;
+    private int allocateCount = 0;
 
 
     private final MmcWorld lobbyWorld;
@@ -65,6 +66,17 @@ public class InstancesManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
+    public void preAllocate(int _allocateCount){
+        this.logger.info(String.format("Allocating schematics for %d instances", _allocateCount));
+        for(int i = 0; i < _allocateCount; i++){
+            this.logger.info(String.format("Allocating for instance %d/%d", i + 1, _allocateCount));
+            Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
+            Instance.allocate(this.settings.schematic(), this.settings.schematicOptions(), location);
+        }
+        this.allocateCount = _allocateCount;
+        this.logger.info(String.format("%d slots allocated", _allocateCount));
+    }
+
     public void start(@NotNull List<MmcTeam> mmcTeams){
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
@@ -76,6 +88,7 @@ public class InstancesManager implements Listener {
     }
 
     private void startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
+        if(this.isStarted) this.allocateCount = 0; // Reset allocated slots to reset maps
         this.isStarted = false;
         this.instances.clear();
         this.instancesState.clear();
@@ -124,7 +137,7 @@ public class InstancesManager implements Listener {
                     this.instances.size(),
                     MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
             // Instance loading
-            dt = this.initInstance(this.instances.get(i));
+            dt = this.initInstance(this.instances.get(i), i);
             System.out.println(dt); // TODO: remove
             if(dtAvg == 0){
                 dtAvg = dt;
@@ -156,9 +169,9 @@ public class InstancesManager implements Listener {
 //        this.awaitState(InstanceState.STOP);
     }
 
-    private long initInstance(@NotNull Instance instance) {
+    private long initInstance(@NotNull Instance instance, int instanceCount) {
         long dt = System.currentTimeMillis();
-        instance.init(false);
+        instance.init(instanceCount < this.allocateCount);
         return System.currentTimeMillis() - dt;
     }
 
