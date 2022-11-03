@@ -135,7 +135,7 @@
         <repository>
             <id>github</id>
             <name>MultiMC-API GitHub packages</name>
-            <url>https://maven.pkg.github.com/IUTRS-MultiMC-LAN/MultiMC-API</url>
+            <url>https://maven.pkg.github.com/IUTRS-MultiMC-LAN/MultiMC-API/experimental</url>
         </repository>
     </distributionManagement>
 </project>
