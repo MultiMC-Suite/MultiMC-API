@@ -104,7 +104,7 @@ public class Instance extends BukkitRunnable{
         for(MmcPlayer mmcPlayer : this.players){
             this.teleportPlayer(mmcPlayer, this.instancesManager.getLobbyWorld().getSpawnPoint());
         }
-        this.cancel();
+        if(!this.isCancelled()) this.cancel();
         this.updateState(InstanceState.STOP);
     }
 
