@@ -1,7 +1,6 @@
 package fr.multimc.api.spigot.managers.games.instances;
 
 import fr.multimc.api.commons.tools.times.MmcTime;
-import fr.multimc.api.spigot.managers.games.GameType;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
@@ -34,28 +33,33 @@ import java.util.logging.Logger;
 public class InstancesManager implements Listener {
 
     private final JavaPlugin plugin;
-    private final List<Instance> instances;
-    private List<MmcTeam> mmcTeams = new ArrayList<>();
-    private final HashMap<Integer, InstanceState> instancesState = new HashMap<>();
-    private final GameType gameType;
+    private final Logger logger;
     private final Class<? extends Instance> instanceClass;
     private final InstanceSettings settings;
-    private final Logger logger;
-    private boolean isStarted = false;
-    private int allocateCount = 0;
-
-
     private final MmcWorld lobbyWorld;
     private final MmcWorld gameWorld;
 
+    private final List<Instance> instances = new ArrayList<>();
+    private final HashMap<Integer, InstanceState> instancesState = new HashMap<>();
+    private List<MmcTeam> mmcTeams = new ArrayList<>();
+
+    private boolean isStarted = false;
+    private int allocations = 0;
+
+    /**
+     * Default constructor for the InstancesManager
+     * @param plugin JavaPlugin instance
+     * @param instanceClass Class used for the instances
+     * @param settings Instance settings
+     * @param lobbyWorld MmcWorld instance that represent the Lobby world
+     * @param gameWorld MmcWorld instance that represent the Game world
+     */
     public InstancesManager(@NotNull JavaPlugin plugin,
                             @NotNull Class<? extends Instance> instanceClass,
                             @NotNull InstanceSettings settings,
                             @NotNull MmcWorld lobbyWorld,
                             @NotNull MmcWorld gameWorld) {
         this.plugin = plugin;
-        this.instances = new ArrayList<>();
-        this.gameType = settings.gameType();
         this.instanceClass = instanceClass;
         this.settings = settings;
         this.logger = plugin.getLogger();
@@ -66,35 +70,47 @@ public class InstancesManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void preAllocate(int _allocateCount){
-        this.logger.info(String.format("Allocating schematics for %d instances", _allocateCount));
-        for(int i = 0; i < _allocateCount; i++){
-            this.logger.info(String.format("Allocating for instance %d/%d", i + 1, _allocateCount));
+    /**
+     * Pre-allocate schematics for instances
+     * @param allocateCount Number of instances to allocate
+     */
+    public void preAllocate(int allocateCount){
+        this.logger.info(String.format("Allocating schematics for %d instances", allocateCount));
+        for(int i = 0; i < allocateCount; i++){
+            this.logger.info(String.format("Allocating for instance %d/%d", i + 1, allocateCount));
             Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
             Instance.allocate(this.settings.schematic(), this.settings.schematicOptions(), location);
         }
-        this.allocateCount = _allocateCount;
-        this.logger.info(String.format("%d slots allocated", _allocateCount));
+        this.allocations = allocateCount;
+        this.logger.info(String.format("%d slots allocated", allocateCount));
     }
 
+    /**
+     * Start the instances manager from sync to async
+     * @param mmcTeams List of MmcTeam instances
+     */
     public void start(@NotNull List<MmcTeam> mmcTeams){
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 startAsync(mmcTeams);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         });
     }
 
+    /**
+     * Start the instances manager asynchronously
+     * @param mmcTeams List of MmcTeam instances
+     */
     private void startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
-        if(this.isStarted) this.allocateCount = 0; // Reset allocated slots to reset maps
+        if(this.isStarted) this.allocations = 0; // Reset allocated slots to reset maps
         this.isStarted = false;
         this.instances.clear();
         this.instancesState.clear();
         this.mmcTeams = new ArrayList<>(mmcTeams);
         List<List<MmcTeam>> gameTeams = new ArrayList<>();
-        switch (this.gameType) {
+        switch (this.settings.gameType()) {
             case SOLO -> {
                 List<MmcTeam> onePlayerTeams = this.getOnePlayerTeams();
                 for(MmcTeam onePlayerTeam : onePlayerTeams){
@@ -123,8 +139,16 @@ public class InstancesManager implements Listener {
             this.logger.warning("No instance created");
             return;
         }
-//        this.awaitState(InstanceState.CREATE);
         // Init instances
+        this.initInstances();
+        // Start instances
+        this.startInstances();
+    }
+
+    /**
+     * Init all instances
+     */
+    private void initInstances() throws InterruptedException {
         long dt;
         long dtAvg = 0;
         for(int i = 0; i < this.instances.size(); i++){
@@ -133,11 +157,11 @@ public class InstancesManager implements Listener {
             long finalDtAvg = dtAvg;
             int taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, () ->
                     this.sendTeamActionBar(new TextBuilder(String.format("&bInstance &6%d/%d &binitialized (&e%s&3 remaining)",
-                    finalI + 1,
-                    this.instances.size(),
-                    MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
+                            finalI + 1,
+                            this.instances.size(),
+                            MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
             // Instance loading
-            dt = this.initInstance(this.instances.get(i), i);
+            dt = this.initInstance(this.instances.get(i), this.instances.get(i).getInstanceId());
             System.out.println(dt); // TODO: remove
             if(dtAvg == 0){
                 dtAvg = dt;
@@ -145,44 +169,68 @@ public class InstancesManager implements Listener {
             dtAvg = (dtAvg + dt) / 2;
             Bukkit.getScheduler().cancelTask(taskID);
         }
-//        this.awaitState(InstanceState.INIT);
         for(MmcPlayer player: this.getSpectators()){
             Bukkit.getScheduler().runTask(plugin, () -> {
                 player.teleport(this.gameWorld.getSpawnPoint());
                 player.setGameMode(GameMode.SPECTATOR);
             });
         }
-        for(int i = 0; i <= 5; i++){
+        for(int i = 5; i >= 0; i--){
             Thread.sleep(1000);
-            if (i != 5) this.sendTeamTitle(new TextBuilder(String.format("&6%d", 5 - i)).build(), new TextBuilder("&7Get ready...").build());
+            if (i != 0) this.sendTeamTitle(new TextBuilder(String.format("&6%d", i)).build(), new TextBuilder("&7Get ready...").build());
             else this.sendTeamTitle(new TextBuilder("&fLet's &bGO!").build(), null);
             this.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
         }
-        // Start instances
+    }
+
+    /**
+     * Start all instances
+     */
+    private void startInstances(){
         this.instances.forEach(this::startInstance);
-//        this.awaitState(InstanceState.START);
         this.isStarted = true;
     }
 
+    /**
+     * Stop all instances
+     */
     public void stopInstances(){
         instances.forEach(this::stopInstance);
-//        this.awaitState(InstanceState.STOP);
     }
 
-    private long initInstance(@NotNull Instance instance, int instanceCount) {
+    /**
+     * Init an instance
+     * @param instance Instance to init
+     * @param instanceId ID of the instance
+     * @return Time taken to init the instance
+     */
+    private long initInstance(@NotNull Instance instance, int instanceId) {
         long dt = System.currentTimeMillis();
-        instance.init(instanceCount < this.allocateCount);
+        instance.init(instanceId < this.allocations);
         return System.currentTimeMillis() - dt;
     }
 
+    /**
+     * Start an instance
+     * @param instance Instance to start
+     */
     private void startInstance(@NotNull Instance instance){
         instance.start();
     }
 
+    /**
+     * Stop an instance
+     * @param instance Instance to stop
+     */
     private void stopInstance(@NotNull Instance instance){
        instance.stop();
     }
 
+    /**
+     * Called by instance to update their state, and if all are stopped, reset the instances manager
+     * @param instanceId ID if the instance
+     * @param state New state for the instance
+     */
     protected void updateInstanceState(int instanceId, @NotNull InstanceState state){
         if(instancesState.containsKey(instanceId)){
             this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
@@ -191,6 +239,7 @@ public class InstancesManager implements Listener {
             this.logger.info(String.format("Instance %d set state to %s", instanceId, state));
             instancesState.put(instanceId, state);
         }
+        // Check if all instances are stopped
         boolean isAllStopped = true;
         for(int _instanceId: this.instancesState.keySet()){
             if(this.instancesState.get(_instanceId) != InstanceState.STOP){
@@ -203,10 +252,15 @@ public class InstancesManager implements Listener {
         }
     }
 
+    /**
+     * Reset the instances manager
+     */
     private void resetManager(){
         for(MmcPlayer player: this.getSpectators()){
             player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
-            player.setGameModeSync(this.plugin, GameMode.SURVIVAL);
+        }
+        for(MmcTeam mmcTeam: this.mmcTeams){
+            mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false));
         }
     }
 
@@ -246,6 +300,26 @@ public class InstancesManager implements Listener {
         }
     }
 
+    /**
+     * Get teams of 1 players (for solo game type)
+     * @return List of teams with only 1 player intos
+     */
+    private List<MmcTeam> getOnePlayerTeams(){
+        List<MmcTeam> mmcTeams = new ArrayList<>();
+        for(MmcTeam mmcTeam : this.mmcTeams){
+            for(MmcPlayer player: mmcTeam.getPlayers()){
+                MmcTeam onePlayerMmcTeam = new MmcTeam(mmcTeam.getName(), mmcTeam.getTeamCode(), player);
+                mmcTeams.add(onePlayerMmcTeam);
+            }
+        }
+        return mmcTeams;
+    }
+
+    /**
+     * For Team VS Team game type, get tuple of teams
+     * @param mmcTeams List of teams
+     * @return List of tuple of teams
+     */
     private List<List<MmcTeam>> getTeamsTuple(@NotNull List<MmcTeam> mmcTeams) {
         List<List<MmcTeam>> teamsTuple = new ArrayList<>();
         if(mmcTeams.size() % 2 == 0){
@@ -259,6 +333,10 @@ public class InstancesManager implements Listener {
         return teamsTuple;
     }
 
+    /**
+     * Get the list of spectators
+     * @return List of spectators
+     */
     private List<MmcPlayer> getSpectators() {
         List<MmcPlayer> nonPlayerPlayers = new ArrayList<>();
         for(Player player : Bukkit.getOnlinePlayers()){
@@ -277,8 +355,12 @@ public class InstancesManager implements Listener {
         return nonPlayerPlayers;
     }
 
+    /**
+     * Get instance count from the game type and the number of teams/players
+     * @return Instance count to create
+     */
     private int getInstanceCount(){
-        switch (this.gameType){
+        switch (this.settings.gameType()){
             case SOLO:
                 int count = 0;
                 for(MmcTeam mmcTeam : this.mmcTeams){
@@ -296,54 +378,17 @@ public class InstancesManager implements Listener {
         }
     }
 
-    private List<MmcTeam> getOnePlayerTeams(){
-        List<MmcTeam> mmcTeams = new ArrayList<>();
-        for(MmcTeam mmcTeam : this.mmcTeams){
-            for(MmcPlayer player: mmcTeam.getPlayers()){
-                MmcTeam onePlayerMmcTeam = new MmcTeam(mmcTeam.getName(), mmcTeam.getTeamCode(), player);
-                mmcTeams.add(onePlayerMmcTeam);
-            }
-        }
-        return mmcTeams;
-    }
-
-    public MmcWorld getLobbyWorld(){
-        return this.lobbyWorld;
-    }
-
-    public MmcWorld getGameWorld(){
-        return this.gameWorld;
-    }
-
-    public boolean isStarted() {
-        return this.isStarted;
-    }
-
     public boolean isSpectator(MmcPlayer player){
         return this.getSpectators().contains(player);
     }
-
-
-
-    // TODO: recode this shit
-    @Deprecated
-    private void awaitState(@NotNull InstanceState targetState){
-        boolean isStateReached = false;
-        while(!isStateReached){
-            for(int instanceId : this.instancesState.keySet()){
-                if(this.instancesState.get(instanceId) != targetState){
-                    isStateReached = false;
-                    break;
-                }else{
-                    isStateReached = true;
-                }
-            }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public MmcWorld getLobbyWorld(){
+        return this.lobbyWorld;
+    }
+    public MmcWorld getGameWorld(){
+        return this.gameWorld;
+    }
+    public boolean isStarted() {
+        return this.isStarted;
     }
 
     @EventHandler
@@ -361,45 +406,40 @@ public class InstancesManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
         MmcPlayer mmcPlayer = new MmcPlayer(player);
-        if(this.isStarted){
-            for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(mmcPlayer)){
-                    if(instance.isRunning()){
-                        this.logger.info(String.format("Reconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
-                        instance.onPlayerReconnect(mmcPlayer);
-                        this.logger.info(String.format("Player %s reconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
-                    }else{
-                        this.logger.info(String.format("Instance %d not running, teleporting player %s to lobby...", instance.getInstanceId(), mmcPlayer.getName()));
-                        mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
-                        this.logger.info(String.format("Player %s teleported to lobby...", mmcPlayer.getName()));
-                        player.getInventory().clear();
-                    }
-                    return;
-                }
-            }
-            this.logger.info(String.format("No instance found for player %s, make him a spectator", mmcPlayer.getName()));
-            player.setGameMode(GameMode.SPECTATOR);
-        }else{
+        if(!this.isStarted){
             this.logger.info(String.format("Instance manager not started, teleporting player %s to lobby", mmcPlayer.getName()));
             mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
             player.getInventory().clear();
             this.logger.info(String.format("Player %s teleported to lobby...", mmcPlayer.getName()));
+            return;
         }
+        for(Instance instance : this.instances){
+            if(!instance.isPlayerOnInstance(mmcPlayer)) continue;
+            if(instance.isRunning()){
+                this.logger.info(String.format("Reconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
+                instance.onPlayerReconnect(mmcPlayer);
+                this.logger.info(String.format("Player %s reconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
+            }else{
+                this.logger.info(String.format("Instance %d not running, teleporting player %s to lobby...", instance.getInstanceId(), mmcPlayer.getName()));
+                mmcPlayer.teleport(this.getLobbyWorld().getSpawnPoint());
+                this.logger.info(String.format("Player %s teleported to lobby...", mmcPlayer.getName()));
+                player.getInventory().clear();
+            }
+            return;
+        }
+        this.logger.info(String.format("No instance found for player %s, make him a spectator", mmcPlayer.getName()));
+        player.setGameMode(GameMode.SPECTATOR);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent e){
         MmcPlayer mmcPlayer = new MmcPlayer(e.getPlayer());
-        if(this.isStarted){
-            for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(mmcPlayer)){
-                    if(instance.isRunning()){
-                        this.logger.info(String.format("Disconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
-                        instance.onPlayerDisconnect(mmcPlayer);
-                        this.logger.info(String.format("Player %s disconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
-                    }
-                }
-            }
+        if(!this.isStarted) return;
+        for(Instance instance : this.instances){
+            if(!instance.isPlayerOnInstance(mmcPlayer) || !instance.isRunning()) continue;
+            this.logger.info(String.format("Disconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
+            instance.onPlayerDisconnect(mmcPlayer);
+            this.logger.info(String.format("Player %s disconnected to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
         }
     }
 
