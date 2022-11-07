@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ReassignedVariable"})
 public class MessagesFactory {
 
     private final Component prefix;
@@ -24,7 +24,9 @@ public class MessagesFactory {
         return this.getMessage(messageType, new TextBuilder(playerName).build(), new TextBuilder(message).build(), new TextBuilder(teamName).build());
     }
 
-    public Component getMessage(@NotNull MessageType messageType, @NotNull Component playerName, @NotNull Component message, @NotNull Component teamName){
+    public Component getMessage(@NotNull MessageType messageType, @NotNull Component playerName, @NotNull Component message, @Nullable Component teamName){
+        if(teamName == null)
+            teamName = Component.empty();
         switch (messageType){
             case GAME -> {
                 return Component.text()
@@ -58,7 +60,7 @@ public class MessagesFactory {
                 .build();
     }
 
-    private Component getTeamedMessage(Component message, Component playerName, Component teamName){
+    private Component getTeamedMessage(@NotNull Component message, @NotNull Component playerName, @NotNull Component teamName){
         return Component.text()
                 .append(teamName.decorate(TextDecoration.ITALIC))
                 .append(Component.text(" "))
