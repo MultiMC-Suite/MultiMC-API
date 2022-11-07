@@ -4,8 +4,13 @@ import fr.multimc.api.commons.tools.times.MmcTime;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.tools.utils.MessageType;
+import fr.multimc.api.spigot.tools.utils.MessagesFactory;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -34,6 +39,7 @@ public class InstancesManager implements Listener {
 
     private final JavaPlugin plugin;
     private final Logger logger;
+    private final MessagesFactory factory;
     private final Class<? extends Instance> instanceClass;
     private final InstanceSettings settings;
     private final MmcWorld lobbyWorld;
@@ -57,11 +63,13 @@ public class InstancesManager implements Listener {
     public InstancesManager(@NotNull JavaPlugin plugin,
                             @NotNull Class<? extends Instance> instanceClass,
                             @NotNull InstanceSettings settings,
+                            @Nullable MessagesFactory factory,
                             @NotNull MmcWorld lobbyWorld,
                             @NotNull MmcWorld gameWorld) {
         this.plugin = plugin;
         this.instanceClass = instanceClass;
         this.settings = settings;
+        this.factory = factory;
         this.logger = plugin.getLogger();
         this.lobbyWorld = lobbyWorld;
         this.gameWorld = gameWorld;
@@ -104,8 +112,6 @@ public class InstancesManager implements Listener {
      * @param mmcTeams List of MmcTeam instances
      */
     private void startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
-        if(this.isStarted) this.allocations = 0; // Reset allocated slots to reset maps
-        this.isStarted = false;
         this.instances.clear();
         this.instancesState.clear();
         this.mmcTeams = new ArrayList<>(mmcTeams);
@@ -143,6 +149,8 @@ public class InstancesManager implements Listener {
         this.initInstances();
         // Start instances
         this.startInstances();
+        this.isStarted = true;
+        this.allocations = 0; // Reset allocated slots to reset maps
     }
 
     /**
@@ -162,7 +170,6 @@ public class InstancesManager implements Listener {
                             MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
             // Instance loading
             dt = this.initInstance(this.instances.get(i), this.instances.get(i).getInstanceId());
-            System.out.println(dt); // TODO: remove
             if(dtAvg == 0){
                 dtAvg = dt;
             }
@@ -188,13 +195,12 @@ public class InstancesManager implements Listener {
      */
     private void startInstances(){
         this.instances.forEach(this::startInstance);
-        this.isStarted = true;
     }
 
     /**
      * Stop all instances
      */
-    public void stopInstances(){
+    private void stopInstances(){
         instances.forEach(this::stopInstance);
     }
 
@@ -248,20 +254,22 @@ public class InstancesManager implements Listener {
             }
         }
         if(isAllStopped){
-            this.resetManager();
+            this.stopManager();
         }
     }
 
     /**
      * Reset the instances manager
      */
-    private void resetManager(){
+    public void stopManager(){
+        this.stopInstances();
         for(MmcPlayer player: this.getSpectators()){
             player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
         }
         for(MmcTeam mmcTeam: this.mmcTeams){
             mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false));
         }
+        this.isStarted = false;
     }
 
     /**
@@ -302,7 +310,7 @@ public class InstancesManager implements Listener {
 
     /**
      * Get teams of 1 players (for solo game type)
-     * @return List of teams with only 1 player intos
+     * @return List of teams with only 1 player into
      */
     private List<MmcTeam> getOnePlayerTeams(){
         List<MmcTeam> mmcTeams = new ArrayList<>();
@@ -378,7 +386,33 @@ public class InstancesManager implements Listener {
         }
     }
 
-    public boolean isSpectator(MmcPlayer player){
+    /**
+     * Get a team from a MmcPlayer object
+     * @param mmcPlayer MmcPlayer object
+     * @return Team of the player
+     */
+    @Nullable
+    private MmcTeam getTeamFromPlayer(@NotNull MmcPlayer mmcPlayer){
+        for(MmcTeam mmcTeam: this.mmcTeams){
+            if(mmcTeam.getPlayers().contains(mmcPlayer)) return mmcTeam;
+        }
+        return null;
+    }
+
+    /**
+     * Get an instance from a MmcPlayer object
+     * @param mmcPlayer MmcPlayer object
+     * @return Instance of the player
+     */
+    @Nullable
+    private Instance getInstanceFromPlayer(@NotNull MmcPlayer mmcPlayer){
+        for(Instance instance: this.instances){
+            if(instance.getPlayers().contains(mmcPlayer)) return instance;
+        }
+        return null;
+    }
+
+    public boolean isSpectator(@Nullable MmcPlayer player){
         return this.getSpectators().contains(player);
     }
     public MmcWorld getLobbyWorld(){
@@ -458,6 +492,53 @@ public class InstancesManager implements Listener {
             if(!this.isStarted){
                 e.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onAsyncChatEvent(AsyncChatEvent e){
+        if(this.factory == null) return;
+        e.setCancelled(true);
+        Player player = e.getPlayer();
+        MmcPlayer mmcPlayer = new MmcPlayer(player);
+        Component newMessage;
+        if(!this.isStarted){
+            newMessage = this.factory.getMessage(MessageType.PREFIXED, Component.text(player.getName()), e.message(), null);
+            for(Player _player: Bukkit.getOnlinePlayers()){
+                _player.sendMessage(newMessage);
+            }
+            return;
+        }
+        for(Instance instance: this.instances){
+            if(!instance.isPlayerOnInstance(new MmcPlayer(player))) continue;
+            MmcTeam team = this.getTeamFromPlayer(mmcPlayer);
+            switch (this.settings.gameType()) {
+                case SOLO, ONLY_TEAM -> {
+                    // Send message to player's team
+                    if (team == null) return;
+                    newMessage = this.factory.getMessage(MessageType.TEAM, Component.text(player.getName()), e.message(), Component.text(team.getName()));
+                    team.sendMessage(newMessage);
+                }
+                case TEAM_VS_TEAM -> {
+                    String rawMessage = PlainTextComponentSerializer.plainText().serialize(e.message());
+                    String chatPrefix = MessageType.GAME.getChatPrefix();
+                    if (chatPrefix == null || team == null) return;
+                    if (rawMessage.startsWith(chatPrefix)) {
+                        // Send message to instance players
+                        String message = rawMessage.replaceFirst(chatPrefix, "");
+                        newMessage = this.factory.getMessage(MessageType.GAME, Component.text(player.getName()), new TextBuilder(message).build(), Component.text(team.getName()));
+                        for (MmcTeam instanceTeam : instance.getTeams()) {
+                            instanceTeam.sendMessage(newMessage);
+                        }
+                    } else {
+                        // Send message to player's team
+                        newMessage = this.factory.getMessage(MessageType.TEAM, Component.text(player.getName()), e.message(), Component.text(team.getName()));
+                        team.sendMessage(newMessage);
+                    }
+                }
+                default -> player.sendMessage(Component.text("Game type not supported").color(NamedTextColor.RED));
+            }
+            return;
         }
     }
 }

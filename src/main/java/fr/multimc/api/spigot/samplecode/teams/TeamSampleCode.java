@@ -9,6 +9,7 @@ import fr.multimc.api.spigot.samplecode.SampleCode;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
+import fr.multimc.api.spigot.tools.utils.MessagesFactory;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import fr.multimc.api.spigot.tools.worlds.WorldSettings;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -35,7 +36,9 @@ public class TeamSampleCode implements SampleCode, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
-        teamManager.addTeam("T1", "T1", "Xen0Xys");
+        teamManager.addTeam("T1", "T1", "Xen0Xys", "XenAdmin");
+
+        MessagesFactory factory = new MessagesFactory("&eTeamSample");
 
         Schematic schematic = new Schematic(plugin, "instances_test");
         InstanceSettings settings = new InstanceSettings(schematic,
@@ -55,7 +58,7 @@ public class TeamSampleCode implements SampleCode, Listener {
                 true);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
         gameWorldSettings.setPreventDamages(false);
-        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
+        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, factory, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
         instancesManager.preAllocate(32);
     }
 
@@ -74,7 +77,7 @@ public class TeamSampleCode implements SampleCode, Listener {
             instancesManager.start(teamManager.loadTeams());
         }else if(message.contains("stop")){
             e.setCancelled(true);
-            instancesManager.stopInstances();
+            instancesManager.stopManager();
         }
     }
 }

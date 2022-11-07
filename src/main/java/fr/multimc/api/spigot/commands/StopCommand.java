@@ -18,7 +18,7 @@ public class StopCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         commandSender.sendMessage("Stopping instances...");
-        this.instancesManager.stopInstances();
+        this.instancesManager.stopManager();
         commandSender.sendMessage("Instances stopped!");
         return true;
     }
