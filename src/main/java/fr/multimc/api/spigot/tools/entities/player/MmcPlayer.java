@@ -305,9 +305,14 @@ public class MmcPlayer {
 
     @Nonnull
     public Status setItem(@Nonnull ItemBuilder item, int slot) {
+        return this.setItem(item.build(), slot);
+    }
+
+    @Nonnull
+    public Status setItem(@Nonnull ItemStack item, int slot) {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         if (slot >= 36) return new Error("%s is not a valid slot!", "" + slot);
-        this.getInventory().setItem(slot, item.build());
+        this.getInventory().setItem(slot, item);
         this.getPlayer().updateInventory();
         return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
     }
@@ -324,6 +329,13 @@ public class MmcPlayer {
         if (!this.isOnline()) return new Error("%s is not online!", this.name);
         this.getPlayer().setFoodLevel(level);
         return new Success("%s's food level has been set to %s.", this.name, "" + level);
+    }
+
+    @Nonnull
+    public Status setSaturation(int level) {
+        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+        this.getPlayer().setSaturation(level);
+        return new Success("%s's saturation level has been set to %s.", this.name, "" + level);
     }
 
     @Nonnull

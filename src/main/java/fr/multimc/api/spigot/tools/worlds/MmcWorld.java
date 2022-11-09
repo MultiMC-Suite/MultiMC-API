@@ -122,6 +122,7 @@ public class MmcWorld implements Listener {
                 if(this.worldSettings.isPreventBuild()){
                     e.setCancelled(true);
                     player.setFoodLevel(20);
+                    player.setSaturation(20);
                 }
             }
         }

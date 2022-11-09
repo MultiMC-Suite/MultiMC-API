@@ -17,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class Instance extends BukkitRunnable{
@@ -36,6 +33,7 @@ public class Instance extends BukkitRunnable{
     private final List<MmcPlayer> players;
     private final HashMap<UUID, Location> playerSpawns;
     private InstanceState instanceState;
+    private final Map<Long, InstanceState> instanceStateUpdates = new HashMap<>();
 
     private int remainingTime;
 
@@ -55,16 +53,33 @@ public class Instance extends BukkitRunnable{
     }
 
     // GAME ACTIONS
+
+    /**
+     * Past the schematic for the instance (can be called for pre-allocation too)
+     * @param schematic Schematic to paste
+     * @param options Schematic options
+     * @param location Location to paste the schematic
+     */
+    public static void allocate(Schematic schematic, SchematicOptions options, Location location) {
+        options.setLocation(location);
+        Instance.pasteSchematic(schematic, options);
+    }
+
     /**
      * Initialize game instance
      */
-    public void init(){
+    public void init(boolean isPreAllocated){
         if(this.instanceState == InstanceState.PRE_INIT || this.instanceState == InstanceState.INIT) return;
-        this.updateState(InstanceState.PRE_INIT);
         // Place schematic
-        SchematicOptions options = instanceSettings.schematicOptions();
-        options.setLocation(instanceLocation);
-        this.pasteSchematic(instanceSettings.schematic(), options);
+        if(!isPreAllocated){
+            this.updateState(InstanceState.PRE_ALLOCATE);
+//            SchematicOptions options = instanceSettings.schematicOptions();
+//            options.setLocation(instanceLocation);
+//            Instance.pasteSchematic(instanceSettings.schematic(), options);
+            Instance.allocate(instanceSettings.schematic(), instanceSettings.schematicOptions(), instanceLocation);
+            this.updateState(InstanceState.ALLOCATE);
+        }
+        this.updateState(InstanceState.PRE_INIT);
         for(UUID uuid: this.playerSpawns.keySet()){
             MmcPlayer mmcPlayer = this.players.stream().filter(p -> p.getUUID().equals(uuid)).findFirst().orElse(null);
             if(mmcPlayer != null){
@@ -85,6 +100,11 @@ public class Instance extends BukkitRunnable{
      */
     public void start(){
         if(this.instanceState == InstanceState.PRE_START || this.instanceState == InstanceState.START) return;
+        for(MmcPlayer player : this.players){
+            player.setHealth(20);
+            player.setFoodLevel(20);
+            player.setSaturation(20);
+        }
         this.updateState(InstanceState.PRE_START);
         this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
@@ -101,7 +121,7 @@ public class Instance extends BukkitRunnable{
         for(MmcPlayer mmcPlayer : this.players){
             this.teleportPlayer(mmcPlayer, this.instancesManager.getLobbyWorld().getSpawnPoint());
         }
-        this.cancel();
+        if(!this.isCancelled()) this.cancel();
         this.updateState(InstanceState.STOP);
     }
 
@@ -115,7 +135,7 @@ public class Instance extends BukkitRunnable{
         // Reset instance
         this.resetInstance();
         // Restart instance
-        this.init();
+        this.init(false);
         this.start();
     }
 
@@ -212,6 +232,7 @@ public class Instance extends BukkitRunnable{
      * @param state New InstanceState
      */
     protected void updateState(@NotNull InstanceState state){
+        this.instanceStateUpdates.put(System.currentTimeMillis(), state);
         this.instanceState = state;
         this.instancesManager.updateInstanceState(this.instanceId, state);
     }
@@ -221,7 +242,7 @@ public class Instance extends BukkitRunnable{
      * @param schematic Schematic object
      * @param schematicOptions SchematicOptions object
      */
-    private void pasteSchematic(@NotNull Schematic schematic, @NotNull SchematicOptions schematicOptions){
+    private static void pasteSchematic(@NotNull Schematic schematic, @NotNull SchematicOptions schematicOptions){
         try {
             schematic.paste(schematicOptions);
         } catch (WorldEditException e) {
@@ -336,5 +357,8 @@ public class Instance extends BukkitRunnable{
     }
     public HashMap<UUID, Location> getPlayerSpawns() {
         return playerSpawns;
+    }
+    public Map<Long, InstanceState> getInstanceStateUpdates() {
+        return instanceStateUpdates;
     }
 }
