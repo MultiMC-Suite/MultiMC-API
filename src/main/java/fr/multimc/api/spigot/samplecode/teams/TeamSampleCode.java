@@ -21,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -36,7 +37,8 @@ public class TeamSampleCode implements SampleCode, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
-        teamManager.addTeam("T1", "T1", "Xen0Xys", "XenAdmin");
+        teamManager.addTeam("T1", "Name 1", "Xen0Xys");
+        teamManager.addTeam("T2", "Name 2", "XenAdmin");
 
         MessagesFactory factory = new MessagesFactory("&eTeamSample");
 
@@ -78,6 +80,11 @@ public class TeamSampleCode implements SampleCode, Listener {
         }else if(message.contains("stop")){
             e.setCancelled(true);
             instancesManager.stopManager();
+        }else if(message.contains("push")){
+            HashMap<String, Integer> scores = new HashMap<>();
+            scores.put("T1", 16);
+            scores.put("T2", 15);
+            teamManager.pushScores(scores);
         }
     }
 }
