@@ -9,7 +9,7 @@ import fr.multimc.api.spigot.samplecode.SampleCode;
 import fr.multimc.api.spigot.tools.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.schematics.Schematic;
 import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
-import fr.multimc.api.spigot.tools.utils.MessagesFactory;
+import fr.multimc.api.spigot.tools.utils.messages.MessagesFactory;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import fr.multimc.api.spigot.tools.worlds.WorldSettings;
 import io.papermc.paper.event.player.AsyncChatEvent;

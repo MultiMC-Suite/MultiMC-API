@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.utils;
+package fr.multimc.api.spigot.tools.utils.messages;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

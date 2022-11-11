@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.utils;
+package fr.multimc.api.spigot.tools.utils.messages;
 
 import fr.multimc.api.spigot.tools.chat.TextBuilder;
 import net.kyori.adventure.text.Component;
