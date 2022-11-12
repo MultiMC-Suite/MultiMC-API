@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.tools.worlds;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.spigot.tools.schematics.SchematicOptions;
+import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;

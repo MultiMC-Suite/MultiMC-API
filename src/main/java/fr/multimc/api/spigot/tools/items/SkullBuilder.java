@@ -4,9 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Create easily a skull.
@@ -15,6 +14,7 @@ import javax.annotation.Nullable;
  * @version 1.0
  * @since 04/10/2022
  */
+@SuppressWarnings("unused")
 public class SkullBuilder extends ItemBuilder {
     /**
      * Create an instance of SkullBuilder based on the ItemBuilder.
@@ -25,16 +25,14 @@ public class SkullBuilder extends ItemBuilder {
 
     /**
      * Create an instance of SkullBuilder based on the ItemBuilder with an existing item.
-     *
      * @param item Item.
      */
-    public SkullBuilder(@Nonnull ItemStack item) {
+    public SkullBuilder(@NotNull ItemStack item) {
         super(item);
     }
 
     /**
      * Create an instance of SkullBuilder bas on the ItemBuilder with a custom amount.
-     *
      * @param amount Amount.
      */
     public SkullBuilder(int amount) {
@@ -42,21 +40,7 @@ public class SkullBuilder extends ItemBuilder {
     }
 
     /**
-     * Set the skull owner by name.
-     *
-     * @param ownerName Owner name.
-     * @return Current instance of the builder.
-     */
-    @Deprecated
-    public SkullBuilder setOwner(@Nullable String ownerName) {
-        SkullMeta meta = (SkullMeta) this.getMeta();
-        meta.setOwner(ownerName);
-        return (SkullBuilder) this.applyMeta(meta);
-    }
-
-    /**
      * Set the skull owner by an offline player (could be connected too).
-     *
      * @param owner Owning player.
      * @return Current instance of the builder.
      */

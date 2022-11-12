@@ -47,24 +47,12 @@ public class MmcTeam {
         return false;
     }
 
-    public void sendMessage(@Nonnull String message){
-        for (MmcPlayer player: this.players) player.sendMessage(message);
-    }
-
     public void sendMessage(@Nonnull Component message){
         for (MmcPlayer player: this.players) player.sendMessage(message);
     }
 
-    public void sendTitle(@Nullable String title, @Nullable String subtitle){
-        for (MmcPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
-    }
-
     public void sendTitle(@Nullable Component title, @Nullable Component subtitle){
         for (MmcPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
-    }
-
-    public void sendActionBar(@Nonnull String bar){
-        for (MmcPlayer player: this.players) player.sendActionBar(bar);
     }
 
     public void sendActionBar(@Nonnull Component bar){

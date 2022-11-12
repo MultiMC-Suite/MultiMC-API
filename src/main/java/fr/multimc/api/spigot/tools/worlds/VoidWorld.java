@@ -9,7 +9,7 @@ public class VoidWorld extends ChunkGenerator {
 
     public World generate(String name){
         WorldCreator wc = new WorldCreator(name);
-        wc.generator(new VoidWorld());
+        wc.generator(this);
         wc.createWorld();
         return Bukkit.getWorld(name);
     }

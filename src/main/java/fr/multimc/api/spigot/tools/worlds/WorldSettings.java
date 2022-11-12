@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.tools.worlds;
 
-import fr.multimc.api.spigot.tools.locations.RelativeLocation;
-import fr.multimc.api.spigot.tools.schematics.Schematic;
+import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.jetbrains.annotations.NotNull;

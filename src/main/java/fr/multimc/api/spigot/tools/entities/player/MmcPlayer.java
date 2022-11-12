@@ -1,21 +1,18 @@
 package fr.multimc.api.spigot.tools.entities.player;
 
-import fr.multimc.api.commons.tools.compares.StringFormatter;
-import fr.multimc.api.commons.tools.enums.Status;
-import fr.multimc.api.commons.tools.status.Error;
-import fr.multimc.api.commons.tools.status.SameValue;
-import fr.multimc.api.commons.tools.status.Success;
-import fr.multimc.api.spigot.tools.chat.ClickableMessageBuilder;
-import fr.multimc.api.spigot.tools.chat.TextBuilder;
+import fr.multimc.api.spigot.tools.entities.interfaces.IHasGameMode;
+import fr.multimc.api.spigot.tools.entities.interfaces.IHasSpeed;
+import fr.multimc.api.spigot.tools.entities.interfaces.ITeleportable;
+import fr.multimc.api.spigot.tools.messages.ComponentBuilder;
 import fr.multimc.api.spigot.tools.items.ItemBuilder;
-import fr.multimc.api.spigot.tools.locations.RelativeLocation;
+import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
@@ -24,351 +21,289 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions", "UnusedReturnValue"})
-public class MmcPlayer {
+public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
     private final UUID uuid;
     private final String name;
 
-    public MmcPlayer(@Nonnull UUID uuid){
+    public MmcPlayer(@NotNull UUID uuid){
         this.uuid = uuid;
-        this.name = this.fetchName();
+        this.name = this.getName();
     }
 
-    public MmcPlayer(@Nonnull String name){
+    public MmcPlayer(@NotNull String name){
         this.name = name;
         this.uuid = this.fetchUUID();
     }
 
-    public MmcPlayer(@Nonnull Player player){
+    public MmcPlayer(@NotNull Player player){
         this.uuid = player.getUniqueId();
         this.name = player.getName();
     }
 
     // SETTERS & FUNCTIONS \\
-    @Nonnull
-    public Status setGameMode(@Nonnull GameMode mode) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (this.getPlayer().getGameMode().equals(mode)) return new SameValue("%s's game mode is already %s.", this.name, StringFormatter.capitalize(mode.name()));
+    public boolean setGameMode(@NotNull GameMode mode) {
+        if (!this.isOnline()) return false;
+        if (this.getPlayer().getGameMode().equals(mode)) return false;
         this.getPlayer().setGameMode(mode);
-        return new Success("%s's game mode has been updated to %s.", this.name, StringFormatter.capitalize(mode.name()));
+        return true;
     }
-    @Nonnull
-    public Status setGameModeSync(@NotNull JavaPlugin plugin, @Nonnull GameMode mode) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (this.getPlayer().getGameMode().equals(mode)) return new SameValue("%s's game mode is already %s.", this.name, StringFormatter.capitalize(mode.name()));
+    public boolean setGameModeSync(@NotNull JavaPlugin plugin, @NotNull GameMode mode) {
+        if (!this.isOnline()) return false;
+        if (this.getPlayer().getGameMode().equals(mode)) return false;
         Bukkit.getScheduler().runTask(plugin, () -> this.getPlayer().setGameMode(mode));
-        return new Success("%s's game mode has been updated to %s.", this.name, StringFormatter.capitalize(mode.name()));
+        return true;
     }
 
-    @Nonnull
-    public Status setSpeed(@Nullable PlayerSpeed speed) {
+    public boolean setSpeed(@Nullable PlayerSpeed speed) {
         if (this.isFlying()) return this.setFlySpeed(speed);
         return this.setWalkSpeed(speed);
     }
 
-    @Nonnull
-    public Status setWalkSpeed(@Nullable PlayerSpeed speed) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (this.getWalkSpeed().equals(speed)) return new SameValue("%s's walk speed level is already set to %s.", this.name, StringFormatter.capitalize(StringFormatter.reduce(this.getWalkSpeed().name().split("_"))));
+    public boolean setWalkSpeed(@Nullable PlayerSpeed speed) {
+        if (!this.isOnline()) return false;
+        if (this.getWalkSpeed().equals(speed)) return true;
         PlayerSpeed level = Objects.isNull(speed) ? PlayerSpeed.LEVEL_1 : speed;
         this.getPlayer().setWalkSpeed(level.getWalkLevel());
-        return new Success("%s's walk speed level has been updated to %s.");
+        return true;
     }
 
-    @Nonnull
-    public Status setFlySpeed(@Nullable PlayerSpeed speed) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (this.getFlySpeed().equals(speed)) return new SameValue("%s's fly speed level is already set to %s.", this.name, StringFormatter.capitalize(StringFormatter.reduce(this.getWalkSpeed().name().split("_"))));
+    public boolean setFlySpeed(@Nullable PlayerSpeed speed) {
+        if (!this.isOnline()) return false;
+        if (this.getFlySpeed().equals(speed)) return false;
         PlayerSpeed level = Objects.isNull(speed) ? PlayerSpeed.LEVEL_1 : speed;
         this.getPlayer().setFlySpeed(level.getFlyLevel());
-        return new Success("%s's fly speed level has been updated to %s.");
+        return true;
     }
 
-    @Nonnull
-    public Status teleport(@Nonnull MmcPlayer target) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (!target.isOnline()) return new Error("%s is not online!", target.getName());
+    @Override
+    public boolean teleportTo(@NotNull MmcPlayer target) {
+        if (!this.isOnline()) return false;
+        if (!target.isOnline()) return false;
 
         this.getPlayer().teleport(target.getPlayer());
-        return new Success("%s has been teleported to %s.", this.name, target.getName());
+        return true;
     }
 
-    @Nonnull
-    public Status teleport(@Nonnull Location target) {
-        return this.teleport(target, false);
+    @Override
+    public boolean teleportRelative(@NotNull RelativeLocation location) {
+        return this.teleportRelative(location, false);
     }
 
-    @Nonnull
-    public Status teleport(@Nonnull Location location, boolean toCenter) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-
-        Location target = toCenter ? location.getBlock().getLocation().clone().add(.5, 0, .5) : location;
-        this.getPlayer().teleport(target);
-        return new Success("%s has been teleported to %f, %f, %f.", this.name, target.getX(), target.getY(), target.getZ());
+    @Override
+    public boolean teleportRelative(@NotNull RelativeLocation location, boolean center) {
+        return this.teleport(location.toAbsolute(this.getPlayer().getLocation()), center);
     }
 
-    @Nonnull
-    public Status teleport(@Nonnull RelativeLocation location) {
+    @Override
+    public boolean teleport(@NotNull Location location) {
         return this.teleport(location, false);
     }
 
-    @Nonnull
-    public Status teleport(@Nonnull RelativeLocation location, boolean toCenter) {
-        return this.teleport(location.toAbsolute(this.getPlayer().getLocation()), toCenter);
+    @Override
+    public boolean teleport(@NotNull Location location, boolean center) {
+        if (!this.isOnline()) return false;
+        Location target = center ? location.getBlock().getLocation().clone().add(.5, 0, .5) : location;
+        this.getPlayer().teleport(target, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+        return true;
     }
 
-    @Nonnull
-    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter) {
-        return this.teleportSync(plugin, location, toCenter, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    @Override
+    public boolean teleportToSync(@NotNull JavaPlugin plugin, @NotNull MmcPlayer target) {
+        if (!this.isOnline()) return false;
+        Bukkit.getScheduler().runTask(plugin, () -> this.teleportTo(target));
+        return true;
     }
 
-    @Nonnull
-    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location) {
-        return this.teleportSync(plugin, location, false, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    @Override
+    public boolean teleportRelativeSync(@NotNull JavaPlugin plugin, @NotNull RelativeLocation location) {
+        return this.teleportRelativeSync(plugin, location, false);
     }
 
-    // TODO
-    @Nonnull
-    public Status teleportSync(@NotNull JavaPlugin plugin, @Nonnull Location location, boolean toCenter, @NotNull PlayerTeleportEvent.TeleportCause cause) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        Bukkit.getScheduler().runTask(plugin, () -> this.teleport(location, toCenter));
-        return new Success("%s has been teleported to %f, %f, %f.", this.name, location.getX(), location.getY(), location.getZ());
+    @Override
+    public boolean teleportRelativeSync(@NotNull JavaPlugin plugin, @NotNull RelativeLocation location, boolean center) {
+        if (!this.isOnline()) return false;
+        Bukkit.getScheduler().runTask(plugin, () -> this.teleportRelative(location, center));
+        return true;
     }
 
-    @Nonnull
-    public Status sendMessage(@Nonnull String message) {
-        return this.sendMessage(new TextBuilder(message).build());
+    @Override
+    public boolean teleportSync(@NotNull JavaPlugin plugin, @NotNull Location location) {
+        return this.teleportSync(plugin, location, false);
     }
 
-    @Nonnull
-    public Status sendMessage(@Nonnull Component component) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    @Override
+    public boolean teleportSync(@NotNull JavaPlugin plugin, @NotNull Location location, boolean center) {
+        if (!this.isOnline()) return false;
+        Bukkit.getScheduler().runTask(plugin, () -> this.teleport(location, center));
+        return true;
+    }
+
+    public boolean sendMessage(@NotNull Component component) {
+        if (!this.isOnline()) return false;
         this.getPlayer().sendMessage(component);
-        return new Success("%s received the message \"%s\".", this.name, PlainTextComponentSerializer.plainText().serialize(component));
+        return true;
     }
 
-    @Nonnull
-    public Status sendMessage(@Nonnull ClickableMessageBuilder component) {
-        return this.sendMessage(component.build());
-    }
-
-    @Nonnull
-    public Status sendActionBar(@Nonnull String text) {
-        return this.sendActionBar(new TextBuilder(text).build());
-    }
-
-    @Nonnull
-    public Status sendActionBar(@Nonnull Component component) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean sendActionBar(@NotNull Component component) {
+        if (!this.isOnline()) return false;
         this.getPlayer().sendActionBar(component);
-        return new Success("%s received the action bar \"%s\".", this.name, PlainTextComponentSerializer.plainText().serialize(component));
+        return true;
     }
 
-    @Nonnull
-    public Status sendTitle(@Nullable String title, @Nullable String subtitle) {
+    public boolean sendTitle(@Nullable Component title, @Nullable Component subtitle) {
         return this.sendTitle(title, subtitle, Duration.ofSeconds(1L));
     }
 
-    @Nonnull
-    public Status sendTitle(@Nullable Component title, @Nullable Component subtitle) {
-        return this.sendTitle(title, subtitle, Duration.ofSeconds(1L));
-    }
-
-    @Nonnull
-    public Status sendTitle(@Nullable String title, @Nullable String subtitle, @Nonnull Duration stay) {
+    public boolean sendTitle(@Nullable Component title, @Nullable Component subtitle, @NotNull Duration stay) {
         return this.sendTitle(title, subtitle, Duration.ZERO, stay, Duration.ZERO);
     }
 
-    @Nonnull
-    public Status sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nonnull Duration stay) {
-        return this.sendTitle(title, subtitle, Duration.ZERO, stay, Duration.ZERO);
-    }
-
-    @Nonnull
-    public Status sendTitle(@Nullable String title, @Nullable String subtitle, @Nonnull Duration fade, @Nonnull Duration stay) {
+    public boolean sendTitle(@Nullable Component title, @Nullable Component subtitle, @NotNull Duration fade, @NotNull Duration stay) {
         return this.sendTitle(title, subtitle, fade, stay, fade);
     }
 
-    @Nonnull
-    public Status sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nonnull Duration fade, @Nonnull Duration stay) {
-        return this.sendTitle(title, subtitle, fade, stay, fade);
-    }
-
-    @Nonnull
-    public Status sendTitle(@Nullable String title, @Nullable String subtitle, @Nonnull Duration fadeIn, @Nonnull Duration stay, @Nonnull Duration fadeOut) {
+    public boolean sendTitle(@Nullable Component title, @Nullable Component subtitle, @NotNull Duration fadeIn, @NotNull Duration stay, @NotNull Duration fadeOut) {
         return this.sendTitle(title, subtitle, Title.Times.times(fadeIn, stay, fadeOut));
     }
 
-    @Nonnull
-    public Status sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nonnull Duration fadeIn, @Nonnull Duration stay, @Nonnull Duration fadeOut) {
-        return this.sendTitle(title, subtitle, Title.Times.times(fadeIn, stay, fadeOut));
+    private boolean sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nullable Title.Times times) {
+        if (!this.isOnline()) return false;
+        this.getPlayer().showTitle(Title.title(Objects.isNull(title) ? title : new ComponentBuilder().build(), Objects.isNull(subtitle) ? subtitle : new ComponentBuilder().build(), times));
+        return true;
     }
 
-    @Nonnull
-    private Status sendTitle(@Nullable String title, @Nullable String subtitle, @Nullable Title.Times times) {
-        return this.sendTitle(Objects.isNull(title) ? null : new TextBuilder(title).build(), Objects.isNull(subtitle) ? null : new TextBuilder(subtitle).build(), times);
-    }
-
-    @Nonnull
-    private Status sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nullable Title.Times times) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        this.getPlayer().showTitle(Title.title(Objects.nonNull(title) ? title : new TextBuilder().build(), Objects.nonNull(subtitle) ? subtitle : new TextBuilder().build(), times));
-        return new Success("%s received the title.", this.name);
-    }
-
-    @Nonnull
-    public Status clear() {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean clear() {
+        if (!this.isOnline()) return false;
         this.getInventory().clear();
         this.getPlayer().updateInventory();
-        return new Success("%s's inventory has been cleared!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status clearInventory() {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean clearInventory() {
+        if (!this.isOnline()) return false;
         this.getInventory().setStorageContents(new ItemStack[9*4]);
         this.getPlayer().updateInventory();
-        return new Success("%s's inventory has been cleared!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status clearArmor() {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean clearArmor() {
+        if (!this.isOnline()) return false;
         this.getInventory().setArmorContents(new ItemStack[4]);
         this.getPlayer().updateInventory();
-        return new Success("%s's armor has been cleared!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status setArmor(@Nonnull ItemStack[] armorContent) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (armorContent.length != 4) return new Error("%s is not a valid size!", "" + armorContent.length);
+    public boolean setArmor(@NotNull ItemStack[] armorContent) {
+        if (!this.isOnline()) return false;
+        if (armorContent.length != 4) return false;
         this.getInventory().setArmorContents(armorContent);
         this.getPlayer().updateInventory();
-        return new Success("%s's armor has been updated!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status setHelmet(@Nonnull ItemStack item) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setHelmet(@NotNull ItemStack item) {
+        if (!this.isOnline()) return false;
         this.getInventory().setHelmet(item);
         this.getPlayer().updateInventory();
-        return new Success("%s's helmet has been replaced!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status setChestPlate(@Nonnull ItemStack item) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setChestPlate(@NotNull ItemStack item) {
+        if (!this.isOnline()) return false;
         this.getInventory().setChestplate(item);
         this.getPlayer().updateInventory();
-        return new Success("%s's chest plate has been replaced!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status setLeggings(@Nonnull ItemStack item) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setLeggings(@NotNull ItemStack item) {
+        if (!this.isOnline()) return false;
         this.getInventory().setLeggings(item);
         this.getPlayer().updateInventory();
-        return new Success("%s's leggings has been replaced!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status setBoots(@Nonnull ItemStack item) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setBoots(@NotNull ItemStack item) {
+        if (!this.isOnline()) return false;
         this.getInventory().setBoots(item);
         this.getPlayer().updateInventory();
-        return new Success("%s's boots has been replaced!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status giveItem(@Nonnull ItemBuilder item) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean giveItem(@NotNull ItemBuilder item) {
+        if (!this.isOnline()) return false;
         this.getInventory().addItem(item.build());
         this.getPlayer().updateInventory();
-        return new Success("%s received the item.", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status giveItems(@Nonnull ItemBuilder... items) {
+    public boolean giveItems(@NotNull ItemBuilder... items) {
         for (ItemBuilder item : items) {
-            Status result = this.giveItem(item);
-            if (!(result instanceof Success)) return result;
+            boolean result = this.giveItem(item);
+            if (!result) return result;
         }
-        return new Success("%s received %s items.", this.name, "" + items.length);
+        return true;
     }
 
-    @Nonnull
-    public Status setItem(@Nonnull ItemBuilder item, int slot) {
+    public boolean setItem(@NotNull ItemBuilder item, int slot) {
         return this.setItem(item.build(), slot);
     }
 
-    @Nonnull
-    public Status setItem(@Nonnull ItemStack item, int slot) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        if (slot >= 36) return new Error("%s is not a valid slot!", "" + slot);
+    public boolean setItem(@NotNull ItemStack item, int slot) {
+        if (!this.isOnline()) return false;
+        if (slot >= 36) return false;
         this.getInventory().setItem(slot, item);
         this.getPlayer().updateInventory();
-        return new Success("%s's inventory slot n°%s has been replaced!", this.name, "" + slot);
+        return true;
     }
 
-    @NotNull
-    public Status setSpawnPoint(@NotNull Location location) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setSpawnPoint(@NotNull Location location) {
+        if (!this.isOnline()) return false;
         this.getPlayer().setBedSpawnLocation(location, true);
-        return new Success("%s's spawn point has been set!", this.name);
+        return true;
     }
 
-    @Nonnull
-    public Status setFoodLevel(int level) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setFoodLevel(int level) {
+        if (!this.isOnline()) return false;
         this.getPlayer().setFoodLevel(level);
-        return new Success("%s's food level has been set to %s.", this.name, "" + level);
+        return true;
     }
 
-    @Nonnull
-    public Status setSaturation(int level) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setSaturation(int level) {
+        if (!this.isOnline()) return false;
         this.getPlayer().setSaturation(level);
-        return new Success("%s's saturation level has been set to %s.", this.name, "" + level);
+        return true;
     }
 
-    @Nonnull
-    public Status setHealth(double health) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean setHealth(double health) {
+        if (!this.isOnline()) return false;
         this.getPlayer().setHealth(health);
-        return new Success("%s's health has been set to %sHP.", this.name, "" + health);
+        return true;
     }
 
-    @SuppressWarnings("deprecation")
-    @Nonnull
-    public Status setMaxHealth(double maxHealth) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
-        this.getPlayer().setMaxHealth(maxHealth);
-        return new Success("%s's max health has been set to %sHP.", this.name, "" + maxHealth);
+    public boolean setMaxHealth(double maxHealth) {
+        if (!this.isOnline()) return false;
+        this.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        return true;
     }
 
-    @Nonnull
-    public Status feed() {
+    public boolean feed() {
         return this.setFoodLevel(20);
     }
 
-    @Nonnull
-    public Status heal() {
+    public boolean heal() {
         return this.heal(true);
     }
 
-    @Nonnull
-    public Status heal(boolean feed) {
-        if (!this.isOnline()) return new Error("%s is not online!", this.name);
+    public boolean heal(boolean feed) {
+        if (!this.isOnline()) return false;
         this.setHealth(this.getMaxHealth());
         if (feed) this.feed();
-        return new Success("%s has been healed!", this.name);
+        return true;
     }
 
     // CHECKS \\
@@ -389,10 +324,6 @@ public class MmcPlayer {
     }
 
     // GETTERS \\
-    private String fetchName(){
-        return Bukkit.getOfflinePlayer(this.uuid).getName();
-    }
-
     private UUID fetchUUID(){
         return Bukkit.getOfflinePlayer(this.name).getUniqueId();
     }
@@ -407,12 +338,12 @@ public class MmcPlayer {
     }
 
     public String getName(){
-        return this.name;
+        return this.isOnline() ? this.getPlayer().getName() : Bukkit.getOfflinePlayer(this.uuid).getName();
     }
 
     @Nullable
-    public String getNickName() {
-        return this.isOnline() ? PlainTextComponentSerializer.plainText().serialize(this.getPlayer().displayName()) : null;
+    public Component getNickName() {
+        return this.isOnline() ? this.getPlayer().displayName() : null;
     }
 
     @NotNull
@@ -420,7 +351,7 @@ public class MmcPlayer {
         return PlayerSpeed.fromWalkSpeed(this.getPlayer().getWalkSpeed()).orElse(PlayerSpeed.LEVEL_1);
     }
 
-    @Nonnull
+    @NotNull
     public PlayerSpeed getFlySpeed() {
         return PlayerSpeed.fromFlySpeed(this.getPlayer().getFlySpeed()).orElse(PlayerSpeed.LEVEL_1);
     }
@@ -444,9 +375,8 @@ public class MmcPlayer {
         return this.isOnline() ? this.getPlayer().getHealth() : -1;
     }
 
-    @SuppressWarnings("deprecation")
     public double getMaxHealth() {
-        return this.isOnline() ? this.getPlayer().getMaxHealth() : -1;
+        return this.isOnline() ? this.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : -1;
     }
 
     public int getFoodLevel() {

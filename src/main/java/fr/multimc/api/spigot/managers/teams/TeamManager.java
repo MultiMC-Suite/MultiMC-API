@@ -28,7 +28,7 @@ public class TeamManager {
 
     public List<MmcTeam> loadTeams(){
         // Create teams
-        mmcTeams = new ArrayList<>();
+        this.mmcTeams = new ArrayList<>();
         HashMap<String, List<String>> playersByTeam = playersTable.getPlayersByTeam();
         HashMap<String, String> teamNames = teamsTable.getTeamNames();
         // Iterate by team code
@@ -42,17 +42,17 @@ public class TeamManager {
             }
             // Add team object to list
             MmcTeam mmcTeam = new MmcTeam(teamNames.get(teamCode), teamCode, players.toArray(new MmcPlayer[0]));
-            mmcTeams.add(mmcTeam);
+            this.mmcTeams.add(mmcTeam);
         }
-        return mmcTeams;
+        return this.mmcTeams;
     }
 
     public List<MmcTeam> getTeams() {
-        return mmcTeams;
+        return this.mmcTeams;
     }
 
     public MmcTeam getTeamFromCode(@NotNull String teamCode){
-        for(MmcTeam mmcTeam : mmcTeams){
+        for(MmcTeam mmcTeam : this.mmcTeams){
             if(mmcTeam.getTeamCode().equals(teamCode)){
                 return mmcTeam;
             }
@@ -61,7 +61,7 @@ public class TeamManager {
     }
 
     public MmcTeam getTeamFromPlayer(@NotNull MmcPlayer player){
-        for(MmcTeam mmcTeam : mmcTeams){
+        for(MmcTeam mmcTeam : this.mmcTeams){
             if(mmcTeam.isPlayerInTeam(player)){
                 return mmcTeam;
             }
