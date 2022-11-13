@@ -22,11 +22,19 @@ public class MmcTeam {
     private final List<MmcPlayer> players;
 
 
-    public MmcTeam(@NotNull String name, @NotNull String teamCode, @NotNull MmcPlayer... localPlayers){
+    public MmcTeam(@NotNull String name, @NotNull String teamCode, @NotNull MmcPlayer... mmcPlayers){
         this.name = name;
         this.teamCode = teamCode;
         this.players = new ArrayList<>();
-        this.players.addAll(Arrays.asList(localPlayers));
+        this.players.addAll(Arrays.asList(mmcPlayers));
+    }
+
+    public void addPlayer(MmcPlayer mmcPlayer){
+        this.players.add(mmcPlayer);
+    }
+
+    public void removePlayer(MmcPlayer mmcPlayer){
+        this.players.remove(mmcPlayer);
     }
 
     public boolean isPlayerInTeam(@NotNull UUID uuid){
@@ -38,9 +46,9 @@ public class MmcTeam {
         return false;
     }
 
-    public boolean isPlayerInTeam(@NotNull MmcPlayer player){
+    public boolean isPlayerInTeam(@NotNull MmcPlayer mmcPlayer){
         for(MmcPlayer _player: this.players){
-            if(_player.equals(player)){
+            if(_player.equals(mmcPlayer)){
                 return true;
             }
         }

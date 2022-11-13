@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.pre_made.commands;
+package fr.multimc.api.spigot.pre_made.commands.executors;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;

@@ -173,7 +173,7 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
 
     private boolean sendTitle(@Nullable Component title, @Nullable Component subtitle, @Nullable Title.Times times) {
         if (!this.isOnline()) return false;
-        this.getPlayer().showTitle(Title.title(Objects.isNull(title) ? title : new ComponentBuilder().build(), Objects.isNull(subtitle) ? subtitle : new ComponentBuilder().build(), times));
+        this.getPlayer().showTitle(Title.title(!Objects.isNull(title) ? title : new ComponentBuilder().build(), !Objects.isNull(subtitle) ? subtitle : new ComponentBuilder().build(), times));
         return true;
     }
 

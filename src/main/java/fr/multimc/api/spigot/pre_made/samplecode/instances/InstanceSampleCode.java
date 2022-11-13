@@ -5,6 +5,9 @@ import fr.multimc.api.spigot.managers.instance.enums.GameType;
 import fr.multimc.api.spigot.managers.instance.InstanceSettings;
 import fr.multimc.api.spigot.managers.instance.InstancesManager;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
+import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
+import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
+import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
 import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
@@ -24,7 +27,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ConstantConditions"})
 public class InstanceSampleCode implements SampleCode, Listener {
 
     private InstancesManager instancesManager;
@@ -62,6 +65,11 @@ public class InstanceSampleCode implements SampleCode, Listener {
         gameWorldSettings.setPreventDamages(false);
         instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, factory, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
         instancesManager.preAllocate(32);
+
+        // Commands
+        plugin.getCommand("stop-mmc").setExecutor(new StopCommand(instancesManager));
+        plugin.getCommand("start-mmc").setExecutor(new StartCommand(instancesManager, teamManager));
+        plugin.getCommand("start-mmc").setTabCompleter(new StartTabCompleter());
     }
 
     @EventHandler

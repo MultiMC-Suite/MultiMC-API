@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.pre_made.commands;
+package fr.multimc.api.spigot.pre_made.commands.executors;
 
 import fr.multimc.api.spigot.managers.instance.InstancesManager;
 import org.bukkit.command.Command;
