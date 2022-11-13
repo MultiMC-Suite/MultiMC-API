@@ -25,17 +25,16 @@ import java.util.HashMap;
 @SuppressWarnings("unused")
 public class Schematic {
     private final Clipboard clipboard;
-    private final String name;
     private final File schematicFile;
+    private final SchematicOptions options;
 
-    public Schematic(@NotNull Plugin plugin, @NotNull String name) {
-        this.name = name;
+    public Schematic(@NotNull Plugin plugin, @NotNull String name, @NotNull SchematicOptions options) {
         File pluginFile = new File("schematics/" + name + ".schem");
         this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
+        this.options = options;
         if(!schematicFile.exists()) {
             plugin.saveResource(pluginFile.getPath(), false);
         }
-
         try {
             this.clipboard = this.load();
         } catch (IOException e) {
@@ -43,10 +42,9 @@ public class Schematic {
         }
     }
 
-    public Schematic(@NotNull File schematicFile) {
-        this.name = schematicFile.getName().replace(".schem", "");
+    public Schematic(@NotNull File schematicFile, @NotNull SchematicOptions options) {
         this.schematicFile = schematicFile;
-
+        this.options = options;
         try {
             this.clipboard = this.load();
         } catch (IOException e) {
@@ -66,14 +64,18 @@ public class Schematic {
         return localClipboard;
     }
 
+    public void paste() throws WorldEditException {
+        this.paste(this.options);
+    }
+
     public void paste(@NotNull SchematicOptions options) throws WorldEditException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.LOCATION.getWorld()))) {
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.getLocation().getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
             PasteBuilder pasteBuilder = clipboardHolder.createPaste(editSession)
-                    .to(BlockVector3.at(options.LOCATION.getX(), options.LOCATION.getY(), options.LOCATION.getZ()))
-                    .ignoreAirBlocks(options.IGNORE_AIR)
-                    .copyEntities(options.COPY_ENTITIES)
-                    .copyBiomes(options.COPY_BIOMES);
+                    .to(BlockVector3.at(options.getLocation().getX(), options.getLocation().getY(), options.getLocation().getZ()))
+                    .ignoreAirBlocks(options.isIgnoreAir())
+                    .copyEntities(options.isCopyEntity())
+                    .copyBiomes(options.isCopyBiomes());
             Operation operation = pasteBuilder.build();
             Operations.complete(operation);
         }
@@ -92,12 +94,12 @@ public class Schematic {
         return blockCount;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public File getSchematicFile() throws NullPointerException {
         if (!this.schematicFile.exists()) throw new NullPointerException("Provied file doesn't exist!");
         return schematicFile;
+    }
+
+    public SchematicOptions getOptions() {
+        return options;
     }
 }
