@@ -1,5 +1,8 @@
 package fr.multimc.api.spigot.tools.utils.dispatcher;
 
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -7,11 +10,12 @@ public class Dispatcher {
 
     private final DispatchAlgorithm dispatchAlgorithm;
 
-    public Dispatcher(DispatchAlgorithm dispatchAlgorithm){
+    public Dispatcher(@NotNull DispatchAlgorithm dispatchAlgorithm){
         this.dispatchAlgorithm = dispatchAlgorithm;
     }
 
-    public <A, B> Map<A, B> dispatch(List<A> keys, List<B> values){
+    @Nullable
+    public <A, B> Map<A, B> dispatch(@NotNull List<A> keys, @NotNull List<B> values){
         Map<A, B> finalMap = new HashMap<>();
         switch (dispatchAlgorithm){
             case ROUND_ROBIN -> {
