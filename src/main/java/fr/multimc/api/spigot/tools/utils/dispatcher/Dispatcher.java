@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot.tools.utils.dispatcher;
 
+import fr.multimc.api.spigot.tools.utils.random.MmcRandom;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -30,7 +31,7 @@ public class Dispatcher {
             }
             case RANDOM -> {
                 for(A key: keys){
-                    finalMap.put(key, values.get(this.getRandomNumber(values.size())));
+                    finalMap.put(key, values.get(new MmcRandom().nextInt(values.size())));
                 }
             }
             case RANDOM_UNIQUE -> {
@@ -38,7 +39,7 @@ public class Dispatcher {
                 List<B> valuesCopy = new ArrayList<>(values);
                 int random;
                 for(A key: keys){
-                    random = this.getRandomNumber(valuesCopy.size());
+                    random = new MmcRandom().nextInt(valuesCopy.size());
                     finalMap.put(key, valuesCopy.get(random));
                     valuesCopy.remove(random);
                 }
@@ -48,13 +49,5 @@ public class Dispatcher {
             }
         }
         return finalMap;
-    }
-
-    private int getRandomNumber(int max){
-        return new Random().nextInt(max);
-    }
-
-    private int getRandomNumber(int min, int max){
-        return new Random().nextInt(max - min) + min;
     }
 }
