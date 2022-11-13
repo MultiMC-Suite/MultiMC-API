@@ -5,9 +5,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ public class MmcTeam {
     private final String name;
     private final String teamCode;
     private final List<MmcPlayer> players;
-
 
     public MmcTeam(@NotNull String name, @NotNull String teamCode, @NotNull MmcPlayer... mmcPlayers){
         this.name = name;
@@ -47,15 +45,15 @@ public class MmcTeam {
     }
 
     public boolean isPlayerInTeam(@NotNull MmcPlayer mmcPlayer){
-        for(MmcPlayer _player: this.players){
-            if(_player.equals(mmcPlayer)){
+        for(MmcPlayer player: this.players){
+            if(player.equals(mmcPlayer)){
                 return true;
             }
         }
         return false;
     }
 
-    public void sendMessage(@Nonnull Component message){
+    public void sendMessage(@NotNull Component message){
         for (MmcPlayer player: this.players) player.sendMessage(message);
     }
 
@@ -63,7 +61,7 @@ public class MmcTeam {
         for (MmcPlayer player: this.players) player.sendTitle(title, subtitle, Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(150));
     }
 
-    public void sendActionBar(@Nonnull Component bar){
+    public void sendActionBar(@NotNull Component bar){
         for (MmcPlayer player: this.players) player.sendActionBar(bar);
     }
 

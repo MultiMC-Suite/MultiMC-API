@@ -2,7 +2,7 @@ package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.spigot.managers.instance.enums.GameType;
-import fr.multimc.api.spigot.managers.instance.InstanceSettings;
+import fr.multimc.api.spigot.tools.settings.InstanceSettings;
 import fr.multimc.api.spigot.managers.instance.InstancesManager;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
@@ -14,8 +14,10 @@ import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
 import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
 import fr.multimc.api.spigot.tools.messages.MessagesFactory;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
-import fr.multimc.api.spigot.tools.worlds.WorldSettings;
+import fr.multimc.api.spigot.tools.settings.WorldSettings;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -43,15 +45,17 @@ public class InstanceSampleCode implements SampleCode, Listener {
         teamManager.addTeam("T1", "Name 1", "Xen0Xys");
         teamManager.addTeam("T2", "Name 2", "XenAdmin");
 
-        MessagesFactory factory = new MessagesFactory("&eTeamSample");
+        MessagesFactory factory = new MessagesFactory(Component.text("InstanceSample").color(NamedTextColor.YELLOW));
 
-        Schematic schematic = new Schematic(plugin, "instances_test");
-        InstanceSettings settings = new InstanceSettings(schematic,
-                new SchematicOptions(),
+        Schematic schematic = new Schematic(plugin, "instances_test", new SchematicOptions());
+        InstanceSettings settings = new InstanceSettings(
+                schematic,
                 GameType.SOLO,
-                120, List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
+                List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 null,
                 null,
+                120,
+                1,
                 20);
         WorldSettings lobbyWorldSettings = new WorldSettings("multimc_lobby",
                 schematic,

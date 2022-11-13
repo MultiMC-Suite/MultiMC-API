@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.worlds;
+package fr.multimc.api.spigot.tools.settings;
 
 import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;

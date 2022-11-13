@@ -5,8 +5,9 @@ import fr.multimc.api.spigot.managers.instance.enums.InstanceState;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.messages.ComponentBuilder;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.tools.messages.MessageType;
+import fr.multimc.api.spigot.tools.messages.enums.MessageType;
 import fr.multimc.api.spigot.tools.messages.MessagesFactory;
+import fr.multimc.api.spigot.tools.settings.InstanceSettings;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
@@ -88,7 +89,7 @@ public class InstancesManager implements Listener {
         for(int i = 0; i < allocateCount; i++){
             this.logger.info(String.format("Allocating for instance %d/%d", i + 1, allocateCount));
             Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
-            Instance.allocate(this.settings.schematic(), this.settings.schematicOptions(), location);
+            Instance.allocate(this.settings.schematic(), location);
         }
         this.allocations = allocateCount;
         this.logger.info(String.format("%d slots allocated", allocateCount));

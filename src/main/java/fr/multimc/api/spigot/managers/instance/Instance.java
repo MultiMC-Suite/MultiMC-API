@@ -5,9 +5,9 @@ import fr.multimc.api.spigot.managers.instance.enums.InstanceState;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.entities.MmcEntity;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.tools.settings.InstanceSettings;
 import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
-import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
 import fr.multimc.api.spigot.tools.utils.dispatcher.DispatchAlgorithm;
 import fr.multimc.api.spigot.tools.utils.dispatcher.Dispatcher;
 import net.kyori.adventure.text.Component;
@@ -31,24 +31,30 @@ public class Instance extends BukkitRunnable{
     private final InstanceSettings instanceSettings;
     private final Location instanceLocation;
     private final int instanceId;
+
+    private InstanceState instanceState;
+
     private final List<MmcTeam> mmcTeams;
-    private boolean isRunning = false;
-    private final List<Entity> instanceEntities;
     private final List<MmcPlayer> players;
     private final Map<UUID, Location> playerSpawns;
-    private InstanceState instanceState;
+
+    private final List<Entity> instanceEntities;
+
     private final Map<Long, InstanceState> instanceStateUpdates = new HashMap<>();
 
+    private boolean isRunning = false;
     private int remainingTime;
 
-    public Instance(JavaPlugin plugin, InstancesManager instancesManager, int instanceId, InstanceSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams) {
-        this.instancesManager = instancesManager;
-        this.instanceId = instanceId;
-        this.updateState(InstanceState.PRE_CREATE);
+    public Instance(JavaPlugin plugin, InstancesManager instancesManager, InstanceSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
         this.plugin = plugin;
+        this.instancesManager = instancesManager;
+        this.updateState(InstanceState.PRE_CREATE);
         this.instanceSettings = settings;
         this.instanceLocation = instanceLocation;
         this.mmcTeams = new ArrayList<>(mmcTeams);
+        this.instanceId = instanceId;
+
+
         this.instanceEntities = new ArrayList<>();
         this.remainingTime = this.instanceSettings.duration();
         this.players = this.getInstancePlayers();
@@ -61,12 +67,11 @@ public class Instance extends BukkitRunnable{
     /**
      * Past the schematic for the instance (can be called for pre-allocation too)
      * @param schematic Schematic to paste
-     * @param options Schematic options
      * @param location Location to paste the schematic
      */
-    public static void allocate(Schematic schematic, SchematicOptions options, Location location) {
-        options.setLocation(location);
-        Instance.pasteSchematic(schematic, options);
+    public static void allocate(Schematic schematic, Location location) {
+        schematic.getOptions().setLocation(location);
+        Instance.pasteSchematic(schematic);
     }
 
     /**
@@ -77,7 +82,7 @@ public class Instance extends BukkitRunnable{
         // Paste schematic
         if(!isPreAllocated){
             this.updateState(InstanceState.PRE_ALLOCATE);
-            Instance.allocate(instanceSettings.schematic(), instanceSettings.schematicOptions(), instanceLocation);
+            Instance.allocate(instanceSettings.schematic(), instanceLocation);
             this.updateState(InstanceState.ALLOCATE);
         }
         this.updateState(InstanceState.PRE_INIT);
@@ -241,11 +246,10 @@ public class Instance extends BukkitRunnable{
     /**
      * Paste instance schematic
      * @param schematic Schematic object
-     * @param schematicOptions SchematicOptions object
      */
-    private static void pasteSchematic(@NotNull Schematic schematic, @NotNull SchematicOptions schematicOptions){
+    private static void pasteSchematic(@NotNull Schematic schematic){
         try {
-            schematic.paste(schematicOptions);
+            schematic.paste();
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -262,18 +266,24 @@ public class Instance extends BukkitRunnable{
         switch(this.instanceSettings.gameType()) {
             case SOLO -> playerSpawns.put(this.mmcTeams.get(0).getPlayers().get(0).getUUID(), this.getSpawnPoints().get(0));
             case ONLY_TEAM -> {
-                List<Location> spawnPoints = this.getSpawnPoints();
+                List<Location> locations = this.getSpawnPoints();
                 List<UUID> playersUUID = this.mmcTeams.get(0).getPlayers().stream().map(MmcPlayer::getUUID).toList();
-                playerSpawns.putAll(new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(playersUUID, spawnPoints));
+                Map<UUID, Location> spawns = new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(playersUUID, locations);
+                if(Objects.nonNull(spawns))
+                    playerSpawns.putAll(spawns);
             }
             case TEAM_VS_TEAM -> {
                 int spawnPointsCount = this.getSpawnPoints().size() % 2 == 0 ? this.getSpawnPoints().size() / 2 : ((this.getSpawnPoints().size() - 1) / 2);
-                List<Location> t1SpawnPoints = this.getSpawnPoints().subList(0, spawnPointsCount);
-                List<Location> t2SpawnPoints = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
+                List<Location> team1Locations = this.getSpawnPoints().subList(0, spawnPointsCount);
+                List<Location> team2Locations = this.getSpawnPoints().subList(spawnPointsCount, this.getSpawnPoints().size());
                 List<UUID> team1UUIDs = this.mmcTeams.get(0).getPlayers().stream().map(MmcPlayer::getUUID).toList();
                 List<UUID> team2UUIDs = this.mmcTeams.get(1).getPlayers().stream().map(MmcPlayer::getUUID).toList();
-                playerSpawns.putAll(new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(team1UUIDs, t1SpawnPoints));
-                playerSpawns.putAll(new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(team2UUIDs, t2SpawnPoints));
+                Map<UUID, Location> team1Spawns = new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(team1UUIDs, team1Locations);
+                Map<UUID, Location> team2Spawns = new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(team2UUIDs, team2Locations);
+                if(Objects.nonNull(team1Spawns) && Objects.nonNull(team2Spawns)){
+                    playerSpawns.putAll(team1Spawns);
+                    playerSpawns.putAll(team2Spawns);
+                }
             }
         }
         return playerSpawns;

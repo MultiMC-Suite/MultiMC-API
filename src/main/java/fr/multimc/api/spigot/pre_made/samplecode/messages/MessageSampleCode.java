@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.pre_made.samplecode.messages;
 
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
-import fr.multimc.api.spigot.tools.messages.MessageType;
+import fr.multimc.api.spigot.tools.messages.enums.MessageType;
 import fr.multimc.api.spigot.tools.messages.MessagesFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
