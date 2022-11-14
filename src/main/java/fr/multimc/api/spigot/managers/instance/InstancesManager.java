@@ -128,7 +128,7 @@ public class InstancesManager implements Listener {
         for(int i = 0; i < gameTeams.size(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i + 1, gameTeams.size()));
             Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
-            this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, i, this.settings, location, gameTeams.get(i)));
+            this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, this.settings, location, gameTeams.get(i), i));
         }
         if(this.instances.size() == 0){
             this.logger.warning("No instance created");
