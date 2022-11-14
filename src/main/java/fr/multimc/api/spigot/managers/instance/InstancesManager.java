@@ -165,12 +165,10 @@ public class InstancesManager implements Listener {
             dtAvg = (dtAvg + dt) / 2;
             Bukkit.getScheduler().cancelTask(taskID);
         }
-        for(MmcPlayer player: this.getSpectators()){
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                player.teleport(this.gameWorld.getSpawnPoint());
-                player.setGameMode(GameMode.SPECTATOR);
-            });
-        }
+        this.getSpectators().forEach(player -> {
+            player.teleportSync(this.plugin, this.gameWorld.getSpawnPoint());
+            player.setGameModeSync(this.plugin, GameMode.SPECTATOR);
+        });
         for(int i = 5; i >= 0; i--){
             Thread.sleep(1000);
             if (i != 0) this.sendTeamTitle(new ComponentBuilder(String.format("&6%d", i)).build(), new ComponentBuilder("&7Get ready...").build());

@@ -32,22 +32,7 @@ public class WorldSettings {
         this.preventPortalUse = defaultSettingsValue;
     }
 
-    public WorldSettings(@NotNull String worldName, @Nullable Schematic schematic, boolean defaultSettingsValue) {
-        this.worldName = worldName;
-        this.schematic = schematic;
-        this.spawn = new RelativeLocation(0.5, 100, 0.5);
-        this.difficulty = Difficulty.NORMAL;
-        this.gameMode = null;
-        this.preventDamages = defaultSettingsValue;
-        this.preventPvp = defaultSettingsValue;
-        this.PreventBuild = defaultSettingsValue;
-        this.PreventFoodLoss = defaultSettingsValue;
-        this.preventTimeFlow = defaultSettingsValue;
-        this.preventWeather = defaultSettingsValue;
-        this.preventPortalUse = defaultSettingsValue;
-    }
-
-    public WorldSettings(@NotNull String worldName, @Nullable Schematic schematic, @Nullable RelativeLocation spawn, boolean defaultSettingsValue) {
+    public WorldSettings(@NotNull String worldName, @Nullable Schematic schematic, @Nullable RelativeLocation spawn, @NotNull Difficulty difficulty, boolean defaultSettingsValue) {
         this.worldName = worldName;
         this.schematic = schematic;
         this.spawn = spawn == null ? new RelativeLocation(0.5, 100, 0.5) : spawn;
@@ -75,21 +60,6 @@ public class WorldSettings {
         this.preventTimeFlow = defaultSettingsValue;
         this.preventWeather = defaultSettingsValue;
         this.preventPortalUse = defaultSettingsValue;
-    }
-
-    public WorldSettings(@NotNull String world_name, @Nullable Schematic schematic, @Nullable RelativeLocation spawn, @NotNull Difficulty difficulty, @Nullable GameMode gameMode, boolean prevent_damages, boolean prevent_pvp, boolean prevent_build, boolean prevent_food, boolean preventTimeFlow, boolean preventWeather, boolean preventPortalUse) {
-        this.worldName = world_name;
-        this.schematic = schematic;
-        this.spawn = spawn == null ? new RelativeLocation(0.5, 100, 0.5) : spawn;
-        this.difficulty = difficulty;
-        this.gameMode = gameMode;
-        this.preventDamages = prevent_damages;
-        this.preventPvp = prevent_pvp;
-        this.PreventBuild = prevent_build;
-        this.PreventFoodLoss = prevent_food;
-        this.preventTimeFlow = preventTimeFlow;
-        this.preventWeather = preventWeather;
-        this.preventPortalUse = preventPortalUse;
     }
 
     public String getWorldName() {
