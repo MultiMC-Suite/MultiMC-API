@@ -1,5 +1,9 @@
 # MultiMC-API
 
+![GitHub](https://img.shields.io/github/license/MultiMC-Suite/MultiMC-API?style=flat-square)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/MultiMC-Suite/MultiMC-API?style=flat-square)
+![GitHub](https://img.shields.io/badge/snapshot-v1.9_snapshot-orange)
+
 ## Exporting JAR:
 To export the API JAR, please use `mvn install` (by default, exported to "server/plugins/")
 
