@@ -46,12 +46,15 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
     }
 
     // SETTERS & FUNCTIONS \\
+    @Override
     public boolean setGameMode(@NotNull GameMode mode) {
         if (!this.isOnline()) return false;
         if (this.getPlayer().getGameMode().equals(mode)) return false;
         this.getPlayer().setGameMode(mode);
         return true;
     }
+
+    @Override
     public boolean setGameModeSync(@NotNull JavaPlugin plugin, @NotNull GameMode mode) {
         if (!this.isOnline()) return false;
         if (this.getPlayer().getGameMode().equals(mode)) return false;
@@ -59,11 +62,13 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
         return true;
     }
 
+    @Override
     public boolean setSpeed(@Nullable PlayerSpeed speed) {
         if (this.isFlying()) return this.setFlySpeed(speed);
         return this.setWalkSpeed(speed);
     }
 
+    @Override
     public boolean setWalkSpeed(@Nullable PlayerSpeed speed) {
         if (!this.isOnline()) return false;
         if (this.getWalkSpeed().equals(speed)) return true;
@@ -72,6 +77,7 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
         return true;
     }
 
+    @Override
     public boolean setFlySpeed(@Nullable PlayerSpeed speed) {
         if (!this.isOnline()) return false;
         if (this.getFlySpeed().equals(speed)) return false;
