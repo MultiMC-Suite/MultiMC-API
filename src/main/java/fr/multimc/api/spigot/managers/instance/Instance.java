@@ -106,13 +106,12 @@ public class Instance extends BukkitRunnable{
      */
     public void start(){
         if(this.instanceState == InstanceState.PRE_START || this.instanceState == InstanceState.START) return;
+        this.updateState(InstanceState.PRE_START);
         for(MmcPlayer player : this.players){
             player.setHealth(20);
             player.setFoodLevel(20);
             player.setSaturation(20);
         }
-        this.updateState(InstanceState.PRE_START);
-        this.isRunning = true;
         this.runTaskAsynchronously(this.plugin);
         this.updateState(InstanceState.START);
     }
@@ -167,6 +166,7 @@ public class Instance extends BukkitRunnable{
     @SuppressWarnings("BusyWait")
     @Override
     public void run(){
+        this.isRunning = true;
         double deltaTick = 0.05 * this.instanceSettings.tickDelay();
         long lastTickTime;
         long lastSecondTime;
@@ -327,12 +327,7 @@ public class Instance extends BukkitRunnable{
      * @return True if the player is on this instance
      */
     public boolean isPlayerOnInstance(MmcPlayer mmcPlayer){
-        for(MmcPlayer gamePlayer : this.players){
-            if(gamePlayer.equals(mmcPlayer)){
-                return true;
-            }
-        }
-        return false;
+        return this.players.stream().anyMatch(player -> player.equals(mmcPlayer));
     }
 
     // PUBLIC GETTERS

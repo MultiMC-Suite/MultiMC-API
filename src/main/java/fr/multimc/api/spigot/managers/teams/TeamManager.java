@@ -15,7 +15,7 @@ public class TeamManager {
 
     private final TeamsTable teamsTable;
     private final PlayersTable playersTable;
-    private List<MmcTeam> mmcTeams = new ArrayList<>();
+    private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
     public TeamManager(@NotNull Database database) {
         this.teamsTable = new TeamsTable(database);
@@ -28,7 +28,7 @@ public class TeamManager {
 
     public List<MmcTeam> loadTeams(){
         // Create teams
-        this.mmcTeams = new ArrayList<>();
+        this.mmcTeams.clear();
         HashMap<String, List<String>> playersByTeam = playersTable.getPlayersByTeam();
         HashMap<String, String> teamNames = teamsTable.getTeamNames();
         // Iterate by team code
@@ -41,7 +41,7 @@ public class TeamManager {
                 players.add(player);
             }
             // Add team object to list
-            MmcTeam mmcTeam = new MmcTeam(teamNames.get(teamCode), teamCode, players.toArray(new MmcPlayer[0]));
+            MmcTeam mmcTeam = new MmcTeam(teamCode, teamNames.get(teamCode), players.toArray(new MmcPlayer[0]));
             this.mmcTeams.add(mmcTeam);
         }
         return this.mmcTeams;
