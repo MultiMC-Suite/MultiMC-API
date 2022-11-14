@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -119,23 +120,9 @@ public class InstancesManager implements Listener {
         this.mmcTeams = new ArrayList<>(mmcTeams);
         List<List<MmcTeam>> gameTeams = new ArrayList<>();
         switch (this.settings.gameType()) {
-            case SOLO -> {
-                List<MmcTeam> onePlayerTeams = this.getOnePlayerTeams();
-                for(MmcTeam onePlayerTeam : onePlayerTeams){
-                    List<MmcTeam> tempTeamList = new ArrayList<>();
-                    tempTeamList.add(onePlayerTeam);
-                    gameTeams.add(tempTeamList);
-                }
-            }
-            case ONLY_TEAM -> {
-                List<MmcTeam> localTeams2 = new ArrayList<>(mmcTeams);
-                for(MmcTeam team: localTeams2){
-                    List<MmcTeam> tempTeamList = new ArrayList<>();
-                    tempTeamList.add(team);
-                    gameTeams.add(tempTeamList);
-                }
-            }
-            case TEAM_VS_TEAM -> gameTeams = this.getTeamsTuple(this.mmcTeams);
+            case SOLO -> this.getOnePlayerTeams().forEach(team -> gameTeams.add(Collections.singletonList(team)));
+            case ONLY_TEAM -> mmcTeams.forEach(team -> gameTeams.add(Collections.singletonList(team)));
+            case TEAM_VS_TEAM -> gameTeams.addAll(this.getTeamsTuple(this.mmcTeams));
         }
         // Create instances
         for(int i = 0; i < gameTeams.size(); i++){
@@ -279,7 +266,7 @@ public class InstancesManager implements Listener {
      * @param message Message to send
      */
     private void broadcast(@NotNull Component message) {
-        for(MmcTeam mmcTeam : this.mmcTeams) mmcTeam.sendMessage(message);
+        mmcTeams.forEach(team -> team.sendMessage(message));
     }
 
     /**
@@ -288,7 +275,7 @@ public class InstancesManager implements Listener {
      * @param subtitle Subtitle to send
      */
     private void sendTeamTitle(@Nullable Component title, @Nullable Component subtitle) {
-        for(MmcTeam mmcTeam : this.mmcTeams) mmcTeam.sendTitle(title, subtitle);
+        mmcTeams.forEach(mmcTeam -> mmcTeam.sendTitle(title, subtitle));
     }
 
     /**
@@ -296,7 +283,7 @@ public class InstancesManager implements Listener {
      * @param actionBar Action bar to send
      */
     private void sendTeamActionBar(@NotNull Component actionBar) {
-        for(MmcTeam mmcTeam : this.mmcTeams) mmcTeam.sendActionBar(actionBar);
+        mmcTeams.forEach(mmcTeam -> mmcTeam.sendActionBar(actionBar));
     }
 
     /**
@@ -305,9 +292,7 @@ public class InstancesManager implements Listener {
      */
     @SuppressWarnings("SameParameterValue")
     private void playSound(@NotNull Sound sound) {
-        for(MmcTeam mmcTeam : this.mmcTeams){
-            mmcTeam.playSound(sound);
-        }
+        mmcTeams.forEach(mmcTeam -> mmcTeam.playSound(sound));
     }
 
     /**
@@ -348,21 +333,15 @@ public class InstancesManager implements Listener {
      * @return List of spectators
      */
     private List<MmcPlayer> getSpectators() {
-        List<MmcPlayer> nonPlayerPlayers = new ArrayList<>();
-        for(Player player : Bukkit.getOnlinePlayers()){
-            MmcPlayer mmcPlayer = new MmcPlayer(player);
-            boolean isPlayer = false;
-            for(Instance instance : this.instances){
-                if(instance.isPlayerOnInstance(mmcPlayer)){
-                    isPlayer = true;
-                    break;
-                }
-            }
-            if(!isPlayer){
-                nonPlayerPlayers.add(mmcPlayer);
-            }
-        }
-        return nonPlayerPlayers;
+        // Get all players on an instance
+        List<MmcPlayer> instancePlayers = new ArrayList<>();
+        mmcTeams.forEach(mmcTeam -> instancePlayers.addAll(mmcTeam.getPlayers()));
+        List<MmcPlayer> spectators = new ArrayList<>();
+        Bukkit.getOnlinePlayers()
+                .stream()
+                .filter(player -> instancePlayers.stream().noneMatch(mmcPlayer -> mmcPlayer.equals(new MmcPlayer(player))))
+                .forEach(player -> spectators.add(new MmcPlayer(player)));
+        return spectators;
     }
 
     /**
@@ -395,10 +374,7 @@ public class InstancesManager implements Listener {
      */
     @Nullable
     private MmcTeam getTeamFromPlayer(@NotNull MmcPlayer mmcPlayer){
-        for(MmcTeam mmcTeam: this.mmcTeams){
-            if(mmcTeam.getPlayers().contains(mmcPlayer)) return mmcTeam;
-        }
-        return null;
+        return this.mmcTeams.stream().filter(mmcTeam -> mmcTeam.getPlayers().contains(mmcPlayer)).findFirst().orElse(null);
     }
 
     /**
@@ -408,10 +384,7 @@ public class InstancesManager implements Listener {
      */
     @Nullable
     private Instance getInstanceFromPlayer(@NotNull MmcPlayer mmcPlayer){
-        for(Instance instance: this.instances){
-            if(instance.getPlayers().contains(mmcPlayer)) return instance;
-        }
-        return null;
+        return this.instances.stream().filter(instance -> instance.getPlayers().contains(mmcPlayer)).findFirst().orElse(null);
     }
 
     public boolean isSpectator(@Nullable MmcPlayer player){
@@ -429,13 +402,9 @@ public class InstancesManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e){
-        if(e.getPlayer().getWorld().equals(this.gameWorld.getWorld())){
-            if(!this.isStarted){
-                if(e.getFrom().distance(e.getTo()) > 0){
-                    e.setCancelled(true);
-                }
-            }
-        }
+        if(!e.getPlayer().getWorld().equals(this.gameWorld.getWorld())) return;
+        if(this.isStarted) return;
+        if(e.getFrom().distance(e.getTo()) > 0) e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
