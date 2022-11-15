@@ -15,3 +15,5 @@ jobs:
         cache: maven
     - name: Check if code compile
       run: mvn verify
+    - name: Maven deploy
+      run: mvn deploy
