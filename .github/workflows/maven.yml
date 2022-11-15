@@ -17,3 +17,5 @@ jobs:
       run: mvn verify
     - name: Maven deploy
       run: mvn deploy
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
