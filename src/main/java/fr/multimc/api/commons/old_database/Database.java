@@ -1,7 +1,7 @@
 package fr.multimc.api.commons.old_database;
 
+import fr.multimc.api.commons.database.enums.DatabaseType;
 import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
-import fr.multimc.api.commons.old_database.enums.DatabaseType;
 import fr.multimc.api.commons.old_database.query.Query;
 import fr.multimc.api.commons.old_database.query.QueryBuilder;
 import fr.multimc.api.commons.old_database.query.QueryResult;
@@ -170,6 +170,26 @@ public class Database {
         return new QueryResult(query.queryType(), queryStatus, resultSet);
     }
 
+    public QueryResult executeQuery(String query, QueryType queryType){
+        DatabaseStatus queryStatus = DatabaseStatus.SQLERROR;
+        ResultSet resultSet = null;
+        try {
+            Statement statement = this.getStatement();
+            if(statement != null) {
+                if(queryType == QueryType.SELECT) {
+                    resultSet = statement.executeQuery(query);
+                    queryStatus = DatabaseStatus.SUCCESS;
+                }else if(queryType == QueryType.UPDATE) {
+                    statement.executeUpdate(query);
+                    queryStatus = DatabaseStatus.SUCCESS;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new QueryResult(queryType, queryStatus, resultSet);
+    }
+
     /**
      * Check if a given table exists in the database
      * @param tableName Target table name
@@ -234,4 +254,7 @@ public class Database {
         return inputString;
     }
 
+    public DatabaseType getDatabaseType() {
+        return databaseType;
+    }
 }
