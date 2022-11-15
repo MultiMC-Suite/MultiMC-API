@@ -171,6 +171,8 @@ public class Database {
     }
 
     public QueryResult executeQuery(String query, QueryType queryType){
+        this.logger.warning("Executing query: ");
+        this.logger.warning(query);
         DatabaseStatus queryStatus = DatabaseStatus.SQLERROR;
         ResultSet resultSet = null;
         try {

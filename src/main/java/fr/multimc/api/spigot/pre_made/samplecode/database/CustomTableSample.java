@@ -25,7 +25,7 @@ public class CustomTableSample extends Table {
     @SuppressWarnings("UnusedReturnValue")
     public boolean addContent(String content1, String content2){
         QueryResult queryResult = this.getDatabase().executeQuery(new QueryBuilder(QueryType.UPDATE,
-                String.format("INSERT INTO %s VALUES (NULL, '%s', '%s');", this.getTableName(), content1, content2))
+                String.format("INSERT INTO %s VALUES (NULL, '%s', '%s');", this.getName(), content1, content2))
                 .getQuery());
         return queryResult.queryStatus() == DatabaseStatus.SUCCESS;
     }

@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public enum Property {
-    AUTO_INCREMENT("AUTO_INCREMENT", "AUTOINCREMENT"),
+    AUTO_INCREMENT("AUTO_INCREMENT", "AUTO_INCREMENT"),
     NOT_NULL("NOT NULL", "NOT NULL");
 
     private final String mysql;

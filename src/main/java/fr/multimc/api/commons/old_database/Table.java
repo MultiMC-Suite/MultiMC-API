@@ -72,7 +72,7 @@ public class Table {
      * Get table name
      * @return String that is the table name
      */
-    public String getTableName(){
+    public String getName(){
         return this.name;
     }
 

@@ -1,7 +1,12 @@
 package fr.multimc.api.commons.old_database.tables;
 
+import fr.multimc.api.commons.database.Table;
+import fr.multimc.api.commons.database.enums.FieldType;
+import fr.multimc.api.commons.database.enums.Property;
+import fr.multimc.api.commons.database.interfaces.IConstraint;
+import fr.multimc.api.commons.database.models.Field;
+import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.Table;
 import fr.multimc.api.commons.old_database.query.Query;
 import fr.multimc.api.commons.old_database.query.QueryBuilder;
 import fr.multimc.api.commons.old_database.query.QueryResult;
@@ -16,14 +21,20 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public class PlayersTable extends Table {
+
+    // Fields
+    private static final Field usernameField = new Field("code", FieldType.VARCHAR, 6, null);
+    private static final Field teamCodeField = new Field("name", FieldType.VARCHAR, 30, List.of(new Property[]{Property.NOT_NULL}));
+    private static final IConstraint pkConstraint = new PrimaryKeyConstraint("pk_players", usernameField);
+
     public PlayersTable(@NotNull Database database, String name) {
-        super(database, name, "username VARCHAR(16) PRIMARY KEY", "team_code VARCHAR(6)");
+        super(database, "players", List.of(usernameField, teamCodeField), List.of(pkConstraint), false);
     }
 
     public void addPlayer(String playerName, String teamId){
         Query playerQuery = new QueryBuilder()
                 .setQueryType(QueryType.UPDATE)
-                .setQuery(String.format("INSERT INTO %s VALUES ('%s', '%s');", this.getTableName(), playerName, teamId))
+                .setQuery(String.format("INSERT INTO %s VALUES ('%s', '%s');", this.getName(), playerName, teamId))
                 .getQuery();
         this.getDatabase().executeQuery(playerQuery);
     }
@@ -31,7 +42,7 @@ public class PlayersTable extends Table {
     public void addPlayers(String teamCode, String... players){
         StringBuilder playersQueryString = new StringBuilder();
         for(String player: players){
-            playersQueryString.append(String.format("INSERT INTO %s VALUES ('%s', '%s');", this.getTableName(), player, teamCode));
+            playersQueryString.append(String.format("INSERT INTO %s VALUES ('%s', '%s');", this.getName(), player, teamCode));
         }
         Query playerQuery = new QueryBuilder()
                 .setQueryType(QueryType.UPDATE)
@@ -43,7 +54,7 @@ public class PlayersTable extends Table {
     public List<String> getTeamMembersNames(String teamCode){
         Query teamQuery = new QueryBuilder()
                 .setQueryType(QueryType.UPDATE)
-                .setQuery(String.format("SELECT username FROM %s WHERE team_code='%s';", this.getTableName(), teamCode))
+                .setQuery(String.format("SELECT username FROM %s WHERE team_code='%s';", this.getName(), teamCode))
                 .getQuery();
         QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
         List<String> playersName = null;
@@ -62,7 +73,7 @@ public class PlayersTable extends Table {
         HashMap<String, List<String>> teams = new HashMap<>();
         Query teamQuery = new QueryBuilder()
                 .setQueryType(QueryType.SELECT)
-                .setQuery(String.format("SELECT username, team_code FROM %s;", this.getTableName()))
+                .setQuery(String.format("SELECT username, team_code FROM %s;", this.getName()))
                 .getQuery();
         try (ResultSet resultSet = this.getDatabase().executeQuery(teamQuery).resultSet()) {
             while (resultSet.next()) {
