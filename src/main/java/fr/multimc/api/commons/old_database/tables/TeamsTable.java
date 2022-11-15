@@ -1,12 +1,12 @@
-package fr.multimc.api.commons.database.tables;
+package fr.multimc.api.commons.old_database.tables;
 
-import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.commons.database.Table;
-import fr.multimc.api.commons.database.enums.DatabaseStatus;
-import fr.multimc.api.commons.database.query.Query;
-import fr.multimc.api.commons.database.query.QueryBuilder;
-import fr.multimc.api.commons.database.query.QueryResult;
-import fr.multimc.api.commons.database.query.QueryType;
+import fr.multimc.api.commons.old_database.Database;
+import fr.multimc.api.commons.old_database.Table;
+import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
+import fr.multimc.api.commons.old_database.query.Query;
+import fr.multimc.api.commons.old_database.query.QueryBuilder;
+import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.old_database.query.QueryType;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -44,8 +44,7 @@ public class TeamsTable extends Table {
                 .setQuery(String.format("SELECT code FROM %s WHERE name='%s';", this.getTableName(), teamName))
                 .getQuery();
         QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
-        ResultSet resultSet = queryResult.resultSet();
-        try {
+        try (ResultSet resultSet = queryResult.resultSet()) {
             return resultSet.getString("code");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -59,9 +58,12 @@ public class TeamsTable extends Table {
                 .setQuery(String.format("SELECT name FROM %s WHERE code='%s';", this.getTableName(), code))
                 .getQuery();
         QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
-        ResultSet resultSet = queryResult.resultSet();
-        try {
-            return resultSet.getString("name");
+        try (ResultSet resultSet = queryResult.resultSet()) {
+            try {
+                return resultSet.getString("name");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,14 +81,13 @@ public class TeamsTable extends Table {
                 .setQuery(String.format("SELECT code, name FROM %s;", this.getTableName()))
                 .getQuery();
         QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
-        ResultSet resultSet = queryResult.resultSet();
-        try{
-            while(resultSet.next()){
+        try (ResultSet resultSet = queryResult.resultSet()) {
+            while (resultSet.next()) {
                 String code = resultSet.getString("code");
                 String name = resultSet.getString("name");
                 teamNames.put(code, name);
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return teamNames;
@@ -99,14 +100,13 @@ public class TeamsTable extends Table {
                 .setQuery(String.format("SELECT code, score FROM %s;", this.getTableName()))
                 .getQuery();
         QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
-        ResultSet resultSet = queryResult.resultSet();
-        try{
-            while(resultSet.next()){
+        try (ResultSet resultSet = queryResult.resultSet()) {
+            while (resultSet.next()) {
                 String code = resultSet.getString("code");
                 int score = resultSet.getInt("score");
                 scores.put(code, score);
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return scores;

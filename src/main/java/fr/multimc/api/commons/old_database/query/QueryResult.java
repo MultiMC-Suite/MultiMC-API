@@ -1,6 +1,6 @@
-package fr.multimc.api.commons.database.query;
+package fr.multimc.api.commons.old_database.query;
 
-import fr.multimc.api.commons.database.enums.DatabaseStatus;
+import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
 
 import java.sql.ResultSet;
 

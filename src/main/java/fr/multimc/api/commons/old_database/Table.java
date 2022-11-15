@@ -1,9 +1,9 @@
-package fr.multimc.api.commons.database;
+package fr.multimc.api.commons.old_database;
 
-import fr.multimc.api.commons.database.enums.DatabaseStatus;
-import fr.multimc.api.commons.database.query.QueryBuilder;
-import fr.multimc.api.commons.database.query.QueryResult;
-import fr.multimc.api.commons.database.query.QueryType;
+import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
+import fr.multimc.api.commons.old_database.query.QueryBuilder;
+import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.old_database.query.QueryType;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")

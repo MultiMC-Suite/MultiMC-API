@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.database.query;
+package fr.multimc.api.commons.old_database.query;
 
 public enum QueryType {
     SELECT,

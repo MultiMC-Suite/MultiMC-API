@@ -3,7 +3,7 @@ package fr.multimc.api.spigot.tools.entities.player;
 import fr.multimc.api.spigot.tools.entities.interfaces.IHasGameMode;
 import fr.multimc.api.spigot.tools.entities.interfaces.IHasSpeed;
 import fr.multimc.api.spigot.tools.entities.interfaces.ITeleportable;
-import fr.multimc.api.spigot.tools.messages.ComponentBuilder;
+import fr.multimc.api.commons.tools.messages.ComponentBuilder;
 import fr.multimc.api.spigot.tools.items.ItemBuilder;
 import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import net.kyori.adventure.text.Component;

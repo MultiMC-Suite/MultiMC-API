@@ -1,11 +1,11 @@
 package fr.multimc.api.spigot.pre_made.samplecode.database;
 
-import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.commons.database.Table;
-import fr.multimc.api.commons.database.enums.DatabaseStatus;
-import fr.multimc.api.commons.database.query.QueryBuilder;
-import fr.multimc.api.commons.database.query.QueryResult;
-import fr.multimc.api.commons.database.query.QueryType;
+import fr.multimc.api.commons.old_database.Database;
+import fr.multimc.api.commons.old_database.Table;
+import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
+import fr.multimc.api.commons.old_database.query.QueryBuilder;
+import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.old_database.query.QueryType;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")

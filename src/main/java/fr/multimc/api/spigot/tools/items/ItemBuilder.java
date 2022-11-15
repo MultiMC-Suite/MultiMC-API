@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.tools.items;
 
-import fr.multimc.api.spigot.tools.messages.ComponentBuilder;
+import fr.multimc.api.commons.tools.messages.ComponentBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.messages;
+package fr.multimc.api.commons.tools.messages;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;

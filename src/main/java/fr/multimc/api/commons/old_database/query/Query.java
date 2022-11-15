@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.database.query;
+package fr.multimc.api.commons.old_database.query;
 
 /**
  * The Query is a custom SQL object that allow you to put a string with a QueryType

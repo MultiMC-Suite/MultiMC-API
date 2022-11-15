@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.database.enums;
+package fr.multimc.api.commons.old_database.enums;
 
 public enum DatabaseStatus {
     SUCCESS,

@@ -1,11 +1,11 @@
-package fr.multimc.api.commons.database;
+package fr.multimc.api.commons.old_database;
 
-import fr.multimc.api.commons.database.enums.DatabaseStatus;
-import fr.multimc.api.commons.database.enums.DatabaseType;
-import fr.multimc.api.commons.database.query.Query;
-import fr.multimc.api.commons.database.query.QueryBuilder;
-import fr.multimc.api.commons.database.query.QueryResult;
-import fr.multimc.api.commons.database.query.QueryType;
+import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
+import fr.multimc.api.commons.old_database.enums.DatabaseType;
+import fr.multimc.api.commons.old_database.query.Query;
+import fr.multimc.api.commons.old_database.query.QueryBuilder;
+import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.old_database.query.QueryType;
 
 import java.io.File;
 import java.sql.*;
@@ -188,15 +188,14 @@ public class Database {
         }
         QueryResult queryResult = this.executeQuery(query);
         if(queryResult.queryStatus() == DatabaseStatus.SUCCESS){
-            ResultSet rs = this.executeQuery(query).resultSet();
-            try {
-                if(rs.next()){
+            try (ResultSet rs = this.executeQuery(query).resultSet()) {
+                if (rs.next()) {
                     return DatabaseStatus.TABLE_EXIST;
-                }else{
+                } else {
                     return DatabaseStatus.TABLE_NOT_EXIST;
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return DatabaseStatus.SQLERROR;

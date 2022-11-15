@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
-import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.old_database.Database;
 import fr.multimc.api.spigot.managers.instance.enums.GameType;
 import fr.multimc.api.spigot.tools.settings.InstanceSettings;
 import fr.multimc.api.spigot.managers.instance.InstancesManager;
@@ -12,7 +12,7 @@ import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
 import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
 import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
-import fr.multimc.api.spigot.tools.messages.MessagesFactory;
+import fr.multimc.api.commons.tools.messages.MessagesFactory;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import fr.multimc.api.spigot.tools.settings.WorldSettings;
 import io.papermc.paper.event.player.AsyncChatEvent;

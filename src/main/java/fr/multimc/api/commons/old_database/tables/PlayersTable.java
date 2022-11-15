@@ -1,11 +1,11 @@
-package fr.multimc.api.commons.database.tables;
+package fr.multimc.api.commons.old_database.tables;
 
-import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.commons.database.Table;
-import fr.multimc.api.commons.database.query.Query;
-import fr.multimc.api.commons.database.query.QueryBuilder;
-import fr.multimc.api.commons.database.query.QueryResult;
-import fr.multimc.api.commons.database.query.QueryType;
+import fr.multimc.api.commons.old_database.Database;
+import fr.multimc.api.commons.old_database.Table;
+import fr.multimc.api.commons.old_database.query.Query;
+import fr.multimc.api.commons.old_database.query.QueryBuilder;
+import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.old_database.query.QueryType;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -46,10 +46,10 @@ public class PlayersTable extends Table {
                 .setQuery(String.format("SELECT username FROM %s WHERE team_code='%s';", this.getTableName(), teamCode))
                 .getQuery();
         QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
-        ResultSet resultSet = queryResult.resultSet();
-        List<String> playersName = new ArrayList<>();
-        try{
-            while(resultSet.next()){
+        List<String> playersName = null;
+        try (ResultSet resultSet = queryResult.resultSet()) {
+            playersName = new ArrayList<>();
+            while (resultSet.next()) {
                 playersName.add(resultSet.getString("username"));
             }
         } catch (SQLException e) {
@@ -64,11 +64,10 @@ public class PlayersTable extends Table {
                 .setQueryType(QueryType.SELECT)
                 .setQuery(String.format("SELECT username, team_code FROM %s;", this.getTableName()))
                 .getQuery();
-        ResultSet resultSet = this.getDatabase().executeQuery(teamQuery).resultSet();
-        try{
-            while(resultSet.next()){
+        try (ResultSet resultSet = this.getDatabase().executeQuery(teamQuery).resultSet()) {
+            while (resultSet.next()) {
                 String teamCode = resultSet.getString("team_code");
-                if(!teams.containsKey(teamCode)) {
+                if (!teams.containsKey(teamCode)) {
                     teams.put(teamCode, new ArrayList<>());
                 }
                 teams.get(teamCode).add(resultSet.getString("username"));

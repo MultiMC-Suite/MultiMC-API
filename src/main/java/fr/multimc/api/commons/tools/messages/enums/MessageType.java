@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.messages.enums;
+package fr.multimc.api.commons.tools.messages.enums;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

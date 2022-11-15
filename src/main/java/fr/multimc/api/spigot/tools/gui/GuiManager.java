@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.tools.gui;
 
-import fr.multimc.api.spigot.tools.messages.ComponentBuilder;
+import fr.multimc.api.commons.tools.messages.ComponentBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

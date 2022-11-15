@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.database.query;
+package fr.multimc.api.commons.old_database.query;
 
 /**
  * The QueryBuilder allow you to create a query from a QueryType and a query String
