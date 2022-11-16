@@ -16,7 +16,7 @@ public class DatabaseSampleCode implements SampleCode {
     @Override
     public void run(JavaPlugin plugin) {
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
-        List<Field> fields = List.of(new Field("playerName", FieldType.VARCHAR, List.of(new Property[]{Property.NOT_NULL})), new Field("playerUUID", FieldType.INTEGER, List.of(new Property[]{Property.NOT_NULL})));
+        List<Field> fields = List.of(new Field("playerName", FieldType.VARCHAR, Property.NOT_NULL), new Field("playerUUID", FieldType.INTEGER, Property.NOT_NULL));
         Table table = new Table(database, "table_name", fields, null, true);
     }
 }

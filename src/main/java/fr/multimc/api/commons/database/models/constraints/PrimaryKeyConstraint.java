@@ -5,11 +5,11 @@ import fr.multimc.api.commons.database.models.Field;
 
 public class PrimaryKeyConstraint implements IConstraint {
 
-    private final String name;
+    private final String constraintName;
     private final Field[] fields;
 
-    public PrimaryKeyConstraint(String name, Field... fields) {
-        this.name = name;
+    public PrimaryKeyConstraint(String constraintName, Field... fields) {
+        this.constraintName = constraintName;
         this.fields = fields;
     }
 
@@ -22,6 +22,6 @@ public class PrimaryKeyConstraint implements IConstraint {
                 builder.append(", ");
             }
         }
-        return String.format("CONSTRAINT %s PRIMARY KEY (%s)", name, builder);
+        return String.format("CONSTRAINT %s PRIMARY KEY (%s)", constraintName, builder);
     }
 }

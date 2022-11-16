@@ -23,15 +23,16 @@ import java.util.List;
 public class TeamsTable extends Table {
 
     // Fields
-    private static final Field codeField = new Field("code", FieldType.VARCHAR, 6, null);
-    private static final Field nameField = new Field("name", FieldType.VARCHAR, 30, List.of(new Property[]{Property.NOT_NULL}));
-    private static final Field scoreField = new Field("score", FieldType.INTEGER, null);
+    private static final String name = "teams";
+    private static final Field codeField = new Field("code", FieldType.VARCHAR, 6, Property.NOT_NULL, Property.UNIQUE);
+    private static final Field nameField = new Field("name", FieldType.VARCHAR, 30, Property.NOT_NULL, Property.UNIQUE);
+    private static final Field scoreField = new Field("score", FieldType.INTEGER, Property.NOT_NULL);
     private static final IConstraint pkConstraint = new PrimaryKeyConstraint("pk_teams", codeField);
 
     private final PlayersTable playersTable;
 
     public TeamsTable(@NotNull Database database) {
-        super(database, "teams", List.of(codeField, nameField, scoreField), List.of(pkConstraint), false);
+        super(database, name, List.of(codeField, nameField, scoreField), List.of(pkConstraint), false);
 
         this.playersTable = new PlayersTable(this.getDatabase(), "players");
     }

@@ -5,6 +5,7 @@ import fr.multimc.api.commons.database.enums.FieldType;
 import fr.multimc.api.commons.database.enums.Property;
 import fr.multimc.api.commons.database.interfaces.IConstraint;
 import fr.multimc.api.commons.database.models.Field;
+import fr.multimc.api.commons.database.models.constraints.ForeignKeyConstraint;
 import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.old_database.Database;
 import fr.multimc.api.commons.old_database.query.Query;
@@ -23,12 +24,14 @@ import java.util.List;
 public class PlayersTable extends Table {
 
     // Fields
-    private static final Field usernameField = new Field("code", FieldType.VARCHAR, 6, null);
-    private static final Field teamCodeField = new Field("name", FieldType.VARCHAR, 30, List.of(new Property[]{Property.NOT_NULL}));
+    private static final String name = "players";
+    private static final Field teamCodeField = new Field("team_code", FieldType.VARCHAR, 6);
+    private static final Field usernameField = new Field("username", FieldType.VARCHAR, 30, Property.NOT_NULL, Property.UNIQUE);
     private static final IConstraint pkConstraint = new PrimaryKeyConstraint("pk_players", usernameField);
+    private static final IConstraint fkConstraint = new ForeignKeyConstraint("fk_players", teamCodeField, "teams", "code");
 
     public PlayersTable(@NotNull Database database, String name) {
-        super(database, "players", List.of(usernameField, teamCodeField), List.of(pkConstraint), false);
+        super(database, name, List.of(teamCodeField, usernameField), List.of(pkConstraint, fkConstraint), false);
     }
 
     public void addPlayer(String playerName, String teamId){

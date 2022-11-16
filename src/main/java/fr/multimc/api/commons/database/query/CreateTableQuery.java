@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,13 +25,12 @@ public class CreateTableQuery implements IQuery {
 
     public CreateTableQuery(@NotNull String tableName, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints, boolean autoId) {
         this.tableName = tableName;
-        this.fields = new ArrayList<>(fields);
+        this.fields = fields;
         this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : new ArrayList<>(constraints);
         if(autoId){
-            Field idField = new Field("id", FieldType.INTEGER, Collections.singletonList(Property.AUTO_INCREMENT));
+            Field idField = new Field("id", FieldType.INTEGER, Property.AUTO_INCREMENT);
             this.fields.add(0, idField);
             this.constraints.add(new PrimaryKeyConstraint("pk_%s".formatted(tableName), idField));
-
         }
     }
 

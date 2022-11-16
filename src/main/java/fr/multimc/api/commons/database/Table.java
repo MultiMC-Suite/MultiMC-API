@@ -28,6 +28,14 @@ public class Table {
         }
     }
 
+    public void enableConstraint(IConstraint constraint){
+
+    }
+
+    public void disableConstraint(IConstraint constraint){
+
+    }
+
     public Database getDatabase() {
         return database;
     }
