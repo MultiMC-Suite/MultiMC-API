@@ -2,6 +2,7 @@ package fr.multimc.api.spigot.tools.worlds;
 
 import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.tools.settings.WorldSettings;
+import fr.multimc.api.spigot.tools.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -20,7 +21,9 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@SuppressWarnings("unused")
+import java.util.Map;
+
+@SuppressWarnings({"unused", "rawtypes", "unchecked"})
 public class MmcWorld implements Listener {
 
     private final WorldSettings worldSettings;
@@ -32,16 +35,14 @@ public class MmcWorld implements Listener {
         this.worldSettings = worldSettings;
         this.world = this.getWorld();
         this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        // Game rules
-        if(this.worldSettings.isPreventTimeFlow()){
-            this.world.setTime(6000);
-            this.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        }
-        if(this.worldSettings.isPreventWeather()){
-            this.world.setStorm(false);
-            this.world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-        }
+        this.applyGameRules();
         this.world.setDifficulty(this.worldSettings.getDifficulty());
+    }
+
+    private void applyGameRules(){
+        for(Map.Entry<GameRule, Object> gameRule : this.worldSettings.getGameRules().entrySet()){
+            this.world.setGameRule(gameRule.getKey(), gameRule.getValue());
+        }
     }
 
     private World generateWorld(){
@@ -73,6 +74,10 @@ public class MmcWorld implements Listener {
         return this.world;
     }
 
+    private boolean checkPrevention(WorldPrevention prevention){
+        return this.worldSettings.getPreventions().contains(prevention) ^ this.worldSettings.getPreventions().contains(WorldPrevention.ALL);
+    }
+
     public Location getSpawnPoint(){
         return this.worldSettings.getSpawn().toAbsolute(new Location(this.world, 0, 0, 0));
     }
@@ -83,7 +88,7 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onEntityDamaged(EntityDamageEvent e){
         if(e.getEntity().getWorld().equals(this.world)){
-            if(this.worldSettings.isPreventDamages()){
+            if(this.checkPrevention(WorldPrevention.PREVENT_DAMAGES)){
                 e.setCancelled(true);
             }
         }
@@ -92,7 +97,7 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onEntityDamageEntity(EntityDamageByEntityEvent e){
         if(e.getEntity().getWorld().equals(this.world)){
-            if(this.worldSettings.isPreventPvp()){
+            if(this.checkPrevention(WorldPrevention.PREVENT_PVP)){
                 e.setCancelled(true);
             }
         }
@@ -101,7 +106,7 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onBlockPlaced(BlockPlaceEvent e){
         if(e.getPlayer().getWorld().equals(this.world)){
-            if(this.worldSettings.isPreventBuild()){
+            if(this.checkPrevention(WorldPrevention.PREVENT_BUILD)){
                 e.setCancelled(true);
             }
         }
@@ -110,7 +115,7 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e){
         if(e.getPlayer().getWorld().equals(this.world)){
-            if(this.worldSettings.isPreventBuild()){
+            if(this.checkPrevention(WorldPrevention.PREVENT_BUILD)){
                 e.setCancelled(true);
             }
         }
@@ -120,7 +125,7 @@ public class MmcWorld implements Listener {
     public void onFoodLevelChange(FoodLevelChangeEvent e){
         if(e.getEntity() instanceof Player player){
             if(player.getWorld().equals(this.world)){
-                if(this.worldSettings.isPreventBuild()){
+                if(this.checkPrevention(WorldPrevention.PREVENT_BUILD)){
                     e.setCancelled(true);
                     player.setFoodLevel(20);
                     player.setSaturation(20);
@@ -133,7 +138,7 @@ public class MmcWorld implements Listener {
     public void onPlayerPortal(PlayerPortalEvent e){
         Player player = e.getPlayer();
         if (player.getWorld().equals(this.world)) {
-            if(this.worldSettings.isPreventPortalUse()){
+            if(this.checkPrevention(WorldPrevention.PREVENT_PORTAL_USE)){
                 e.setCancelled(true);
             }
         }

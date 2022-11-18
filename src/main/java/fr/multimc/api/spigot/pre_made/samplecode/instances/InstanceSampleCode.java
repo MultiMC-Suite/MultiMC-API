@@ -9,6 +9,7 @@ import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
+import fr.multimc.api.spigot.tools.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
 import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
@@ -21,6 +22,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -62,15 +64,16 @@ public class InstanceSampleCode implements SampleCode, Listener {
                 schematic,
                 null,
                 Difficulty.PEACEFUL,
-                true);
-        lobbyWorldSettings.setGameMode(GameMode.ADVENTURE);
+                GameMode.ADVENTURE);
         WorldSettings gameWorldSettings = new WorldSettings(
-                "multimc_game",
-                true);
+                "multimc_game");
+        gameWorldSettings.addPrevention(WorldPrevention.ALL);
+        gameWorldSettings.addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw prevention because Prevention.ALL is already present
+        gameWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        gameWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
-        gameWorldSettings.setPreventDamages(false);
         instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, factory, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
-        instancesManager.preAllocate(32);
+        instancesManager.preAllocate(5);
 
         // Commands
         plugin.getCommand("stop-mmc").setExecutor(new StopCommand(instancesManager));
