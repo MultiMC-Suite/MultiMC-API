@@ -97,8 +97,10 @@ public class MmcWorld implements Listener {
     @EventHandler
     public void onEntityDamageEntity(EntityDamageByEntityEvent e){
         if(e.getEntity().getWorld().equals(this.world)){
-            if(this.checkPrevention(WorldPrevention.PREVENT_PVP)){
-                e.setCancelled(true);
+            if(e.getEntity() instanceof Player && e.getDamager() instanceof Player){
+                if(this.checkPrevention(WorldPrevention.PREVENT_PVP)){
+                    e.setCancelled(true);
+                }
             }
         }
     }
@@ -125,7 +127,7 @@ public class MmcWorld implements Listener {
     public void onFoodLevelChange(FoodLevelChangeEvent e){
         if(e.getEntity() instanceof Player player){
             if(player.getWorld().equals(this.world)){
-                if(this.checkPrevention(WorldPrevention.PREVENT_BUILD)){
+                if(this.checkPrevention(WorldPrevention.PREVENT_FOOD_LOSS)){
                     e.setCancelled(true);
                     player.setFoodLevel(20);
                     player.setSaturation(20);
