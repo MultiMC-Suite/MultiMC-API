@@ -3,22 +3,21 @@ package fr.multimc.api.commons.database.query;
 import fr.multimc.api.commons.database.enums.DatabaseType;
 import fr.multimc.api.commons.database.models.Query;
 import fr.multimc.api.commons.database.models.Field;
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.query.QueryResult;
-import fr.multimc.api.commons.old_database.query.QueryType;
+import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.database.enums.QueryType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class SelectTableQuery extends Query {
+public class SelectQuery extends Query {
 
     private final String tableName;
     private final String whereClause;
     private final String orderByClause;
     private final Field[] targetFields;
 
-    public SelectTableQuery(@NotNull String tableName, @Nullable String whereClause, @Nullable String orderByClause, Field... targetFields) {
+    public SelectQuery(@NotNull String tableName, @Nullable String whereClause, @Nullable String orderByClause, Field... targetFields) {
         this.tableName = tableName;
         this.whereClause = whereClause;
         this.orderByClause = orderByClause;

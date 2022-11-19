@@ -4,12 +4,8 @@ import fr.multimc.api.commons.database.enums.DatabaseType;
 import fr.multimc.api.commons.database.interfaces.IConstraint;
 import fr.multimc.api.commons.database.models.Query;
 import fr.multimc.api.commons.database.models.Field;
-import fr.multimc.api.commons.database.enums.FieldType;
-import fr.multimc.api.commons.database.enums.Property;
-import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.query.QueryResult;
-import fr.multimc.api.commons.old_database.query.QueryType;
+import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.database.enums.QueryType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,15 +19,10 @@ public class CreateTableQuery extends Query {
     private final List<Field> fields;
     private final List<IConstraint> constraints;
 
-    public CreateTableQuery(@NotNull String tableName, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints, boolean autoId) {
+    public CreateTableQuery(@NotNull String tableName, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints) {
         this.tableName = tableName;
         this.fields = fields;
         this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : new ArrayList<>(constraints);
-        if(autoId){
-            Field idField = new Field("id", FieldType.INTEGER, Property.AUTO_INCREMENT);
-            this.fields.add(0, idField);
-            this.constraints.add(new PrimaryKeyConstraint("pk_%s".formatted(tableName), idField));
-        }
     }
 
     @Override

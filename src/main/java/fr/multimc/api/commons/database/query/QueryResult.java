@@ -1,6 +1,7 @@
-package fr.multimc.api.commons.old_database.query;
+package fr.multimc.api.commons.database.query;
 
-import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
+import fr.multimc.api.commons.database.enums.SQLState;
+import fr.multimc.api.commons.database.enums.QueryType;
 
 import java.sql.ResultSet;
 
@@ -14,6 +15,6 @@ import java.sql.ResultSet;
  * @param queryStatus Custom QueryStatus
  * @param resultSet SQL ResultSet, null if the QueryType is not UPDATE
  */
-public record QueryResult(QueryType queryType, DatabaseStatus queryStatus, ResultSet resultSet) {
+public record QueryResult(QueryType queryType, SQLState queryStatus, ResultSet resultSet) {
 
 }

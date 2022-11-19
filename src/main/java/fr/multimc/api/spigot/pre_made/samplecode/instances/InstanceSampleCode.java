@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
-import fr.multimc.api.commons.old_database.Database;
+import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.spigot.managers.instance.enums.GameType;
 import fr.multimc.api.spigot.tools.settings.InstanceSettings;
 import fr.multimc.api.spigot.managers.instance.InstancesManager;

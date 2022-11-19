@@ -1,14 +1,18 @@
 package fr.multimc.api.commons.database;
 
+import fr.multimc.api.commons.database.enums.FieldType;
+import fr.multimc.api.commons.database.enums.Property;
 import fr.multimc.api.commons.database.interfaces.IConstraint;
 import fr.multimc.api.commons.database.models.Field;
+import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.database.query.CreateTableQuery;
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
+import fr.multimc.api.commons.database.enums.SQLState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class Table {
@@ -18,22 +22,27 @@ public class Table {
     private final List<Field> fields;
     private final List<IConstraint> constraints;
 
+    /**
+     * Constructor for SQL table
+     * @param database Database object
+     * @param name Table name
+     * @param fields Field objects that represent SQL columns
+     * @param constraints Constraint objects that represent SQL constraints
+     * @param autoId If true, add an auto-incremented primary key named "id"
+     */
     public Table(@NotNull Database database, @NotNull String name, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints, boolean autoId) {
         this.database = database;
         this.name = name;
         this.fields = fields;
-        this.constraints = constraints;
-        if(database.isTableExist(name) == DatabaseStatus.TABLE_NOT_EXIST){
-            new CreateTableQuery(name, fields, constraints, autoId).execute(database);
+        this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : constraints;
+        if(autoId){
+            Field idField = new Field("id", FieldType.INTEGER, Property.AUTO_INCREMENT);
+            this.fields.add(0, idField);
+            this.constraints.add(new PrimaryKeyConstraint("pk_%s".formatted(name), idField));
         }
-    }
-
-    public void enableConstraint(IConstraint constraint){
-
-    }
-
-    public void disableConstraint(IConstraint constraint){
-
+        if(database.isTableExist(name) == SQLState.TABLE_NOT_EXIST){
+            new CreateTableQuery(name, fields, constraints).execute(database);
+        }
     }
 
     public Database getDatabase() {

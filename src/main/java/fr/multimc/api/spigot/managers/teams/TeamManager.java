@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.managers.teams;
 
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.tables.GameTablesHandler;
+import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.database.tables.GameTablesHandler;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import org.jetbrains.annotations.NotNull;
 

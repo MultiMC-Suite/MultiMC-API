@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.old_database.tables;
+package fr.multimc.api.commons.database.tables;
 
 import fr.multimc.api.commons.database.Table;
 import fr.multimc.api.commons.database.enums.FieldType;
@@ -7,10 +7,10 @@ import fr.multimc.api.commons.database.interfaces.IConstraint;
 import fr.multimc.api.commons.database.models.Field;
 import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.database.query.InsertQuery;
-import fr.multimc.api.commons.database.query.SelectTableQuery;
+import fr.multimc.api.commons.database.query.SelectQuery;
 import fr.multimc.api.commons.database.query.UpdateQuery;
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.database.query.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -43,8 +43,8 @@ public class TeamsTable extends Table {
 
     @Deprecated
     private String getTeamId(String teamName){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s='%s'".formatted(nameField.name(), teamName), null, codeField);
-        try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
+        SelectQuery selectQuery = new SelectQuery(this.getName(), "%s='%s'".formatted(nameField.name(), teamName), null, codeField);
+        try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             return resultSet.getString(codeField.name());
         } catch (SQLException e) {
             e.printStackTrace();
@@ -54,8 +54,8 @@ public class TeamsTable extends Table {
 
     @Deprecated
     public String getTeamName(String teamCode) {
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s='%s'".formatted(codeField.name(), teamCode), null, nameField);
-        try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
+        SelectQuery selectQuery = new SelectQuery(this.getName(), "%s='%s'".formatted(codeField.name(), teamCode), null, nameField);
+        try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             try {
                 return resultSet.getString(nameField.name());
             } catch (SQLException e) {
@@ -68,9 +68,9 @@ public class TeamsTable extends Table {
     }
 
     public HashMap<String, String> getTeamNames() {
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), null, null, codeField, nameField);
+        SelectQuery selectQuery = new SelectQuery(this.getName(), null, null, codeField, nameField);
         HashMap<String, String> teamNames = new HashMap<>();
-        try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
+        try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
                 String code = resultSet.getString(codeField.name());
                 String name = resultSet.getString(nameField.name());
@@ -83,9 +83,9 @@ public class TeamsTable extends Table {
     }
 
     public HashMap<String, Integer> getScores(){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), null, null, codeField, scoreField);
+        SelectQuery selectQuery = new SelectQuery(this.getName(), null, null, codeField, scoreField);
         HashMap<String, Integer> scores = new HashMap<>();
-        try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
+        try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
                 String code = resultSet.getString(codeField.name());
                 int score = resultSet.getInt(scoreField.name());

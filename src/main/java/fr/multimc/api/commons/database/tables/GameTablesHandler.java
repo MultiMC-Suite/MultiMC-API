@@ -1,8 +1,8 @@
-package fr.multimc.api.commons.old_database.tables;
+package fr.multimc.api.commons.database.tables;
 
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
-import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.database.enums.SQLState;
+import fr.multimc.api.commons.database.query.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class GameTablesHandler {
 
     public void addTeam(String teamCode, String teamName, String... playersName){
         QueryResult queryResult = this.teamsTable.addTeam(teamCode, teamName, playersName);
-        if(queryResult.queryStatus() != DatabaseStatus.SUCCESS) throw new RuntimeException("Error while adding team to database: %s".formatted(queryResult.queryStatus()));
+        if(queryResult.queryStatus() != SQLState.SUCCESS) throw new RuntimeException("Error while adding team to database: %s".formatted(queryResult.queryStatus()));
         for(String playerName: playersName){
             this.playersTable.addPlayer(teamCode, playerName);
         }

@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.old_database.tables;
+package fr.multimc.api.commons.database.tables;
 
 import fr.multimc.api.commons.database.Table;
 import fr.multimc.api.commons.database.enums.FieldType;
@@ -8,9 +8,9 @@ import fr.multimc.api.commons.database.models.Field;
 import fr.multimc.api.commons.database.models.constraints.ForeignKeyConstraint;
 import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.database.query.InsertQuery;
-import fr.multimc.api.commons.database.query.SelectTableQuery;
-import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.query.QueryResult;
+import fr.multimc.api.commons.database.query.SelectQuery;
+import fr.multimc.api.commons.database.Database;
+import fr.multimc.api.commons.database.query.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -46,9 +46,9 @@ public class PlayersTable extends Table {
     }
 
     public HashMap<String, List<String>> getPlayersByTeam(){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), null, null, usernameField, teamCodeField);
+        SelectQuery selectQuery = new SelectQuery(this.getName(), null, null, usernameField, teamCodeField);
         HashMap<String, List<String>> teams = new HashMap<>();
-        try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
+        try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
                 String teamCode = resultSet.getString(teamCodeField.name());
                 if (!teams.containsKey(teamCode)) {
@@ -64,8 +64,8 @@ public class PlayersTable extends Table {
 
     @Deprecated
     public List<String> getTeamMembersNames(String teamCode){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s='%s'".formatted(teamCodeField.name(), teamCode), null, usernameField);
-        QueryResult queryResult = selectTableQuery.execute(this.getDatabase());
+        SelectQuery selectQuery = new SelectQuery(this.getName(), "%s='%s'".formatted(teamCodeField.name(), teamCode), null, usernameField);
+        QueryResult queryResult = selectQuery.execute(this.getDatabase());
         List<String> playersName = null;
         try (ResultSet resultSet = queryResult.resultSet()) {
             playersName = new ArrayList<>();
