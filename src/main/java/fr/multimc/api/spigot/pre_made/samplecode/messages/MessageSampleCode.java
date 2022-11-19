@@ -22,9 +22,9 @@ public class MessageSampleCode implements SampleCode, Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
-        player.sendMessage(factory.getMessage(MessageType.PREFIXED, player.getName(), "Sample &nchat&f message", null));
-        player.sendMessage(factory.getMessage(MessageType.GAME, player.getName(), "Sample &ngame&f message", "TeamName"));
-        player.sendMessage(factory.getMessage(MessageType.TEAM, player.getName(), "Sample &nwhisper&f message", null));
+        player.sendMessage(factory.getChatMessage(MessageType.PREFIXED, player.getName(), "Sample &nchat&f message", null));
+        player.sendMessage(factory.getChatMessage(MessageType.GAME, player.getName(), "Sample &ngame&f message", "TeamName"));
+        player.sendMessage(factory.getChatMessage(MessageType.TEAM, player.getName(), "Sample &nwhisper&f message", null));
     }
 
 }
