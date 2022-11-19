@@ -124,7 +124,11 @@ public class InstancesManager {
             }
             return false;
         }
-        // Define team groups
+        // Send warning for each player that is not online
+        this.mmcTeams.stream().flatMap(mmcTeam -> mmcTeam.getPlayers().stream())
+                .filter(mmcPlayer -> !mmcPlayer.isOnline())
+                .forEach(mmcPlayer -> this.logger.warning("Player %s is not online".formatted(mmcPlayer.getName())));
+        // Dispatch teams
         List<List<MmcTeam>> gameTeams = new ArrayList<>();
         switch (this.settings.gameType()) {
             case SOLO -> this.getOnePlayerTeams().forEach(team -> gameTeams.add(Collections.singletonList(team)));
