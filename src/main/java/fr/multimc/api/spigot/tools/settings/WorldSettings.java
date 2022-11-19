@@ -18,15 +18,15 @@ import java.util.Map;
 public class WorldSettings {
 
     private final String worldName;
-    private Schematic schematic = null;
-    private RelativeLocation spawn = new RelativeLocation(0.5, 100, 0.5);
-    private Difficulty difficulty = Difficulty.NORMAL;
-    private GameMode gameMode = null;
+    private final Schematic schematic;
+    private final RelativeLocation spawn;
+    private Difficulty difficulty;
+    private GameMode gameMode;
     private final List<WorldPrevention> preventions = new ArrayList<>();
     private final Map<GameRule, Object> gameRules = new HashMap<>();
 
     public WorldSettings(@NotNull String worldName) {
-        this.worldName = worldName;
+        this(worldName, null, null, Difficulty.NORMAL, null);
     }
 
     public WorldSettings(@NotNull String worldName, @Nullable Schematic schematic, @Nullable RelativeLocation spawn, @NotNull Difficulty difficulty) {
@@ -44,6 +44,7 @@ public class WorldSettings {
     public String getWorldName() {
         return worldName;
     }
+    @Nullable
     public Schematic getSchematic() {
         return schematic;
     }

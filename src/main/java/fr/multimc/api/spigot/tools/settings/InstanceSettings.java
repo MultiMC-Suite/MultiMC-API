@@ -12,9 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public record InstanceSettings(Schematic schematic, GameType gameType,
-                               List<RelativeLocation> spawnPoints, List<MmcEntity> entities,
-                               HashMap<String, Object> customSettings, int duration, int minPlayers, int tickDelay) {
+public record InstanceSettings(Schematic schematic,
+                               GameType gameType,
+                               List<RelativeLocation> spawnPoints,
+                               List<MmcEntity> entities,
+                               HashMap<String, Object> customSettings,
+                               int duration,
+                               int minPlayers,
+                               int tickDelay) {
 
     /**
      * Constructor of InstanceSettings
@@ -43,6 +48,4 @@ public record InstanceSettings(Schematic schematic, GameType gameType,
         this.minPlayers = minPlayers;
         this.tickDelay = tickDelay;
     }
-
-
 }
