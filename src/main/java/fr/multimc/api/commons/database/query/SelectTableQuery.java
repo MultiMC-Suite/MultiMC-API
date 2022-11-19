@@ -1,7 +1,7 @@
 package fr.multimc.api.commons.database.query;
 
 import fr.multimc.api.commons.database.enums.DatabaseType;
-import fr.multimc.api.commons.database.interfaces.IQuery;
+import fr.multimc.api.commons.database.models.Query;
 import fr.multimc.api.commons.database.models.Field;
 import fr.multimc.api.commons.old_database.Database;
 import fr.multimc.api.commons.old_database.query.QueryResult;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class SelectTableQuery implements IQuery {
+public class SelectTableQuery extends Query {
 
     private final String tableName;
     private final String whereClause;
@@ -44,8 +44,7 @@ public class SelectTableQuery implements IQuery {
         return queryBuilder.toString();
     }
 
-    @Override
     public QueryResult execute(@NotNull Database database) {
-        return database.executeQuery(this.getQuery(database.getDatabaseType()), QueryType.SELECT);
+        return this.execute(database, QueryType.SELECT);
     }
 }

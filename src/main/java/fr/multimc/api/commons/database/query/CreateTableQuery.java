@@ -2,7 +2,7 @@ package fr.multimc.api.commons.database.query;
 
 import fr.multimc.api.commons.database.enums.DatabaseType;
 import fr.multimc.api.commons.database.interfaces.IConstraint;
-import fr.multimc.api.commons.database.interfaces.IQuery;
+import fr.multimc.api.commons.database.models.Query;
 import fr.multimc.api.commons.database.models.Field;
 import fr.multimc.api.commons.database.enums.FieldType;
 import fr.multimc.api.commons.database.enums.Property;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateTableQuery implements IQuery {
+public class CreateTableQuery extends Query {
 
     private final String tableName;
     private final List<Field> fields;
@@ -54,9 +54,8 @@ public class CreateTableQuery implements IQuery {
         return String.format("CREATE TABLE %s (%s);", tableName, fieldsBuilder);
     }
 
-    @Override
     public QueryResult execute(@NotNull Database database) {
-        return database.executeQuery(this.getQuery(database.getDatabaseType()), QueryType.UPDATE);
+        return this.execute(database, QueryType.UPDATE);
     }
 
 
