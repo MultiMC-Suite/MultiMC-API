@@ -6,6 +6,7 @@ import fr.multimc.api.commons.database.enums.Property;
 import fr.multimc.api.commons.database.interfaces.IConstraint;
 import fr.multimc.api.commons.database.models.Field;
 import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
+import fr.multimc.api.commons.database.query.InsertQuery;
 import fr.multimc.api.commons.database.query.SelectTableQuery;
 import fr.multimc.api.commons.old_database.Database;
 import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
@@ -20,7 +21,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TeamsTable extends Table {
 
     // Fields
@@ -32,19 +33,18 @@ public class TeamsTable extends Table {
 
     private final PlayersTable playersTable;
 
-    public TeamsTable(@NotNull Database database) {
+    public TeamsTable(@NotNull Database database, PlayersTable playersTable) {
         super(database, name, List.of(codeField, nameField, scoreField), List.of(pkConstraint), false);
-
-        this.playersTable = new PlayersTable(this.getDatabase(), "players");
+        this.playersTable = playersTable;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public boolean addTeam(String teamCode, String teamName, String... playersName){
-        Query teamQuery = new QueryBuilder()
-                .setQueryType(QueryType.UPDATE)
-                .setQuery(String.format("INSERT INTO %s VALUES ('%s', '%s', 0)", this.getName(), teamCode, teamName))
-                .getQuery();
-        QueryResult queryResult = this.getDatabase().executeQuery(teamQuery);
+        InsertQuery insertQuery = new InsertQuery(this.getName(), new HashMap<>() {{
+            put(codeField, teamCode);
+            put(nameField, teamName);
+            put(scoreField, 0);
+        }});
+        QueryResult queryResult = insertQuery.execute(this.getDatabase());
         if(queryResult.queryStatus() == DatabaseStatus.SUCCESS){
             this.playersTable.addPlayers(teamCode, playersName);
             return true;
@@ -52,21 +52,23 @@ public class TeamsTable extends Table {
         return false;
     }
 
+    @Deprecated
     private String getTeamId(String teamName){
         SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), String.format("%s = '%s'", nameField.name(), teamName), null, codeField);
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
-            return resultSet.getString("code");
+            return resultSet.getString(codeField.name());
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public String getTeamName(String code) {
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), String.format("%s = '%s'", codeField.name(), code), null, nameField);
+    @Deprecated
+    public String getTeamName(String teamCode) {
+        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), String.format("%s = '%s'", codeField.name(), teamCode), null, nameField);
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
             try {
-                return resultSet.getString("name");
+                return resultSet.getString(nameField.name());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -85,8 +87,8 @@ public class TeamsTable extends Table {
         HashMap<String, String> teamNames = new HashMap<>();
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
-                String code = resultSet.getString("code");
-                String name = resultSet.getString("name");
+                String code = resultSet.getString(codeField.name());
+                String name = resultSet.getString(nameField.name());
                 teamNames.put(code, name);
             }
         } catch (SQLException e) {
@@ -100,8 +102,8 @@ public class TeamsTable extends Table {
         HashMap<String, Integer> scores = new HashMap<>();
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
-                String code = resultSet.getString("code");
-                int score = resultSet.getInt("score");
+                String code = resultSet.getString(codeField.name());
+                int score = resultSet.getInt(scoreField.name());
                 scores.put(code, score);
             }
         } catch (SQLException e) {

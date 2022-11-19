@@ -54,6 +54,7 @@ public class CreateTableQuery extends Query {
         return String.format("CREATE TABLE %s (%s);", tableName, fieldsBuilder);
     }
 
+    @Override
     public QueryResult execute(@NotNull Database database) {
         return this.execute(database, QueryType.UPDATE);
     }

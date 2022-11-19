@@ -44,6 +44,7 @@ public class SelectTableQuery extends Query {
         return queryBuilder.toString();
     }
 
+    @Override
     public QueryResult execute(@NotNull Database database) {
         return this.execute(database, QueryType.SELECT);
     }

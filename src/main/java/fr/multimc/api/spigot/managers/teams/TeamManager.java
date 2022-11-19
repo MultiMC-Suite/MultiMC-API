@@ -18,8 +18,8 @@ public class TeamManager {
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
     public TeamManager(@NotNull Database database) {
-        this.teamsTable = new TeamsTable(database);
-        this.playersTable = teamsTable.getPlayersTable();
+        this.playersTable = new PlayersTable(database);
+        this.teamsTable = new TeamsTable(database, this.playersTable);
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){

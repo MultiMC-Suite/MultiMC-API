@@ -9,17 +9,17 @@ public class ForeignKeyConstraint implements IConstraint {
     private final String constraintName;
     private final Field localField;
     private final String targetTableName;
-    private final String targetFieldName;
+    private final Field targetField;
 
-    public ForeignKeyConstraint(String constraintName, Field localField, String targetTableName, String targetFieldName) {
+    public ForeignKeyConstraint(String constraintName, Field localField, String targetTableName, Field targetFieldName) {
         this.constraintName = constraintName;
         this.localField = localField;
         this.targetTableName = targetTableName;
-        this.targetFieldName = targetFieldName;
+        this.targetField = targetFieldName;
     }
 
     @Override
     public String getConstraint() {
-        return String.format("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)", constraintName, localField.name(), targetTableName, targetFieldName);
+        return String.format("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)", constraintName, localField.name(), targetTableName, targetField.name());
     }
 }
