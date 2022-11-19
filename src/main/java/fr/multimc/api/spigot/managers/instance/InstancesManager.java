@@ -55,13 +55,13 @@ public class InstancesManager {
     public InstancesManager(@NotNull JavaPlugin plugin,
                             @NotNull Class<? extends Instance> instanceClass,
                             @NotNull InstanceSettings settings,
-                            @Nullable MessagesFactory factory,
+                            @Nullable MessagesFactory messagesFactory,
                             @NotNull MmcWorld lobbyWorld,
                             @NotNull MmcWorld gameWorld) {
         this.plugin = plugin;
         this.instanceClass = instanceClass;
         this.settings = settings;
-        this.factory = factory;
+        this.factory = messagesFactory;
         this.logger = plugin.getLogger();
         this.lobbyWorld = lobbyWorld;
         this.gameWorld = gameWorld;
