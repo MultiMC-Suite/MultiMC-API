@@ -29,18 +29,20 @@ public class StartCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        List<MmcTeam> teams;
         switch (args.length){
-            case 1 -> this.instancesManager.start(this.getTeams(Integer.parseInt(args[0]), DispatchAlgorithm.RANDOM_UNIQUE));
+            case 1 -> teams = this.getTeams(Integer.parseInt(args[0]), DispatchAlgorithm.RANDOM_UNIQUE);
             case 2 -> {
                 int teamSize = Integer.parseInt(args[0]);
                 if(args[0].equals("round_robin")){
-                    this.instancesManager.start(this.getTeams(teamSize, DispatchAlgorithm.ROUND_ROBIN));
+                    teams = this.getTeams(teamSize, DispatchAlgorithm.ROUND_ROBIN);
                 }else{
-                    this.instancesManager.start(this.getTeams(teamSize, DispatchAlgorithm.RANDOM_UNIQUE));
+                    teams = this.getTeams(teamSize, DispatchAlgorithm.RANDOM_UNIQUE);
                 }
             }
-            default -> this.instancesManager.start(this.teamManager.loadTeams());
+            default -> teams = this.teamManager.loadTeams();
         }
+        this.instancesManager.start(commandSender, teams);
         return true;
     }
 
