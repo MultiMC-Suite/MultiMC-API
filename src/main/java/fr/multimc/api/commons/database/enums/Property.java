@@ -4,29 +4,17 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public enum Property {
-    AUTO_INCREMENT("AUTO_INCREMENT", "AUTO_INCREMENT"),
-    NOT_NULL("NOT NULL", "NOT NULL"),
-    UNIQUE("UNIQUE", "UNIQUE");
+    AUTO_INCREMENT("AUTO_INCREMENT"),
+    NOT_NULL("NOT NULL"),
+    UNIQUE("UNIQUE");
 
-    private final String mysql;
-    private final String sqlite;
+    private final String property;
 
-    Property(@NotNull String mysql, @NotNull String sqlite) {
-        this.mysql = mysql;
-        this.sqlite = sqlite;
+    Property(@NotNull String property) {
+        this.property = property;
     }
 
     public String getProperty(DatabaseType databaseType){
-        return switch (databaseType) {
-            case MYSQL -> this.mysql;
-            case SQLITE -> this.sqlite;
-        };
-    }
-
-    public String getMysql() {
-        return mysql;
-    }
-    public String getSqlite() {
-        return sqlite;
+        return property;
     }
 }

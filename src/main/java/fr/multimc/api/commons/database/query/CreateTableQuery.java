@@ -51,7 +51,7 @@ public class CreateTableQuery extends Query {
                 fieldsBuilder.append(", ");
             }
         }
-        return String.format("CREATE TABLE %s (%s);", tableName, fieldsBuilder);
+        return "CREATE TABLE %s (%s);".formatted(tableName, fieldsBuilder);
     }
 
     @Override

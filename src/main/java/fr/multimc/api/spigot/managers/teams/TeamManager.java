@@ -1,8 +1,7 @@
 package fr.multimc.api.spigot.managers.teams;
 
 import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.tables.PlayersTable;
-import fr.multimc.api.commons.old_database.tables.TeamsTable;
+import fr.multimc.api.commons.old_database.tables.GameTablesHandler;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,24 +12,22 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class TeamManager {
 
-    private final TeamsTable teamsTable;
-    private final PlayersTable playersTable;
+    private final GameTablesHandler tablesHandler;
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
     public TeamManager(@NotNull Database database) {
-        this.playersTable = new PlayersTable(database);
-        this.teamsTable = new TeamsTable(database, this.playersTable);
+        this.tablesHandler = new GameTablesHandler(database);
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
-        teamsTable.addTeam(teamCode, name, players);
+        this.tablesHandler.addTeam(teamCode, name, players);
     }
 
     public List<MmcTeam> loadTeams(){
         // Create teams
         this.mmcTeams.clear();
-        HashMap<String, List<String>> playersByTeam = playersTable.getPlayersByTeam();
-        HashMap<String, String> teamNames = teamsTable.getTeamNames();
+        HashMap<String, List<String>> playersByTeam = this.tablesHandler.getPlayersByTeam();
+        HashMap<String, String> teamNames = this.tablesHandler.getTeamNamesByTeam();
         // Iterate by team code
         for(String teamCode: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamCode);
@@ -70,10 +67,10 @@ public class TeamManager {
     }
 
     public void pushScores(@NotNull HashMap<String, Integer> localScores){
-        HashMap<String, Integer> currentScores = this.teamsTable.getCurrentScores();
+        HashMap<String, Integer> currentScores = this.tablesHandler.getScores();
         HashMap<String, Integer> newScores = new HashMap<>();
         localScores.forEach((teamCode, score) -> newScores.put(teamCode, currentScores.getOrDefault(teamCode, 0) + score));
-        this.teamsTable.updateScores(newScores);
+        this.tablesHandler.setScores(newScores);
     }
 
     public void pushTeamScores(@NotNull HashMap<MmcTeam, Integer> localScores){

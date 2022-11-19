@@ -22,6 +22,6 @@ public class PrimaryKeyConstraint implements IConstraint {
                 builder.append(", ");
             }
         }
-        return String.format("CONSTRAINT %s PRIMARY KEY (%s)", constraintName, builder);
+        return "CONSTRAINT %s PRIMARY KEY (%s)".formatted(constraintName, builder);
     }
 }

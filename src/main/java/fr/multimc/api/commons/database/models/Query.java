@@ -11,7 +11,7 @@ public abstract class Query {
     public abstract String getQuery(@NotNull DatabaseType databaseType);
     public abstract QueryResult execute(@NotNull Database database);
 
-    protected QueryResult execute(@NotNull Database database, QueryType queryType){
+    protected QueryResult execute(@NotNull Database database, @NotNull QueryType queryType){
         return database.executeQuery(this.getQuery(database.getDatabaseType()), queryType);
     }
 

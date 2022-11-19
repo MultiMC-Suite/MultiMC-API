@@ -22,13 +22,13 @@ public class PlayersTable extends Table {
 
     // Fields
     public static final String name = "players";
-    public static final Field teamCodeField = new Field("team_code", FieldType.VARCHAR, 6);
     public static final Field usernameField = new Field("username", FieldType.VARCHAR, 30, Property.NOT_NULL, Property.UNIQUE);
+    public static final Field teamCodeField = new Field("team_code", FieldType.VARCHAR, 6);
     public static final IConstraint pkConstraint = new PrimaryKeyConstraint("pk_players", usernameField);
     public static final IConstraint fkConstraint = new ForeignKeyConstraint("fk_players", teamCodeField, TeamsTable.name, TeamsTable.codeField);
 
     public PlayersTable(@NotNull Database database) {
-        super(database, name, List.of(teamCodeField, usernameField), List.of(pkConstraint, fkConstraint), false);
+        super(database, name, List.of(usernameField, teamCodeField), List.of(pkConstraint, fkConstraint), false);
     }
 
     public void addPlayer(String teamCode, String playerName){
@@ -64,7 +64,7 @@ public class PlayersTable extends Table {
 
     @Deprecated
     public List<String> getTeamMembersNames(String teamCode){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s = '%s'".formatted(teamCodeField.name(), teamCode), null, usernameField);
+        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s='%s'".formatted(teamCodeField.name(), teamCode), null, usernameField);
         QueryResult queryResult = selectTableQuery.execute(this.getDatabase());
         List<String> playersName = null;
         try (ResultSet resultSet = queryResult.resultSet()) {

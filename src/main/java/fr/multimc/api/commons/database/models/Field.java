@@ -16,6 +16,6 @@ public record Field(@NotNull String name, @NotNull FieldType type, int size, @No
     public String getField(DatabaseType databaseType){
         StringBuilder propertiesBuilder = new StringBuilder();
         Arrays.asList(properties).forEach(property -> propertiesBuilder.append(" ").append(property.getProperty(databaseType)));
-        return String.format("%s %s%s", name, type.getField(databaseType), propertiesBuilder);
+        return "%s %s%s".formatted(name, type.getField(databaseType), propertiesBuilder);
     }
 }

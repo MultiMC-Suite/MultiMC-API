@@ -10,7 +10,6 @@ import fr.multimc.api.commons.database.query.InsertQuery;
 import fr.multimc.api.commons.database.query.SelectTableQuery;
 import fr.multimc.api.commons.database.query.UpdateQuery;
 import fr.multimc.api.commons.old_database.Database;
-import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
 import fr.multimc.api.commons.old_database.query.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,25 +28,17 @@ public class TeamsTable extends Table {
     public static final Field scoreField = new Field("score", FieldType.INTEGER, Property.NOT_NULL);
     public static final IConstraint pkConstraint = new PrimaryKeyConstraint("pk_teams", codeField);
 
-    private final PlayersTable playersTable;
-
-    public TeamsTable(@NotNull Database database, PlayersTable playersTable) {
+    public TeamsTable(@NotNull Database database) {
         super(database, name, List.of(codeField, nameField, scoreField), List.of(pkConstraint), false);
-        this.playersTable = playersTable;
     }
 
-    public boolean addTeam(String teamCode, String teamName, String... playersName){
+    public QueryResult addTeam(String teamCode, String teamName, String... playersName){
         InsertQuery insertQuery = new InsertQuery(this.getName(), new HashMap<>() {{
             put(codeField, teamCode);
             put(nameField, teamName);
             put(scoreField, 0);
         }});
-        QueryResult queryResult = insertQuery.execute(this.getDatabase());
-        if(queryResult.queryStatus() == DatabaseStatus.SUCCESS){
-            this.playersTable.addPlayers(teamCode, playersName);
-            return true;
-        }
-        return false;
+        return insertQuery.execute(this.getDatabase());
     }
 
     @Deprecated
@@ -76,10 +67,6 @@ public class TeamsTable extends Table {
         return null;
     }
 
-    public PlayersTable getPlayersTable() {
-        return this.playersTable;
-    }
-
     public HashMap<String, String> getTeamNames() {
         SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), null, null, codeField, nameField);
         HashMap<String, String> teamNames = new HashMap<>();
@@ -95,7 +82,7 @@ public class TeamsTable extends Table {
         return teamNames;
     }
 
-    public HashMap<String, Integer> getCurrentScores(){
+    public HashMap<String, Integer> getScores(){
         SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), null, null, codeField, scoreField);
         HashMap<String, Integer> scores = new HashMap<>();
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
@@ -110,14 +97,14 @@ public class TeamsTable extends Table {
         return scores;
     }
 
-    public void updateScores(HashMap<String, Integer> scores){
+    public void setScores(HashMap<String, Integer> scores){
         StringBuilder playersQueryString = new StringBuilder();
         for(String teamCode : scores.keySet()){
-            updateScore(teamCode, scores.get(teamCode));
+            setScore(teamCode, scores.get(teamCode));
         }
     }
 
-    public void updateScore(String teamCode, int score){
+    private void setScore(String teamCode, int score){
         UpdateQuery updateQuery = new UpdateQuery(this.getName(), new HashMap<>() {{
             put(scoreField, score);
         }}, "%s='%s'".formatted(codeField.name(), teamCode));

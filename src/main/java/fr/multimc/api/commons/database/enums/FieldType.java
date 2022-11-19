@@ -7,22 +7,22 @@ import org.jetbrains.annotations.Nullable;
 public enum FieldType {
     INTEGER("INT"),
     BIGINT("BIGINT"),
-    VARCHAR("VARCHAR", "VARCHAR", 30);
+    VARCHAR("VARCHAR", 30);
 
     private final String mysql;
     private final String sqlite;
     private final int defaultSize;
 
     FieldType(@NotNull String field) {
-        this.mysql = field;
-        this.sqlite = field;
-        this.defaultSize = -1;
+        this(field, field, -1);
+    }
+
+    FieldType(@NotNull String field, int defaultSize) {
+        this(field, field, defaultSize);
     }
 
     FieldType(@NotNull String mysql, @NotNull String sqlite) {
-        this.mysql = mysql;
-        this.sqlite = sqlite;
-        this.defaultSize = -1;
+        this(mysql, sqlite, -1);
     }
 
     FieldType(@NotNull String mysql, @NotNull String sqlite, int defaultSize) {

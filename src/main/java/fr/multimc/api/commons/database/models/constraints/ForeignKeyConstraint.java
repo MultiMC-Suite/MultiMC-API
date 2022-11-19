@@ -20,6 +20,6 @@ public class ForeignKeyConstraint implements IConstraint {
 
     @Override
     public String getConstraint() {
-        return String.format("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)", constraintName, localField.name(), targetTableName, targetField.name());
+        return "CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)".formatted(constraintName, localField.name(), targetTableName, targetField.name());
     }
 }
