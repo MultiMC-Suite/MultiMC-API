@@ -100,7 +100,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         }else if(message.contains("push")){
             HashMap<String, Integer> scores = new HashMap<>();
             scores.put("T1", 16);
-            scores.put("T2", 15);
+//            scores.put("T2", 15);
             teamManager.pushScores(scores);
         }
     }
