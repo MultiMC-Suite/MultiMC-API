@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
 public class Instance extends BukkitRunnable{
 
     private final JavaPlugin plugin;
@@ -53,8 +53,6 @@ public class Instance extends BukkitRunnable{
         this.instanceLocation = instanceLocation;
         this.mmcTeams = new ArrayList<>(mmcTeams);
         this.instanceId = instanceId;
-
-
         this.instanceEntities = new ArrayList<>();
         this.remainingTime = this.instanceSettings.duration();
         this.players = this.getInstancePlayers();
