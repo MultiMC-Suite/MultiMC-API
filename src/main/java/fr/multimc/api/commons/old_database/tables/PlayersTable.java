@@ -64,7 +64,7 @@ public class PlayersTable extends Table {
 
     @Deprecated
     public List<String> getTeamMembersNames(String teamCode){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), String.format("%s = '%s'", teamCodeField.name(), teamCode), null, usernameField);
+        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s = '%s'".formatted(teamCodeField.name(), teamCode), null, usernameField);
         QueryResult queryResult = selectTableQuery.execute(this.getDatabase());
         List<String> playersName = null;
         try (ResultSet resultSet = queryResult.resultSet()) {

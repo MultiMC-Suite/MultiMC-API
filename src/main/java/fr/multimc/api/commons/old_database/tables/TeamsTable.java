@@ -8,12 +8,10 @@ import fr.multimc.api.commons.database.models.Field;
 import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.database.query.InsertQuery;
 import fr.multimc.api.commons.database.query.SelectTableQuery;
+import fr.multimc.api.commons.database.query.UpdateQuery;
 import fr.multimc.api.commons.old_database.Database;
 import fr.multimc.api.commons.old_database.enums.DatabaseStatus;
-import fr.multimc.api.commons.old_database.query.Query;
-import fr.multimc.api.commons.old_database.query.QueryBuilder;
 import fr.multimc.api.commons.old_database.query.QueryResult;
-import fr.multimc.api.commons.old_database.query.QueryType;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -54,7 +52,7 @@ public class TeamsTable extends Table {
 
     @Deprecated
     private String getTeamId(String teamName){
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), String.format("%s = '%s'", nameField.name(), teamName), null, codeField);
+        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s='%s'".formatted(nameField.name(), teamName), null, codeField);
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
             return resultSet.getString(codeField.name());
         } catch (SQLException e) {
@@ -65,7 +63,7 @@ public class TeamsTable extends Table {
 
     @Deprecated
     public String getTeamName(String teamCode) {
-        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), String.format("%s = '%s'", codeField.name(), teamCode), null, nameField);
+        SelectTableQuery selectTableQuery = new SelectTableQuery(this.getName(), "%s='%s'".formatted(codeField.name(), teamCode), null, nameField);
         try (ResultSet resultSet = selectTableQuery.execute(this.getDatabase()).resultSet()) {
             try {
                 return resultSet.getString(nameField.name());
@@ -115,11 +113,14 @@ public class TeamsTable extends Table {
     public void updateScores(HashMap<String, Integer> scores){
         StringBuilder playersQueryString = new StringBuilder();
         for(String teamCode : scores.keySet()){
-            Query playerQuery = new QueryBuilder()
-                    .setQueryType(QueryType.UPDATE)
-                    .setQuery(String.format("UPDATE %s SET score=%d WHERE code='%s';", this.getName(), scores.get(teamCode), teamCode))
-                    .getQuery();
-            this.getDatabase().executeQuery(playerQuery);
+            updateScore(teamCode, scores.get(teamCode));
         }
+    }
+
+    public void updateScore(String teamCode, int score){
+        UpdateQuery updateQuery = new UpdateQuery(this.getName(), new HashMap<>() {{
+            put(scoreField, score);
+        }}, "%s='%s'".formatted(codeField.name(), teamCode));
+        updateQuery.execute(this.getDatabase());
     }
 }
