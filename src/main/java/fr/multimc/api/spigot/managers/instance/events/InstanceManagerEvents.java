@@ -2,6 +2,7 @@ package fr.multimc.api.spigot.managers.instance.events;
 
 import fr.multimc.api.commons.tools.messages.ComponentBuilder;
 import fr.multimc.api.commons.tools.messages.enums.MessageType;
+import fr.multimc.api.spigot.managers.enums.ManagerState;
 import fr.multimc.api.spigot.managers.instance.Instance;
 import fr.multimc.api.spigot.managers.instance.InstancesManager;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
@@ -11,7 +12,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,7 +41,8 @@ public class InstanceManagerEvents implements Listener {
     @EventHandler
     public void onPLayerMove(PlayerMoveEvent e){
         if(!e.getPlayer().getWorld().equals(this.instancesManager.getGameWorld().getWorld())) return;
-        if(this.instancesManager.isStarted()) return;
+        if(this.instancesManager.getState() == ManagerState.STARTED) return;
+        if(this.instancesManager.isSpectator(new MmcPlayer(e.getPlayer()))) return;
         if(e.getFrom().distance(e.getTo()) > 0) e.setCancelled(true);
     }
 
@@ -49,7 +50,7 @@ public class InstanceManagerEvents implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
         MmcPlayer mmcPlayer = new MmcPlayer(player);
-        if(!this.instancesManager.isStarted()){
+        if(this.instancesManager.getState() != ManagerState.STARTING && this.instancesManager.getState() != ManagerState.STARTED){
             this.logger.info(String.format("Instance manager not started, teleporting player %s to lobby", mmcPlayer.getName()));
             mmcPlayer.teleport(this.instancesManager.getLobbyWorld().getSpawnPoint());
             player.getInventory().clear();
@@ -70,14 +71,17 @@ public class InstanceManagerEvents implements Listener {
             }
             return;
         }
-        this.logger.info(String.format("No instance found for player %s, make him a spectator", mmcPlayer.getName()));
-        player.setGameMode(GameMode.SPECTATOR);
+        if(e.getPlayer().getWorld().equals(this.instancesManager.getLobbyWorld().getWorld()) || e.getPlayer().getWorld().equals(this.instancesManager.getGameWorld().getWorld())){
+            this.logger.info(String.format("No instance found for player %s, make him a spectator", mmcPlayer.getName()));
+            this.instancesManager.addSpectator(mmcPlayer);
+        }
+
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent e){
         MmcPlayer mmcPlayer = new MmcPlayer(e.getPlayer());
-        if(!this.instancesManager.isStarted()) return;
+        if(this.instancesManager.getState() != ManagerState.STARTED) return;
         for(Instance instance : this.instancesManager.getInstances()){
             if(!instance.isPlayerOnInstance(mmcPlayer) || !instance.isRunning()) continue;
             this.logger.info(String.format("Disconnecting player %s to instance %d...", mmcPlayer.getName(), instance.getInstanceId()));
@@ -89,13 +93,13 @@ public class InstanceManagerEvents implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e){
         if(!e.getPlayer().getWorld().equals(this.instancesManager.getGameWorld().getWorld())) return;
-        if(!this.instancesManager.isStarted()) e.setCancelled(true);
+        if(this.instancesManager.getState() != ManagerState.STARTED) e.setCancelled(true);
     }
 
     @EventHandler
     public void onEntityDamaged(EntityDamageEvent e){
         if(!e.getEntity().getWorld().equals(this.instancesManager.getGameWorld().getWorld())) return;
-        if(!this.instancesManager.isStarted()) e.setCancelled(true);
+        if(this.instancesManager.getState() != ManagerState.STARTED) e.setCancelled(true);
     }
 
     @EventHandler
@@ -105,7 +109,7 @@ public class InstanceManagerEvents implements Listener {
         Player player = e.getPlayer();
         MmcPlayer mmcPlayer = new MmcPlayer(player);
         Component newMessage;
-        if(!this.instancesManager.isStarted()){
+        if(this.instancesManager.getState() != ManagerState.STARTED){
             newMessage = this.instancesManager.getMessageFactory().getChatMessage(MessageType.PREFIXED, Component.text(player.getName()), e.message(), null);
             for(Player _player: Bukkit.getOnlinePlayers()){
                 _player.sendMessage(newMessage);

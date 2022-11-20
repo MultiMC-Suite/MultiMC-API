@@ -1,13 +1,15 @@
 package fr.multimc.api.spigot.managers.instance;
 
 import fr.multimc.api.commons.tools.times.MmcTime;
+import fr.multimc.api.spigot.managers.enums.ManagerState;
 import fr.multimc.api.spigot.managers.instance.enums.InstanceState;
 import fr.multimc.api.spigot.managers.instance.events.InstanceManagerEvents;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
-import fr.multimc.api.commons.tools.messages.ComponentBuilder;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
 import fr.multimc.api.spigot.tools.settings.InstanceSettings;
+import fr.multimc.api.spigot.tools.utils.dispatcher.DispatchAlgorithm;
+import fr.multimc.api.spigot.tools.utils.dispatcher.Dispatcher;
 import fr.multimc.api.spigot.tools.worlds.MmcWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,6 +18,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @SuppressWarnings("unused")
 public class InstancesManager {
@@ -41,7 +45,7 @@ public class InstancesManager {
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
     private final Map<MmcPlayer, Integer> spectators = new HashMap<>();
 
-    private boolean isStarted = false;
+    private ManagerState managerState = ManagerState.IDLE;
     private int allocations = 0;
 
     /**
@@ -111,6 +115,7 @@ public class InstancesManager {
      * @param mmcTeams List of MmcTeam instances
      */
     private boolean startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
+        this.managerState = ManagerState.STARTING;
         // Reset instance manager
         this.instances.clear();
         this.instancesState.clear();
@@ -145,12 +150,15 @@ public class InstancesManager {
             this.logger.severe("No instance created");
             return false;
         }
+        // Set spectators
+        this.spectators.clear();
+        this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectators(), IntStream.rangeClosed(0, this.instances.size() - 1).boxed().collect(Collectors.toList())));
         // Init instances
         this.initInstances();
         // Start instances
         this.startInstances();
-        this.isStarted = true;
-        this.allocations = 0; // Reset allocated slots to reset maps
+        this.managerState = ManagerState.STARTED;
+        this.allocations = 0; // Reset allocated slots for next start
         this.logger.info("Instances manager started");
         return true;
     }
@@ -163,13 +171,16 @@ public class InstancesManager {
         long dtAvg = 0;
         for(int i = 0; i < this.instances.size(); i++){
             // Runnable
-            int finalI = i;
             long finalDtAvg = dtAvg;
+            String timeFormat = MmcTime.format(finalDtAvg * (this.instances.size() - i - 1), "mm:ss");
+            Component actionBarComponent = Component.text("Instance ").color(NamedTextColor.AQUA)
+                    .append(Component.text("%d/%d".formatted(i + 1, this.instances.size())).color(NamedTextColor.GOLD))
+                    .append(Component.text(" initialized (").color(NamedTextColor.AQUA))
+                    .append(Component.text(timeFormat).color(NamedTextColor.YELLOW))
+                    .append(Component.text(" remaining)").color(NamedTextColor.DARK_AQUA));
             int taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, () ->
-                    this.sendTeamActionBar(new ComponentBuilder(String.format("&bInstance &6%d/%d &binitialized (&e%s&3 remaining)",
-                            finalI + 1,
-                            this.instances.size(),
-                            MmcTime.format(finalDtAvg * (this.instances.size() - finalI - 1), "mm:ss"))).build()), 0L, 20L); // 20 ticks = 1 second
+                    this.sendTeamActionBar(actionBarComponent, true),
+                    0L, 20L);
             // Instance loading
             dt = this.initInstance(this.instances.get(i), this.instances.get(i).getInstanceId());
             if(dtAvg == 0){
@@ -178,14 +189,27 @@ public class InstancesManager {
             dtAvg = (dtAvg + dt) / 2;
             Bukkit.getScheduler().cancelTask(taskID);
         }
-        this.getSpectators().forEach(player -> {
-            player.teleportSync(this.plugin, this.gameWorld.getSpawnPoint());
-            player.setGameModeSync(this.plugin, GameMode.SPECTATOR);
+        this.spectators.forEach((mmcPlayer, integer) -> {
+            Instance instance = this.getInstanceFromId(integer);
+            if(Objects.nonNull(instance))
+                mmcPlayer.teleportSync(this.plugin, instance.getInstanceLocation());
+            else
+                mmcPlayer.teleportSync(this.plugin, this.gameWorld.getSpawnPoint());
+            mmcPlayer.setGameModeSync(this.plugin, GameMode.SPECTATOR);
         });
         for(int i = 5; i >= 0; i--){
             Thread.sleep(1000);
-            if (i != 0) this.sendTeamTitle(new ComponentBuilder(String.format("&6%d", i)).build(), new ComponentBuilder("&7Get ready...").build());
-            else this.sendTeamTitle(new ComponentBuilder("&fLet's &bGO!").build(), null);
+            Component titleComponent;
+            Component subTitleComponent;
+            if (i != 0){
+                titleComponent = Component.text(i).color(NamedTextColor.GOLD);
+                subTitleComponent = Component.text("Get ready...").color(NamedTextColor.GRAY);
+            }else{
+                titleComponent = Component.text("Let's").color(NamedTextColor.WHITE)
+                        .append(Component.text(" GO!").color(NamedTextColor.AQUA));
+                subTitleComponent = null;
+            }
+            this.sendTeamTitle(titleComponent, subTitleComponent, true);
             this.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
         }
     }
@@ -262,14 +286,13 @@ public class InstancesManager {
      * Reset the instances manager
      */
     public void stopManager(){
+        this.managerState = ManagerState.STOPPING;
         this.stopInstances();
-        for(MmcPlayer player: this.getSpectators()){
-            player.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false);
-        }
+        this.spectators.keySet().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint()));
         for(MmcTeam mmcTeam: this.mmcTeams){
-            mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint(), false));
+            mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint()));
         }
-        this.isStarted = false;
+        this.managerState = ManagerState.STOPPED;
     }
 
     /**
@@ -286,7 +309,18 @@ public class InstancesManager {
      * @param subtitle Subtitle to send
      */
     private void sendTeamTitle(@Nullable Component title, @Nullable Component subtitle) {
+        this.sendTeamTitle(title, subtitle, false);
+    }
+
+    /**
+     * Send title to all teams
+     * @param title Title to send
+     * @param subtitle Subtitle to send
+     * @param includeSpectators If spectators should receive the title
+     */
+    private void sendTeamTitle(@Nullable Component title, @Nullable Component subtitle, boolean includeSpectators) {
         mmcTeams.forEach(mmcTeam -> mmcTeam.sendTitle(title, subtitle));
+        if(includeSpectators) this.spectators.keySet().forEach(mmcPlayer -> mmcPlayer.sendTitle(title, subtitle));
     }
 
     /**
@@ -294,7 +328,17 @@ public class InstancesManager {
      * @param actionBar Action bar to send
      */
     private void sendTeamActionBar(@NotNull Component actionBar) {
+        this.sendTeamActionBar(actionBar, false);
+    }
+
+    /**
+     * Send action bar to all teams
+     * @param actionBar Action bar to send
+     * @param includeSpectators If spectators should receive the action bar
+     */
+    private void sendTeamActionBar(@NotNull Component actionBar, boolean includeSpectators) {
         mmcTeams.forEach(mmcTeam -> mmcTeam.sendActionBar(actionBar));
+        if(includeSpectators) this.spectators.keySet().forEach(mmcPlayer -> mmcPlayer.sendActionBar(actionBar));
     }
 
     /**
@@ -348,10 +392,12 @@ public class InstancesManager {
         List<MmcPlayer> instancePlayers = new ArrayList<>();
         mmcTeams.forEach(mmcTeam -> instancePlayers.addAll(mmcTeam.getPlayers()));
         List<MmcPlayer> spectators = new ArrayList<>();
-        Bukkit.getOnlinePlayers()
-                .stream()
-                .filter(player -> instancePlayers.stream().noneMatch(mmcPlayer -> mmcPlayer.equals(new MmcPlayer(player))))
-                .forEach(player -> spectators.add(new MmcPlayer(player)));
+        for(Player player : Bukkit.getOnlinePlayers()){
+            if(instancePlayers.contains(new MmcPlayer(player))) continue;
+            if(player.getWorld().equals(this.lobbyWorld.getWorld()) || player.getWorld().equals(this.gameWorld.getWorld())){
+                spectators.add(new MmcPlayer(player));
+            }
+        }
         return spectators;
     }
 
@@ -406,8 +452,23 @@ public class InstancesManager {
         return this.instances.stream().filter(instance -> instance.getPlayers().contains(mmcPlayer)).findFirst().orElse(null);
     }
 
-    public boolean isSpectator(@Nullable MmcPlayer player){
-        return this.getSpectators().contains(player);
+    /**
+     * Get an instance from its id
+     * @param instanceId Target id
+     * @return Instance object
+     */
+    private Instance getInstanceFromId(int instanceId){
+        return this.instances.stream().filter(instance -> instance.getInstanceId() == instanceId).findFirst().orElse(this.instances.get(0));
+    }
+
+    public void addSpectator(@NotNull MmcPlayer mmcPlayer){
+        if(!this.spectators.containsKey(mmcPlayer)) this.spectators.put(mmcPlayer, 0);
+        mmcPlayer.setGameModeSync(this.plugin, GameMode.SPECTATOR);
+        mmcPlayer.teleportSync(this.plugin, this.getInstanceFromId(this.spectators.get(mmcPlayer)).getInstanceLocation());
+    }
+
+    public boolean isSpectator(@NotNull MmcPlayer player){
+        return this.spectators.keySet().stream().anyMatch(player::equals);
     }
     public MmcWorld getLobbyWorld(){
         return this.lobbyWorld;
@@ -415,8 +476,8 @@ public class InstancesManager {
     public MmcWorld getGameWorld(){
         return this.gameWorld;
     }
-    public boolean isStarted() {
-        return this.isStarted;
+    public ManagerState getState() {
+        return this.managerState;
     }
 
     public List<Instance> getInstances() {

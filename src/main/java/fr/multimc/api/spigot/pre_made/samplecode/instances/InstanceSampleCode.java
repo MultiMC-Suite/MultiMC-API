@@ -65,6 +65,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
                 null,
                 Difficulty.PEACEFUL,
                 GameMode.ADVENTURE);
+        lobbyWorldSettings.addPrevention(WorldPrevention.ALL);
         WorldSettings gameWorldSettings = new WorldSettings(
                 "multimc_game");
         gameWorldSettings.addPrevention(WorldPrevention.ALL);
