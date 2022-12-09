@@ -27,6 +27,8 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
         cache: maven
+        server-username: Xen0Xys
+        server-password: GITHUB_TOKEN
     - name: Maven deploy
       run: mvn deploy
       env:
