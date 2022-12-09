@@ -17,7 +17,7 @@ jobs:
       run: mvn verify
   deploy:
     runs-on: ubuntu-latest
-    if: ${{github.ref == 'refs/heads/main'}}
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: [build]
     steps:
     - uses: actions/checkout@v3
@@ -30,4 +30,4 @@ jobs:
     - name: Maven deploy
       run: mvn deploy
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
