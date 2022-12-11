@@ -5,8 +5,8 @@ import fr.multimc.api.commons.database.enums.SQLState;
 import fr.multimc.api.commons.database.query.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameTablesHandler {
     private final TeamsTable teamsTable;
@@ -25,19 +25,19 @@ public class GameTablesHandler {
         }
     }
 
-    public HashMap<String, List<String>> getPlayersByTeam(){
+    public Map<String, List<String>> getPlayersByTeam(){
         return this.playersTable.getPlayersByTeam();
     }
 
-    public HashMap<String, String> getTeamNamesByTeam(){
+    public Map<String, String> getTeamNamesByTeam(){
         return this.teamsTable.getTeamNames();
     }
 
-    public HashMap<String, Integer> getScores(){
+    public Map<String, Integer> getScores(){
         return this.teamsTable.getScores();
     }
 
-    public void setScores(HashMap<String, Integer> scores){
+    public void setScores(Map<String, Integer> scores){
         this.teamsTable.setScores(scores);
     }
 }

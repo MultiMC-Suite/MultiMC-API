@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class TeamManager {
@@ -26,8 +27,8 @@ public class TeamManager {
     public List<MmcTeam> loadTeams(){
         // Create teams
         this.mmcTeams.clear();
-        HashMap<String, List<String>> playersByTeam = this.tablesHandler.getPlayersByTeam();
-        HashMap<String, String> teamNames = this.tablesHandler.getTeamNamesByTeam();
+        Map<String, List<String>> playersByTeam = this.tablesHandler.getPlayersByTeam();
+        Map<String, String> teamNames = this.tablesHandler.getTeamNamesByTeam();
         // Iterate by team code
         for(String teamCode: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamCode);
@@ -66,15 +67,15 @@ public class TeamManager {
         return null;
     }
 
-    public void pushScores(@NotNull HashMap<String, Integer> localScores){
-        HashMap<String, Integer> currentScores = this.tablesHandler.getScores();
-        HashMap<String, Integer> newScores = new HashMap<>();
+    public void pushScores(@NotNull Map<String, Integer> localScores){
+        Map<String, Integer> currentScores = this.tablesHandler.getScores();
+        Map<String, Integer> newScores = new HashMap<>();
         localScores.forEach((teamCode, score) -> newScores.put(teamCode, currentScores.getOrDefault(teamCode, 0) + score));
         this.tablesHandler.setScores(newScores);
     }
 
-    public void pushTeamScores(@NotNull HashMap<MmcTeam, Integer> localScores){
-        HashMap<String, Integer> currentScores = new HashMap<>();
+    public void pushTeamScores(@NotNull Map<MmcTeam, Integer> localScores){
+        Map<String, Integer> currentScores = new HashMap<>();
         localScores.forEach((team, score) -> currentScores.put(team.getTeamCode(), score));
         this.pushScores(currentScores);
     }

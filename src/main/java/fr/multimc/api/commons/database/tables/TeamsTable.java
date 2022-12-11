@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TeamsTable extends Table {
@@ -67,9 +68,9 @@ public class TeamsTable extends Table {
         return null;
     }
 
-    public HashMap<String, String> getTeamNames() {
+    public Map<String, String> getTeamNames() {
         SelectQuery selectQuery = new SelectQuery(this.getName(), null, null, codeField, nameField);
-        HashMap<String, String> teamNames = new HashMap<>();
+        Map<String, String> teamNames = new HashMap<>();
         try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
                 String code = resultSet.getString(codeField.name());
@@ -82,9 +83,9 @@ public class TeamsTable extends Table {
         return teamNames;
     }
 
-    public HashMap<String, Integer> getScores(){
+    public Map<String, Integer> getScores(){
         SelectQuery selectQuery = new SelectQuery(this.getName(), null, null, codeField, scoreField);
-        HashMap<String, Integer> scores = new HashMap<>();
+        Map<String, Integer> scores = new HashMap<>();
         try (ResultSet resultSet = selectQuery.execute(this.getDatabase()).resultSet()) {
             while (resultSet.next()) {
                 String code = resultSet.getString(codeField.name());
@@ -97,7 +98,7 @@ public class TeamsTable extends Table {
         return scores;
     }
 
-    public void setScores(HashMap<String, Integer> scores){
+    public void setScores(Map<String, Integer> scores){
         StringBuilder playersQueryString = new StringBuilder();
         for(String teamCode : scores.keySet()){
             setScore(teamCode, scores.get(teamCode));
