@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.logging.Logger;
 
@@ -75,9 +76,10 @@ public class GamesManagerEvents implements Listener {
             }
             return;
         }
+        // If player spawn in lobby or game world, set him as a spectator
         if(e.getPlayer().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld()) || e.getPlayer().getWorld().equals(this.gamesManager.getGameWorld().getWorld())){
             this.logger.info(String.format("No instance found for player %s, make him a spectator", mmcPlayer.getName()));
-            this.gamesManager.addSpectator(mmcPlayer);
+            this.gamesManager.addSpectator(mmcPlayer, 0);
         }
 
     }
@@ -150,6 +152,47 @@ public class GamesManagerEvents implements Listener {
                 default -> player.sendMessage(Component.text("Game type not supported").color(NamedTextColor.RED));
             }
             return;
+        }
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e){
+        if(e.getCause() != PlayerTeleportEvent.TeleportCause.SPECTATE) return;
+        Player player = e.getPlayer();
+        Player targetPlayer = e.getTo().getWorld().getPlayers().get(0);
+        for(Player worldPlayer : e.getTo().getWorld().getPlayers()){
+            if(worldPlayer.getLocation().distance(e.getTo()) < targetPlayer.getLocation().distance(e.getTo())){
+                targetPlayer = worldPlayer;
+            }
+        }
+        // If player go to another manager, remove him from spectators and stop here
+        if(!e.getTo().getWorld().equals(this.gamesManager.getGameWorld().getWorld())){
+            this.gamesManager.getSpectators().remove(new MmcPlayer(e.getPlayer()));
+            return;
+        }
+        // If player came from another manager, to this manager, set him as a manager's spectator
+        if(!e.getFrom().getWorld().equals(this.gamesManager.getGameWorld().getWorld()) && !e.getFrom().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld())){
+            if(e.getTo().getWorld().equals(this.gamesManager.getGameWorld().getWorld()) || e.getTo().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld())){
+                this.logger.info(String.format("Player %s came from another manager, make him a spectator", e.getPlayer().getName()));
+                this.gamesManager.addSpectator(new MmcPlayer(e.getPlayer()), 0);
+            }
+        }
+
+        // If target player is a spectator, set him spectate the same instance
+        if(gamesManager.isSpectator(new MmcPlayer(targetPlayer))){
+            int targetGameInstanceId = gamesManager.getSpectators().get(new MmcPlayer(targetPlayer));
+            gamesManager.getSpectators().replace(new MmcPlayer(player), targetGameInstanceId);
+            System.out.println("Player " + player.getName() + " is now spectating instance " + targetGameInstanceId);
+        }
+        // Else if target player is a game player, set him spectate his game
+        else{
+            for(GameInstance instance : gamesManager.getInstances()){
+                if(instance.isPlayerOnInstance(new MmcPlayer(targetPlayer))){
+                    gamesManager.getSpectators().replace(new MmcPlayer(player), instance.getInstanceId());
+                    System.out.println("Player " + player.getName() + " is now spectating instance " + instance.getInstanceId());
+                    return;
+                }
+            }
         }
     }
 

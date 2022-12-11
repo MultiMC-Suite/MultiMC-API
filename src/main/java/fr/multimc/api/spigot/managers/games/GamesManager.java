@@ -152,7 +152,7 @@ public class GamesManager {
         }
         // Set spectators
         this.spectators.clear();
-        this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectators(), IntStream.rangeClosed(0, this.gameInstances.size() - 1).boxed().collect(Collectors.toList())));
+        this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectatorList(), IntStream.rangeClosed(0, this.gameInstances.size() - 1).boxed().collect(Collectors.toList())));
         // Init instances
         this.initInstances();
         // Start instances
@@ -288,10 +288,9 @@ public class GamesManager {
     public void stopManager(){
         this.managerState = ManagerState.STOPPING;
         this.stopInstances();
+        // Teleport all spectators and players to the lobby
         this.spectators.keySet().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint()));
-        for(MmcTeam mmcTeam: this.mmcTeams){
-            mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint()));
-        }
+        this.mmcTeams.forEach(mmcTeam -> mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint())));
         this.managerState = ManagerState.STOPPED;
     }
 
@@ -351,7 +350,7 @@ public class GamesManager {
     }
 
     /**
-     * Get teams of 1 players (for solo game type)
+     * Get teams of 1 player (for solo game type)
      * @return List of teams with only 1 player into
      */
     private List<MmcTeam> getOnePlayerTeams(){
@@ -387,7 +386,7 @@ public class GamesManager {
      * Get the list of spectators
      * @return List of spectators
      */
-    private List<MmcPlayer> getSpectators() {
+    private List<MmcPlayer> getSpectatorList() {
         // Get all players on an instance
         List<MmcPlayer> instancePlayers = new ArrayList<>();
         mmcTeams.forEach(mmcTeam -> instancePlayers.addAll(mmcTeam.getPlayers()));
@@ -461,8 +460,8 @@ public class GamesManager {
         return this.gameInstances.stream().filter(gameInstance -> gameInstance.getInstanceId() == instanceId).findFirst().orElse(this.gameInstances.get(0));
     }
 
-    public void addSpectator(@NotNull MmcPlayer mmcPlayer){
-        if(!this.spectators.containsKey(mmcPlayer)) this.spectators.put(mmcPlayer, 0);
+    public void addSpectator(@NotNull MmcPlayer mmcPlayer, int instanceId){
+        if(!this.spectators.containsKey(mmcPlayer)) this.spectators.put(mmcPlayer, instanceId);
         mmcPlayer.setGameModeSync(this.plugin, GameMode.SPECTATOR);
         mmcPlayer.teleportSync(this.plugin, this.getInstanceFromId(this.spectators.get(mmcPlayer)).getInstanceLocation());
     }
@@ -490,5 +489,9 @@ public class GamesManager {
     
     public InstanceSettings getSettings() {
         return settings;
+    }
+
+    public Map<MmcPlayer, Integer> getSpectators() {
+        return spectators;
     }
 }
