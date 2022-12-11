@@ -4,13 +4,13 @@ import fr.multimc.api.commons.tools.times.MmcTime;
 import fr.multimc.api.spigot.managers.enums.ManagerState;
 import fr.multimc.api.spigot.managers.games.enums.GameState;
 import fr.multimc.api.spigot.managers.games.events.GamesManagerEvents;
+import fr.multimc.api.spigot.managers.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
-import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
-import fr.multimc.api.spigot.tools.settings.InstanceSettings;
 import fr.multimc.api.spigot.tools.utils.dispatcher.DispatchAlgorithm;
 import fr.multimc.api.spigot.tools.utils.dispatcher.Dispatcher;
-import fr.multimc.api.spigot.tools.worlds.MmcWorld;
+import fr.multimc.api.spigot.worlds.MmcWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -36,7 +36,7 @@ public class GamesManager {
     private final Logger logger;
     private final MessagesFactory factory;
     private final Class<? extends GameInstance> instanceClass;
-    private final InstanceSettings settings;
+    private final GameSettings settings;
     private final MmcWorld lobbyWorld;
     private final MmcWorld gameWorld;
 
@@ -58,7 +58,7 @@ public class GamesManager {
      */
     public GamesManager(@NotNull JavaPlugin plugin,
                         @NotNull Class<? extends GameInstance> instanceClass,
-                        @NotNull InstanceSettings settings,
+                        @NotNull GameSettings settings,
                         @Nullable MessagesFactory messagesFactory,
                         @NotNull MmcWorld lobbyWorld,
                         @NotNull MmcWorld gameWorld) {
@@ -487,7 +487,7 @@ public class GamesManager {
         return this.factory;
     }
     
-    public InstanceSettings getSettings() {
+    public GameSettings getSettings() {
         return settings;
     }
 

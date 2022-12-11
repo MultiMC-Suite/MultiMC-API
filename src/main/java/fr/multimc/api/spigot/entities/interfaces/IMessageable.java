@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.entities.interfaces;
+package fr.multimc.api.spigot.entities.interfaces;
 
 @SuppressWarnings("unused")
 public interface IMessageable {

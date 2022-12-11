@@ -1,6 +1,6 @@
-package fr.multimc.api.spigot.tools.entities.interfaces;
+package fr.multimc.api.spigot.entities.interfaces;
 
-import fr.multimc.api.spigot.tools.entities.player.PlayerSpeed;
+import fr.multimc.api.spigot.entities.player.PlayerSpeed;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")

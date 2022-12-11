@@ -1,6 +1,6 @@
-package fr.multimc.api.spigot.tools.entities;
+package fr.multimc.api.spigot.entities;
 
-import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;

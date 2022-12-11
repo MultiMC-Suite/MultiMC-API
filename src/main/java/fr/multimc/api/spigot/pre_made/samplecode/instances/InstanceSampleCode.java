@@ -2,20 +2,20 @@ package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
 import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.spigot.managers.games.enums.GameType;
-import fr.multimc.api.spigot.tools.settings.InstanceSettings;
+import fr.multimc.api.spigot.managers.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.games.GamesManager;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
-import fr.multimc.api.spigot.tools.settings.enums.WorldPrevention;
-import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
-import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
-import fr.multimc.api.spigot.tools.worlds.schematics.SchematicOptions;
+import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
+import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.worlds.schematics.Schematic;
+import fr.multimc.api.spigot.worlds.schematics.SchematicOptions;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
-import fr.multimc.api.spigot.tools.worlds.MmcWorld;
-import fr.multimc.api.spigot.tools.settings.WorldSettings;
+import fr.multimc.api.spigot.worlds.MmcWorld;
+import fr.multimc.api.spigot.worlds.settings.WorldSettings;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -50,7 +50,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         MessagesFactory factory = new MessagesFactory(Component.text("InstanceSample").color(NamedTextColor.YELLOW));
 
         Schematic schematic = new Schematic(plugin, "instances_test", new SchematicOptions());
-        InstanceSettings settings = new InstanceSettings(
+        GameSettings settings = new GameSettings(
                 schematic,
                 GameType.SOLO,
                 List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),

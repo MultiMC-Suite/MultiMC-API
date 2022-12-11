@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.worlds.locations;
+package fr.multimc.api.spigot.worlds.locations;
 
 import fr.multimc.api.commons.tools.compares.MathNumber;
 import org.bukkit.Location;

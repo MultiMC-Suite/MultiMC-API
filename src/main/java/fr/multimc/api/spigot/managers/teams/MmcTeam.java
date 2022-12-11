@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.managers.teams;
 
-import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

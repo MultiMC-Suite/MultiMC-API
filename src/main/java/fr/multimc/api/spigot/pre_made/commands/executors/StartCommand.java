@@ -3,7 +3,7 @@ package fr.multimc.api.spigot.pre_made.commands.executors;
 import fr.multimc.api.spigot.managers.games.GamesManager;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
-import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.tools.utils.dispatcher.DispatchAlgorithm;
 import fr.multimc.api.spigot.tools.utils.dispatcher.Dispatcher;
 import org.bukkit.Bukkit;

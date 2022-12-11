@@ -2,12 +2,12 @@ package fr.multimc.api.spigot.managers.games;
 
 import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.managers.games.enums.GameState;
+import fr.multimc.api.spigot.managers.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
-import fr.multimc.api.spigot.tools.entities.MmcEntity;
-import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.tools.settings.InstanceSettings;
-import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
-import fr.multimc.api.spigot.tools.worlds.schematics.Schematic;
+import fr.multimc.api.spigot.entities.MmcEntity;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.worlds.schematics.Schematic;
 import fr.multimc.api.spigot.tools.utils.dispatcher.DispatchAlgorithm;
 import fr.multimc.api.spigot.tools.utils.dispatcher.Dispatcher;
 import net.kyori.adventure.text.Component;
@@ -28,7 +28,7 @@ public class GameInstance extends BukkitRunnable{
 
     private final JavaPlugin plugin;
     private final GamesManager gamesManager;
-    private final InstanceSettings instanceSettings;
+    private final GameSettings gameSettings;
     private final Location instanceLocation;
     private final int instanceId;
 
@@ -45,16 +45,16 @@ public class GameInstance extends BukkitRunnable{
     private boolean isRunning = false;
     private int remainingTime;
 
-    public GameInstance(JavaPlugin plugin, GamesManager gamesManager, InstanceSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
+    public GameInstance(JavaPlugin plugin, GamesManager gamesManager, GameSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
         this.plugin = plugin;
         this.gamesManager = gamesManager;
         this.updateState(GameState.PRE_CREATE);
-        this.instanceSettings = settings;
+        this.gameSettings = settings;
         this.instanceLocation = instanceLocation;
         this.mmcTeams = new ArrayList<>(mmcTeams);
         this.instanceId = instanceId;
         this.instanceEntities = new ArrayList<>();
-        this.remainingTime = this.instanceSettings.duration();
+        this.remainingTime = this.gameSettings.duration();
         this.players = this.getInstancePlayers();
         this.playerSpawns = this.getPlayerSpawnsList();
         this.updateState(GameState.CREATE);
@@ -80,7 +80,7 @@ public class GameInstance extends BukkitRunnable{
         // Paste schematic
         if(!isPreAllocated){
             this.updateState(GameState.PRE_ALLOCATE);
-            GameInstance.allocate(instanceSettings.schematic(), instanceLocation);
+            GameInstance.allocate(gameSettings.schematic(), instanceLocation);
             this.updateState(GameState.ALLOCATE);
         }
         this.updateState(GameState.PRE_INIT);
@@ -93,7 +93,7 @@ public class GameInstance extends BukkitRunnable{
             }
         }
         // Spawn entities
-        for(MmcEntity entity : instanceSettings.entities()){
+        for(MmcEntity entity : gameSettings.entities()){
             instanceEntities.add(entity.spawn(instanceLocation, this.instanceId));
         }
         this.updateState(GameState.INIT);
@@ -150,7 +150,7 @@ public class GameInstance extends BukkitRunnable{
         this.instanceEntities.forEach(Entity::remove);
         this.instanceEntities.clear();
         // Reset time
-        this.remainingTime = this.instanceSettings.duration();
+        this.remainingTime = this.gameSettings.duration();
     }
 
     /**
@@ -165,7 +165,7 @@ public class GameInstance extends BukkitRunnable{
     @Override
     public void run(){
         this.isRunning = true;
-        double deltaTick = 0.05 * this.instanceSettings.tickDelay();
+        double deltaTick = 0.05 * this.gameSettings.tickDelay();
         long lastTickTime;
         long lastSecondTime;
         long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
@@ -261,7 +261,7 @@ public class GameInstance extends BukkitRunnable{
     private Map<UUID, Location> getPlayerSpawnsList(){
         // TODO: need tests
         Map<UUID, Location> playerSpawns = new HashMap<>();
-        switch(this.instanceSettings.gameType()) {
+        switch(this.gameSettings.gameType()) {
             case SOLO -> playerSpawns.put(this.mmcTeams.get(0).getPlayers().get(0).getUUID(), this.getSpawnPoints().get(0));
             case ONLY_TEAM -> {
                 List<Location> locations = this.getSpawnPoints();
@@ -305,7 +305,7 @@ public class GameInstance extends BukkitRunnable{
      */
     private List<Location> getSpawnPoints(){
         List<Location> spawnPoints = new ArrayList<>();
-        for(RelativeLocation customLocation : this.instanceSettings.spawnPoints()){
+        for(RelativeLocation customLocation : this.gameSettings.spawnPoints()){
             spawnPoints.add(customLocation.toAbsolute(this.instanceLocation));
         }
         return spawnPoints;
@@ -329,8 +329,8 @@ public class GameInstance extends BukkitRunnable{
     }
 
     // PUBLIC GETTERS
-    public InstanceSettings getInstanceSettings() {
-        return instanceSettings;
+    public GameSettings getInstanceSettings() {
+        return gameSettings;
     }
     public Location getInstanceLocation() {
         return instanceLocation;

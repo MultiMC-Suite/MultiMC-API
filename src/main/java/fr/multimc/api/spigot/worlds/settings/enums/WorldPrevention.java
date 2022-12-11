@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.settings.enums;
+package fr.multimc.api.spigot.worlds.settings.enums;
 
 public enum WorldPrevention {
     ALL,

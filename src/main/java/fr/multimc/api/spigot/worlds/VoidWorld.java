@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.worlds;
+package fr.multimc.api.spigot.worlds;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;

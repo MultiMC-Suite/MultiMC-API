@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.tools.entities.player;
+package fr.multimc.api.spigot.entities.player;
 
 import java.util.Arrays;
 import java.util.Optional;

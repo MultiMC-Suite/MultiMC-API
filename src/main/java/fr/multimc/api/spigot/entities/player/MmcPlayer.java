@@ -1,11 +1,11 @@
-package fr.multimc.api.spigot.tools.entities.player;
+package fr.multimc.api.spigot.entities.player;
 
-import fr.multimc.api.spigot.tools.entities.interfaces.IHasGameMode;
-import fr.multimc.api.spigot.tools.entities.interfaces.IHasSpeed;
-import fr.multimc.api.spigot.tools.entities.interfaces.ITeleportable;
+import fr.multimc.api.spigot.entities.interfaces.IHasGameMode;
+import fr.multimc.api.spigot.entities.interfaces.IHasSpeed;
+import fr.multimc.api.spigot.entities.interfaces.ITeleportable;
 import fr.multimc.api.commons.tools.messages.ComponentBuilder;
 import fr.multimc.api.spigot.tools.items.ItemBuilder;
-import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;

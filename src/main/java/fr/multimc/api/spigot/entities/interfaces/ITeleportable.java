@@ -1,7 +1,7 @@
-package fr.multimc.api.spigot.tools.entities.interfaces;
+package fr.multimc.api.spigot.entities.interfaces;
 
-import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.tools.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
