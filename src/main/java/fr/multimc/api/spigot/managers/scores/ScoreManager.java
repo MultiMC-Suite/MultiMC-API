@@ -23,10 +23,19 @@ public class ScoreManager {
     /**
      * Set a new score to a team
      * @param team MmcTeam object
-     * @param scoreChange The score to add
+     * @param newScore The new score to set
      */
-    public void updateScore(MmcTeam team, int scoreChange) {
-        scores.put(team, scores.get(team) + scoreChange);
+    public void updateScore(MmcTeam team, int newScore) {
+        scores.put(team, newScore);
+    }
+
+    /**
+     * Add a score to a team
+     * @param team MmcTeam object
+     * @param scoreAddition The score to add
+     */
+    public void addScore(MmcTeam team, int scoreAddition) {
+        scores.put(team, scores.get(team) + scoreAddition);
     }
 
     /**
