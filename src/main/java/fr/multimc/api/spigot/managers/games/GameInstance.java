@@ -63,9 +63,9 @@ public class GameInstance extends BukkitRunnable{
     // GAME ACTIONS
 
     /**
-     * Past the schematic for the instance (can be called for pre-allocation too)
+     * Past the gameSchematic for the instance (can be called for pre-allocation too)
      * @param schematic Schematic to paste
-     * @param location Location to paste the schematic
+     * @param location Location to paste the gameSchematic
      */
     public static void allocate(Schematic schematic, Location location) {
         schematic.getOptions().setLocation(location);
@@ -77,10 +77,10 @@ public class GameInstance extends BukkitRunnable{
      */
     public void init(boolean isPreAllocated){
         if(this.gameState == GameState.PRE_INIT || this.gameState == GameState.INIT) return;
-        // Paste schematic
+        // Paste gameSchematic
         if(!isPreAllocated){
             this.updateState(GameState.PRE_ALLOCATE);
-            GameInstance.allocate(gameSettings.schematic(), instanceLocation);
+            GameInstance.allocate(gameSettings.gameSchematic(), instanceLocation);
             this.updateState(GameState.ALLOCATE);
         }
         this.updateState(GameState.PRE_INIT);
@@ -242,7 +242,7 @@ public class GameInstance extends BukkitRunnable{
     }
 
     /**
-     * Paste instance schematic
+     * Paste instance gameSchematic
      * @param schematic Schematic object
      */
     private static void pasteSchematic(@NotNull Schematic schematic){

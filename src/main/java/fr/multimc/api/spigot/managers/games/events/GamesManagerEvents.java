@@ -125,7 +125,7 @@ public class GamesManagerEvents implements Listener {
         for(GameInstance gameInstance : this.gamesManager.getInstances()){
             if(!gameInstance.isPlayerOnInstance(new MmcPlayer(player))) continue;
             MmcTeam team = this.gamesManager.getTeamFromPlayer(mmcPlayer);
-            switch (this.gamesManager.getSettings().gameType()) {
+            switch (this.gamesManager.getGameSettings().gameType()) {
                 case SOLO, ONLY_TEAM -> {
                     // Send message to player's team
                     if (team == null) return;

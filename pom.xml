@@ -91,9 +91,19 @@
             <version>7.18.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.MegavexNetwork</groupId>
-            <artifactId>scoreboard-library</artifactId>
-            <version>730f9794c5</version>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>api</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>implementation</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>v1_19_R2</artifactId>
+            <version>2.0.0-RC1</version>
         </dependency>
     </dependencies>
 

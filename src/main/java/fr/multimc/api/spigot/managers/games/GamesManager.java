@@ -5,6 +5,7 @@ import fr.multimc.api.spigot.managers.enums.ManagerState;
 import fr.multimc.api.spigot.managers.games.enums.GameState;
 import fr.multimc.api.spigot.managers.games.events.GamesManagerEvents;
 import fr.multimc.api.spigot.managers.games.settings.GameSettings;
+import fr.multimc.api.spigot.managers.games.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
@@ -34,11 +35,7 @@ public class GamesManager {
 
     private final JavaPlugin plugin;
     private final Logger logger;
-    private final MessagesFactory factory;
-    private final Class<? extends GameInstance> instanceClass;
-    private final GameSettings settings;
-    private final MmcWorld lobbyWorld;
-    private final MmcWorld gameWorld;
+    private final GamesManagerSettings managerSettings;
 
     private final List<GameInstance> gameInstances = new ArrayList<>();
     private final HashMap<Integer, GameState> instancesState = new HashMap<>();
@@ -51,25 +48,12 @@ public class GamesManager {
     /**
      * Default constructor for the InstancesManager
      * @param plugin JavaPlugin instance
-     * @param instanceClass Class used for the instances
-     * @param settings Instance settings
-     * @param lobbyWorld MmcWorld instance that represent the Lobby world
-     * @param gameWorld MmcWorld instance that represent the Game world
      */
-    public GamesManager(@NotNull JavaPlugin plugin,
-                        @NotNull Class<? extends GameInstance> instanceClass,
-                        @NotNull GameSettings settings,
-                        @Nullable MessagesFactory messagesFactory,
-                        @NotNull MmcWorld lobbyWorld,
-                        @NotNull MmcWorld gameWorld) {
+    public GamesManager(@NotNull JavaPlugin plugin, GamesManagerSettings managerSettings) {
         this.plugin = plugin;
-        this.instanceClass = instanceClass;
-        this.settings = settings;
-        this.factory = messagesFactory;
         this.logger = plugin.getLogger();
-        this.lobbyWorld = lobbyWorld;
-        this.gameWorld = gameWorld;
-        this.gameWorld.getWorldSettings().setGameMode(null); // Disable game mode changing for game world
+        this.managerSettings = managerSettings;
+        this.managerSettings.gameWorld().getWorldSettings().setGameMode(null); // Disable game mode changing for game world
         // Register local events handlers
         Bukkit.getPluginManager().registerEvents(new GamesManagerEvents(this, this.logger), plugin);
     }
@@ -82,8 +66,8 @@ public class GamesManager {
         this.logger.info(String.format("Allocating schematics for %d instances", allocateCount));
         for(int i = 0; i < allocateCount; i++){
             this.logger.info(String.format("Allocating for instance %d/%d", i + 1, allocateCount));
-            Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
-            GameInstance.allocate(this.settings.schematic(), location);
+            Location location = new Location(this.managerSettings.gameWorld().getWorld(), i * 1024, 100, 0);
+            GameInstance.allocate(this.managerSettings.gameSettings().gameSchematic(), location);
         }
         this.allocations = allocateCount;
         this.logger.info(String.format("%d slots allocated", allocateCount));
@@ -125,7 +109,7 @@ public class GamesManager {
         List<MmcTeam> unsuitableTeams = checkTeamSIze();
         if(unsuitableTeams.size() != 0){
             for(MmcTeam unsuitableTeam : unsuitableTeams){
-                this.logger.warning(String.format("Team %s has not enough players (%d/%d)", unsuitableTeam.getName(), unsuitableTeam.getTeamSize(), this.settings.minPlayers()));
+                this.logger.warning(String.format("Team %s has not enough players (%d/%d)", unsuitableTeam.getName(), unsuitableTeam.getTeamSize(), this.managerSettings.gameSettings().minPlayers()));
             }
             return false;
         }
@@ -135,7 +119,7 @@ public class GamesManager {
                 .forEach(mmcPlayer -> this.logger.warning("Player %s is not online".formatted(mmcPlayer.getName())));
         // Dispatch teams
         List<List<MmcTeam>> gameTeams = new ArrayList<>();
-        switch (this.settings.gameType()) {
+        switch (this.managerSettings.gameSettings().gameType()) {
             case SOLO -> this.getOnePlayerTeams().forEach(team -> gameTeams.add(Collections.singletonList(team)));
             case ONLY_TEAM -> mmcTeams.forEach(team -> gameTeams.add(Collections.singletonList(team)));
             case TEAM_VS_TEAM -> gameTeams.addAll(this.getTeamsTuple(this.mmcTeams));
@@ -143,8 +127,8 @@ public class GamesManager {
         // Create instances
         for(int i = 0; i < gameTeams.size(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i + 1, gameTeams.size()));
-            Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
-            this.gameInstances.add((GameInstance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, this.settings, location, gameTeams.get(i), i));
+            Location location = new Location(this.managerSettings.gameWorld().getWorld(), i * 1024, 100, 0);
+            this.gameInstances.add((GameInstance) this.managerSettings.instanceClass().getConstructors()[0].newInstance(this.plugin, this, this.managerSettings.gameSettings(), location, gameTeams.get(i), i));
         }
         if(this.gameInstances.size() == 0){
             this.logger.severe("No instance created");
@@ -153,6 +137,10 @@ public class GamesManager {
         // Set spectators
         this.spectators.clear();
         this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectatorList(), IntStream.rangeClosed(0, this.gameInstances.size() - 1).boxed().collect(Collectors.toList())));
+        if(Objects.nonNull(this.managerSettings.globalScoreBoard())){
+            this.spectators.forEach((mmcPlayer, gameInstanceId) -> this.managerSettings.globalScoreBoard().addPlayer(mmcPlayer));
+            System.out.println(this.spectators);
+        }
         // Init instances
         this.initInstances();
         // Start instances
@@ -194,7 +182,7 @@ public class GamesManager {
             if(Objects.nonNull(gameInstance))
                 mmcPlayer.teleportSync(this.plugin, gameInstance.getInstanceLocation());
             else
-                mmcPlayer.teleportSync(this.plugin, this.gameWorld.getSpawnPoint());
+                mmcPlayer.teleportSync(this.plugin, this.managerSettings.gameWorld().getSpawnPoint());
             mmcPlayer.setGameModeSync(this.plugin, GameMode.SPECTATOR);
         });
         for(int i = 5; i >= 0; i--){
@@ -289,8 +277,8 @@ public class GamesManager {
         this.managerState = ManagerState.STOPPING;
         this.stopInstances();
         // Teleport all spectators and players to the lobby
-        this.spectators.keySet().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint()));
-        this.mmcTeams.forEach(mmcTeam -> mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.lobbyWorld.getSpawnPoint())));
+        this.spectators.keySet().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.managerSettings.lobbyWorld().getSpawnPoint()));
+        this.mmcTeams.forEach(mmcTeam -> mmcTeam.getPlayers().forEach(mmcPlayer -> mmcPlayer.teleportSync(this.plugin, this.managerSettings.lobbyWorld().getSpawnPoint())));
         this.managerState = ManagerState.STOPPED;
     }
 
@@ -393,7 +381,7 @@ public class GamesManager {
         List<MmcPlayer> spectators = new ArrayList<>();
         for(Player player : Bukkit.getOnlinePlayers()){
             if(instancePlayers.contains(new MmcPlayer(player))) continue;
-            if(player.getWorld().equals(this.lobbyWorld.getWorld()) || player.getWorld().equals(this.gameWorld.getWorld())){
+            if(player.getWorld().equals(this.managerSettings.lobbyWorld().getWorld()) || player.getWorld().equals(this.managerSettings.gameWorld().getWorld())){
                 spectators.add(new MmcPlayer(player));
             }
         }
@@ -405,7 +393,7 @@ public class GamesManager {
      * @return Instance count to create
      */
     private int getInstanceCount(){
-        switch (this.settings.gameType()){
+        switch (this.managerSettings.gameSettings().gameType()){
             case SOLO:
                 int count = 0;
                 for(MmcTeam mmcTeam : this.mmcTeams){
@@ -428,7 +416,7 @@ public class GamesManager {
      * @return List of teams with not enough players
      */
     private List<MmcTeam> checkTeamSIze(){
-        return this.mmcTeams.stream().filter(mmcTeam -> mmcTeam.getTeamSize() < this.settings.minPlayers()).collect(Collectors.toList());
+        return this.mmcTeams.stream().filter(mmcTeam -> mmcTeam.getTeamSize() < this.managerSettings.gameSettings().minPlayers()).collect(Collectors.toList());
     }
 
     /**
@@ -461,19 +449,30 @@ public class GamesManager {
     }
 
     public void addSpectator(@NotNull MmcPlayer mmcPlayer, int instanceId){
-        if(!this.spectators.containsKey(mmcPlayer)) this.spectators.put(mmcPlayer, instanceId);
+        if(!this.spectators.containsKey(mmcPlayer))
+            this.spectators.put(mmcPlayer, instanceId);
         mmcPlayer.setGameModeSync(this.plugin, GameMode.SPECTATOR);
         mmcPlayer.teleportSync(this.plugin, this.getInstanceFromId(this.spectators.get(mmcPlayer)).getInstanceLocation());
+        if(Objects.nonNull(this.managerSettings.globalScoreBoard()))
+            this.managerSettings.globalScoreBoard().addPlayer(mmcPlayer);
+    }
+
+    public void removeSpectator(@NotNull MmcPlayer mmcPlayer){
+        if(this.spectators.containsKey(mmcPlayer)){
+            this.spectators.remove(mmcPlayer);
+            if(Objects.nonNull(this.managerSettings.globalScoreBoard()))
+                this.managerSettings.globalScoreBoard().removePlayer(mmcPlayer);
+        }
     }
 
     public boolean isSpectator(@NotNull MmcPlayer player){
         return this.spectators.keySet().stream().anyMatch(player::equals);
     }
     public MmcWorld getLobbyWorld(){
-        return this.lobbyWorld;
+        return this.managerSettings.lobbyWorld();
     }
     public MmcWorld getGameWorld(){
-        return this.gameWorld;
+        return this.managerSettings.gameWorld();
     }
     public ManagerState getState() {
         return this.managerState;
@@ -484,11 +483,11 @@ public class GamesManager {
     }
 
     public MessagesFactory getMessageFactory() {
-        return this.factory;
+        return this.managerSettings.messagesFactory();
     }
     
-    public GameSettings getSettings() {
-        return settings;
+    public GameSettings getGameSettings() {
+        return this.managerSettings.gameSettings();
     }
 
     public Map<MmcPlayer, Integer> getSpectators() {

@@ -4,11 +4,13 @@ import fr.multimc.api.commons.database.Database;
 import fr.multimc.api.spigot.managers.games.enums.GameType;
 import fr.multimc.api.spigot.managers.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.games.GamesManager;
+import fr.multimc.api.spigot.managers.games.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
+import fr.multimc.api.spigot.scoreboards.MmcSidebar;
 import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.worlds.schematics.Schematic;
@@ -20,6 +22,9 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
+import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
+import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -40,6 +45,18 @@ public class InstanceSampleCode implements SampleCode, Listener {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void run(JavaPlugin plugin) {
+        ScoreboardLibrary scoreboardLibrary;
+        try {
+            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
+        } catch (NoPacketAdapterAvailableException e) {
+            scoreboardLibrary = new NoopScoreboardLibrary();
+        }
+
+        MmcSidebar sidebar = new MmcSidebar(scoreboardLibrary, 5);
+        sidebar.getSidebar().title(Component.text("Sidebar title", NamedTextColor.GREEN));
+
+
+
         new File(plugin.getDataFolder().getPath() + "/database.db").delete();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
@@ -53,6 +70,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         GameSettings settings = new GameSettings(
                 schematic,
                 GameType.SOLO,
+                null,
                 List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 null,
                 null,
@@ -73,7 +91,14 @@ public class InstanceSampleCode implements SampleCode, Listener {
         gameWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         gameWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
-        gamesManager = new GamesManager(plugin, CustomGameInstanceSample.class, settings, factory, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
+        GamesManagerSettings gamesManagerSettings = new GamesManagerSettings(
+                settings,
+                CustomGameInstanceSample.class,
+                new MmcWorld(plugin, lobbyWorldSettings),
+                new MmcWorld(plugin, gameWorldSettings),
+                factory,
+                sidebar);
+        gamesManager = new GamesManager(plugin, gamesManagerSettings);
         gamesManager.preAllocate(5);
 
         // Commands
