@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.pre_made.commands.executors;
 
-import fr.multimc.api.spigot.managers.instance.InstancesManager;
+import fr.multimc.api.spigot.managers.games.GamesManager;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
@@ -19,11 +19,11 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class StartCommand implements CommandExecutor {
-    private final InstancesManager instancesManager;
+    private final GamesManager gamesManager;
     private final TeamManager teamManager;
 
-    public StartCommand(@NotNull InstancesManager instancesManager, @NotNull TeamManager teamManager){
-        this.instancesManager = instancesManager;
+    public StartCommand(@NotNull GamesManager gamesManager, @NotNull TeamManager teamManager){
+        this.gamesManager = gamesManager;
         this.teamManager = teamManager;
     }
 
@@ -42,7 +42,7 @@ public class StartCommand implements CommandExecutor {
             }
             default -> teams = this.teamManager.loadTeams();
         }
-        this.instancesManager.start(commandSender, teams);
+        this.gamesManager.start(commandSender, teams);
         return true;
     }
 

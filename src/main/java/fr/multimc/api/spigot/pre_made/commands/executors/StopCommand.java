@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.pre_made.commands.executors;
 
-import fr.multimc.api.spigot.managers.instance.InstancesManager;
+import fr.multimc.api.spigot.managers.games.GamesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,16 +9,16 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class StopCommand implements CommandExecutor {
 
-    private final InstancesManager instancesManager;
+    private final GamesManager gamesManager;
 
-    public StopCommand(@NotNull InstancesManager instancesManager) {
-        this.instancesManager = instancesManager;
+    public StopCommand(@NotNull GamesManager gamesManager) {
+        this.gamesManager = gamesManager;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         commandSender.sendMessage("Stopping instances...");
-        this.instancesManager.stopManager();
+        this.gamesManager.stopManager();
         commandSender.sendMessage("Instances stopped!");
         return true;
     }

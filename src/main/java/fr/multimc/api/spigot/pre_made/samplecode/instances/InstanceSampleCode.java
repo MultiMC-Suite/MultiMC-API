@@ -1,9 +1,9 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
 import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.spigot.managers.instance.enums.GameType;
+import fr.multimc.api.spigot.managers.games.enums.GameType;
 import fr.multimc.api.spigot.tools.settings.InstanceSettings;
-import fr.multimc.api.spigot.managers.instance.InstancesManager;
+import fr.multimc.api.spigot.managers.games.GamesManager;
 import fr.multimc.api.spigot.managers.teams.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
@@ -34,7 +34,7 @@ import java.util.List;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public class InstanceSampleCode implements SampleCode, Listener {
 
-    private InstancesManager instancesManager;
+    private GamesManager gamesManager;
     private TeamManager teamManager;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -73,12 +73,12 @@ public class InstanceSampleCode implements SampleCode, Listener {
         gameWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         gameWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
-        instancesManager = new InstancesManager(plugin, CustomInstanceSample.class, settings, factory, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
-        instancesManager.preAllocate(5);
+        gamesManager = new GamesManager(plugin, CustomGameInstanceSample.class, settings, factory, new MmcWorld(plugin, lobbyWorldSettings), new MmcWorld(plugin, gameWorldSettings));
+        gamesManager.preAllocate(5);
 
         // Commands
-        plugin.getCommand("stop-mmc").setExecutor(new StopCommand(instancesManager));
-        plugin.getCommand("start-mmc").setExecutor(new StartCommand(instancesManager, teamManager));
+        plugin.getCommand("stop-mmc").setExecutor(new StopCommand(gamesManager));
+        plugin.getCommand("start-mmc").setExecutor(new StartCommand(gamesManager, teamManager));
         plugin.getCommand("start-mmc").setTabCompleter(new StartTabCompleter());
     }
 
@@ -94,10 +94,10 @@ public class InstanceSampleCode implements SampleCode, Listener {
 //                teams.add(team);
 //            }
 //            instancesManager.start(teams);
-            instancesManager.start(e.getPlayer(), teamManager.loadTeams());
+            gamesManager.start(e.getPlayer(), teamManager.loadTeams());
         }else if(message.contains("stop")){
             e.setCancelled(true);
-            instancesManager.stopManager();
+            gamesManager.stopManager();
         }else if(message.contains("push")){
             HashMap<String, Integer> scores = new HashMap<>();
             scores.put("T1", 16);

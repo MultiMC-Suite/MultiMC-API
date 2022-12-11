@@ -1,6 +1,6 @@
-package fr.multimc.api.spigot.managers.instance.enums;
+package fr.multimc.api.spigot.managers.games.enums;
 
-public enum InstanceState {
+public enum GameState {
     PRE_CREATE,
     CREATE,
     PRE_ALLOCATE,

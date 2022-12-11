@@ -1,9 +1,9 @@
-package fr.multimc.api.spigot.managers.instance;
+package fr.multimc.api.spigot.managers.games;
 
 import fr.multimc.api.commons.tools.times.MmcTime;
 import fr.multimc.api.spigot.managers.enums.ManagerState;
-import fr.multimc.api.spigot.managers.instance.enums.InstanceState;
-import fr.multimc.api.spigot.managers.instance.events.InstanceManagerEvents;
+import fr.multimc.api.spigot.managers.games.enums.GameState;
+import fr.multimc.api.spigot.managers.games.events.GamesManagerEvents;
 import fr.multimc.api.spigot.managers.teams.MmcTeam;
 import fr.multimc.api.spigot.tools.entities.player.MmcPlayer;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
@@ -30,18 +30,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @SuppressWarnings("unused")
-public class InstancesManager {
+public class GamesManager {
 
     private final JavaPlugin plugin;
     private final Logger logger;
     private final MessagesFactory factory;
-    private final Class<? extends Instance> instanceClass;
+    private final Class<? extends GameInstance> instanceClass;
     private final InstanceSettings settings;
     private final MmcWorld lobbyWorld;
     private final MmcWorld gameWorld;
 
-    private final List<Instance> instances = new ArrayList<>();
-    private final HashMap<Integer, InstanceState> instancesState = new HashMap<>();
+    private final List<GameInstance> gameInstances = new ArrayList<>();
+    private final HashMap<Integer, GameState> instancesState = new HashMap<>();
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
     private final Map<MmcPlayer, Integer> spectators = new HashMap<>();
 
@@ -56,12 +56,12 @@ public class InstancesManager {
      * @param lobbyWorld MmcWorld instance that represent the Lobby world
      * @param gameWorld MmcWorld instance that represent the Game world
      */
-    public InstancesManager(@NotNull JavaPlugin plugin,
-                            @NotNull Class<? extends Instance> instanceClass,
-                            @NotNull InstanceSettings settings,
-                            @Nullable MessagesFactory messagesFactory,
-                            @NotNull MmcWorld lobbyWorld,
-                            @NotNull MmcWorld gameWorld) {
+    public GamesManager(@NotNull JavaPlugin plugin,
+                        @NotNull Class<? extends GameInstance> instanceClass,
+                        @NotNull InstanceSettings settings,
+                        @Nullable MessagesFactory messagesFactory,
+                        @NotNull MmcWorld lobbyWorld,
+                        @NotNull MmcWorld gameWorld) {
         this.plugin = plugin;
         this.instanceClass = instanceClass;
         this.settings = settings;
@@ -71,7 +71,7 @@ public class InstancesManager {
         this.gameWorld = gameWorld;
         this.gameWorld.getWorldSettings().setGameMode(null); // Disable game mode changing for game world
         // Register local events handlers
-        Bukkit.getPluginManager().registerEvents(new InstanceManagerEvents(this, this.logger), plugin);
+        Bukkit.getPluginManager().registerEvents(new GamesManagerEvents(this, this.logger), plugin);
     }
 
     /**
@@ -83,7 +83,7 @@ public class InstancesManager {
         for(int i = 0; i < allocateCount; i++){
             this.logger.info(String.format("Allocating for instance %d/%d", i + 1, allocateCount));
             Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
-            Instance.allocate(this.settings.schematic(), location);
+            GameInstance.allocate(this.settings.schematic(), location);
         }
         this.allocations = allocateCount;
         this.logger.info(String.format("%d slots allocated", allocateCount));
@@ -117,7 +117,7 @@ public class InstancesManager {
     private boolean startAsync(@NotNull List<MmcTeam> mmcTeams) throws InvocationTargetException, InstantiationException, IllegalAccessException, InterruptedException {
         this.managerState = ManagerState.STARTING;
         // Reset instance manager
-        this.instances.clear();
+        this.gameInstances.clear();
         this.instancesState.clear();
         this.mmcTeams.clear();
         this.mmcTeams.addAll(mmcTeams);
@@ -144,15 +144,15 @@ public class InstancesManager {
         for(int i = 0; i < gameTeams.size(); i++){
             this.logger.info(String.format("Creating instance %d/%d", i + 1, gameTeams.size()));
             Location location = new Location(this.gameWorld.getWorld(), i * 1024, 100, 0);
-            this.instances.add((Instance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, this.settings, location, gameTeams.get(i), i));
+            this.gameInstances.add((GameInstance) this.instanceClass.getConstructors()[0].newInstance(this.plugin, this, this.settings, location, gameTeams.get(i), i));
         }
-        if(this.instances.size() == 0){
+        if(this.gameInstances.size() == 0){
             this.logger.severe("No instance created");
             return false;
         }
         // Set spectators
         this.spectators.clear();
-        this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectators(), IntStream.rangeClosed(0, this.instances.size() - 1).boxed().collect(Collectors.toList())));
+        this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectators(), IntStream.rangeClosed(0, this.gameInstances.size() - 1).boxed().collect(Collectors.toList())));
         // Init instances
         this.initInstances();
         // Start instances
@@ -169,12 +169,12 @@ public class InstancesManager {
     private void initInstances() throws InterruptedException {
         long dt;
         long dtAvg = 0;
-        for(int i = 0; i < this.instances.size(); i++){
+        for(int i = 0; i < this.gameInstances.size(); i++){
             // Runnable
             long finalDtAvg = dtAvg;
-            String timeFormat = MmcTime.format(finalDtAvg * (this.instances.size() - i - 1), "mm:ss");
+            String timeFormat = MmcTime.format(finalDtAvg * (this.gameInstances.size() - i - 1), "mm:ss");
             Component actionBarComponent = Component.text("Instance ").color(NamedTextColor.AQUA)
-                    .append(Component.text("%d/%d".formatted(i + 1, this.instances.size())).color(NamedTextColor.GOLD))
+                    .append(Component.text("%d/%d".formatted(i + 1, this.gameInstances.size())).color(NamedTextColor.GOLD))
                     .append(Component.text(" initialized (").color(NamedTextColor.AQUA))
                     .append(Component.text(timeFormat).color(NamedTextColor.YELLOW))
                     .append(Component.text(" remaining)").color(NamedTextColor.DARK_AQUA));
@@ -182,7 +182,7 @@ public class InstancesManager {
                     this.sendTeamActionBar(actionBarComponent, true),
                     0L, 20L);
             // Instance loading
-            dt = this.initInstance(this.instances.get(i), this.instances.get(i).getInstanceId());
+            dt = this.initInstance(this.gameInstances.get(i), this.gameInstances.get(i).getInstanceId());
             if(dtAvg == 0){
                 dtAvg = dt;
             }
@@ -190,9 +190,9 @@ public class InstancesManager {
             Bukkit.getScheduler().cancelTask(taskID);
         }
         this.spectators.forEach((mmcPlayer, integer) -> {
-            Instance instance = this.getInstanceFromId(integer);
-            if(Objects.nonNull(instance))
-                mmcPlayer.teleportSync(this.plugin, instance.getInstanceLocation());
+            GameInstance gameInstance = this.getInstanceFromId(integer);
+            if(Objects.nonNull(gameInstance))
+                mmcPlayer.teleportSync(this.plugin, gameInstance.getInstanceLocation());
             else
                 mmcPlayer.teleportSync(this.plugin, this.gameWorld.getSpawnPoint());
             mmcPlayer.setGameModeSync(this.plugin, GameMode.SPECTATOR);
@@ -218,42 +218,42 @@ public class InstancesManager {
      * Start all instances
      */
     private void startInstances(){
-        this.instances.forEach(this::startInstance);
+        this.gameInstances.forEach(this::startInstance);
     }
 
     /**
      * Stop all instances
      */
     private void stopInstances(){
-        instances.forEach(this::stopInstance);
+        gameInstances.forEach(this::stopInstance);
     }
 
     /**
      * Init an instance
-     * @param instance Instance to init
+     * @param gameInstance Instance to init
      * @param instanceId ID of the instance
      * @return Time taken to init the instance
      */
-    private long initInstance(@NotNull Instance instance, int instanceId) {
+    private long initInstance(@NotNull GameInstance gameInstance, int instanceId) {
         long dt = System.currentTimeMillis();
-        instance.init(instanceId < this.allocations);
+        gameInstance.init(instanceId < this.allocations);
         return System.currentTimeMillis() - dt;
     }
 
     /**
      * Start an instance
-     * @param instance Instance to start
+     * @param gameInstance Instance to start
      */
-    private void startInstance(@NotNull Instance instance){
-        instance.start();
+    private void startInstance(@NotNull GameInstance gameInstance){
+        gameInstance.start();
     }
 
     /**
      * Stop an instance
-     * @param instance Instance to stop
+     * @param gameInstance Instance to stop
      */
-    private void stopInstance(@NotNull Instance instance){
-       instance.stop();
+    private void stopInstance(@NotNull GameInstance gameInstance){
+       gameInstance.stop();
     }
 
     /**
@@ -261,7 +261,7 @@ public class InstancesManager {
      * @param instanceId ID if the instance
      * @param state New state for the instance
      */
-    protected void updateInstanceState(int instanceId, @NotNull InstanceState state){
+    protected void updateInstanceState(int instanceId, @NotNull GameState state){
         if(instancesState.containsKey(instanceId)){
             this.logger.info(String.format("Instance %d update state from %s to %s", instanceId, instancesState.get(instanceId), state));
             instancesState.replace(instanceId, state);
@@ -272,7 +272,7 @@ public class InstancesManager {
         // Check if all instances are stopped
         boolean isAllStopped = true;
         for(int _instanceId: this.instancesState.keySet()){
-            if(this.instancesState.get(_instanceId) != InstanceState.STOP){
+            if(this.instancesState.get(_instanceId) != GameState.STOP){
                 isAllStopped = false;
                 break;
             }
@@ -448,8 +448,8 @@ public class InstancesManager {
      * @return Instance of the player
      */
     @Nullable
-    private Instance getInstanceFromPlayer(@NotNull MmcPlayer mmcPlayer){
-        return this.instances.stream().filter(instance -> instance.getPlayers().contains(mmcPlayer)).findFirst().orElse(null);
+    private GameInstance getInstanceFromPlayer(@NotNull MmcPlayer mmcPlayer){
+        return this.gameInstances.stream().filter(gameInstance -> gameInstance.getPlayers().contains(mmcPlayer)).findFirst().orElse(null);
     }
 
     /**
@@ -457,8 +457,8 @@ public class InstancesManager {
      * @param instanceId Target id
      * @return Instance object
      */
-    private Instance getInstanceFromId(int instanceId){
-        return this.instances.stream().filter(instance -> instance.getInstanceId() == instanceId).findFirst().orElse(this.instances.get(0));
+    private GameInstance getInstanceFromId(int instanceId){
+        return this.gameInstances.stream().filter(gameInstance -> gameInstance.getInstanceId() == instanceId).findFirst().orElse(this.gameInstances.get(0));
     }
 
     public void addSpectator(@NotNull MmcPlayer mmcPlayer){
@@ -480,8 +480,8 @@ public class InstancesManager {
         return this.managerState;
     }
 
-    public List<Instance> getInstances() {
-        return instances;
+    public List<GameInstance> getInstances() {
+        return gameInstances;
     }
 
     public MessagesFactory getMessageFactory() {
