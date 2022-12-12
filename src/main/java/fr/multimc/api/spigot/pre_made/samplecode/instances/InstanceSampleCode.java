@@ -45,6 +45,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void run(JavaPlugin plugin) {
+        // Load scoreboard library
         ScoreboardLibrary scoreboardLibrary;
         try {
             scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
@@ -54,6 +55,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
 
         MmcSidebar sidebar = new MmcSidebar(scoreboardLibrary, 5);
         sidebar.getSidebar().title(Component.text("Sidebar title", NamedTextColor.GREEN));
+        sidebar.getSidebar().line(0, Component.text("Test"));
 
 
 
