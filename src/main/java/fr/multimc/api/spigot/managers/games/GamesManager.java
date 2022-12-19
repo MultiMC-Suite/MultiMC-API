@@ -140,7 +140,6 @@ public class GamesManager {
         this.spectators.putAll(new Dispatcher(DispatchAlgorithm.RANDOM).dispatch(this.getSpectatorList(), IntStream.rangeClosed(0, this.gameInstances.size() - 1).boxed().collect(Collectors.toList())));
         if(Objects.nonNull(this.managerSettings.globalScoreBoard())){
             this.spectators.forEach((mmcPlayer, gameInstanceId) -> this.managerSettings.globalScoreBoard().addPlayer(mmcPlayer));
-            System.out.println(this.spectators);
         }
         // Init instances
         this.initInstances();

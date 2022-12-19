@@ -9,6 +9,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.logging.Logger;
 
+@SuppressWarnings("unused")
 public class Database {
 
     private String ip;
@@ -131,8 +132,6 @@ public class Database {
      * @return QueryResult object that contain a SQLState and a ResultSet if the query is a SELECT
      */
     public QueryResult executeQuery(String query, QueryType queryType){
-        this.logger.warning("Executing query: ");
-        this.logger.warning(query);
         SQLState queryStatus = SQLState.SQLERROR;
         ResultSet resultSet = null;
         try {

@@ -289,10 +289,7 @@ public class GameInstance extends BukkitRunnable{
                 for(MmcTeam team : this.mmcTeams){
                     playersUUID.addAll(team.getPlayers().stream().map(MmcPlayer::getUUID).toList());
                 }
-                System.out.println(playersUUID);
-                System.out.println(locations);
                 Map<UUID, Location> spawns = new Dispatcher(DispatchAlgorithm.ROUND_ROBIN).dispatch(playersUUID, locations);
-                System.out.println(spawns);
                 if(Objects.nonNull(spawns))
                     playerSpawns.putAll(spawns);
             }

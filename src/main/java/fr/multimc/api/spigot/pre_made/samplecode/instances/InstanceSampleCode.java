@@ -63,7 +63,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
         teamManager = new TeamManager(database);
         teamManager.addTeam("T1", "Name 1", "Xen0Xys");
-        teamManager.addTeam("T2", "Name 2", "XenAdmin");
+//        teamManager.addTeam("T2", "Name 2", "XenAdmin");
 
         MessagesFactory factory = new MessagesFactory(Component.text("InstanceSample").color(NamedTextColor.YELLOW));
 
