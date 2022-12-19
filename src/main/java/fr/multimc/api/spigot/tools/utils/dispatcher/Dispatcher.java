@@ -19,12 +19,12 @@ public class Dispatcher {
         switch (dispatchAlgorithm){
             case ROUND_ROBIN -> {
                 for(int i = 0; i < keys.size(); i++){
-                    finalMap.put(keys.get(i), values.get(i % (values.size() - 1)));
+                    finalMap.put(keys.get(i), values.get(i % (values.size())));
                 }
             }
             case REVERSED_ROUND_ROBIN -> {
                 for(int i = keys.size() - 1; i >= 0; i--){
-                    finalMap.put(keys.get(i), values.get(i % (values.size() - 1)));
+                    finalMap.put(keys.get(i), values.get(i % (values.size())));
                 }
             }
             case RANDOM -> {

@@ -132,7 +132,7 @@ public class GamesManagerEvents implements Listener {
                     newMessage = this.gamesManager.getMessageFactory().getChatMessage(MessageType.TEAM, Component.text(player.getName()), e.message(), Component.text(team.getName()));
                     team.sendMessage(newMessage);
                 }
-                case TEAM_VS_TEAM -> {
+                case TEAM_VS_TEAM, FFA -> {
                     String rawMessage = PlainTextComponentSerializer.plainText().serialize(e.message());
                     String chatPrefix = MessageType.GAME.getChatPrefix();
                     if (chatPrefix == null || team == null) return;

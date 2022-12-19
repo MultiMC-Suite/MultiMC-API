@@ -123,6 +123,7 @@ public class GamesManager {
             case SOLO -> this.getOnePlayerTeams().forEach(team -> gameTeams.add(Collections.singletonList(team)));
             case ONLY_TEAM -> mmcTeams.forEach(team -> gameTeams.add(Collections.singletonList(team)));
             case TEAM_VS_TEAM -> gameTeams.addAll(this.getTeamsTuple(this.mmcTeams));
+            case FFA -> gameTeams.add(this.mmcTeams);
         }
         // Create instances
         for(int i = 0; i < gameTeams.size(); i++){
