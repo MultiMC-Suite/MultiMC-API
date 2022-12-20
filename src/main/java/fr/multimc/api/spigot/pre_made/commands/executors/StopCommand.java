@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.pre_made.commands.executors;
 
-import fr.multimc.api.spigot.managers.games.GamesManager;
+import fr.multimc.api.spigot.managers.GamesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -1,5 +1,6 @@
 package fr.multimc.api.commons.tools.messages;
 
+import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
 import fr.multimc.api.commons.tools.messages.enums.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

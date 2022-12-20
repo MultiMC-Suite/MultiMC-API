@@ -1,11 +1,11 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
-import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.spigot.managers.games.enums.GameType;
-import fr.multimc.api.spigot.managers.games.settings.GameSettings;
-import fr.multimc.api.spigot.managers.games.GamesManager;
-import fr.multimc.api.spigot.managers.games.settings.GamesManagerSettings;
-import fr.multimc.api.spigot.managers.teams.TeamManager;
+import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.spigot.games.enums.GameType;
+import fr.multimc.api.spigot.games.settings.GameSettings;
+import fr.multimc.api.spigot.managers.GamesManager;
+import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
+import fr.multimc.api.spigot.managers.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;

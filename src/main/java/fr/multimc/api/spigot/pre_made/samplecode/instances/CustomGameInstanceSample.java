@@ -1,9 +1,9 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
-import fr.multimc.api.spigot.managers.games.GameInstance;
-import fr.multimc.api.spigot.managers.games.settings.GameSettings;
-import fr.multimc.api.spigot.managers.games.GamesManager;
-import fr.multimc.api.spigot.managers.teams.MmcTeam;
+import fr.multimc.api.spigot.games.GameInstance;
+import fr.multimc.api.spigot.games.settings.GameSettings;
+import fr.multimc.api.spigot.managers.GamesManager;
+import fr.multimc.api.spigot.teams.MmcTeam;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 

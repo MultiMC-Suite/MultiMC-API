@@ -1,15 +1,15 @@
 package fr.multimc.api.spigot.pre_made.samplecode.database;
 
-import fr.multimc.api.commons.database.Table;
-import fr.multimc.api.commons.database.enums.FieldType;
-import fr.multimc.api.commons.database.enums.Property;
-import fr.multimc.api.commons.database.interfaces.IConstraint;
-import fr.multimc.api.commons.database.models.Field;
-import fr.multimc.api.commons.database.models.constraints.PrimaryKeyConstraint;
-import fr.multimc.api.commons.database.query.InsertQuery;
-import fr.multimc.api.commons.database.query.SelectQuery;
-import fr.multimc.api.commons.database.Database;
-import fr.multimc.api.commons.database.query.QueryResult;
+import fr.multimc.api.commons.data.database.models.Table;
+import fr.multimc.api.commons.data.database.enums.FieldType;
+import fr.multimc.api.commons.data.database.enums.Property;
+import fr.multimc.api.commons.data.database.interfaces.IConstraint;
+import fr.multimc.api.commons.data.database.models.Field;
+import fr.multimc.api.commons.data.database.models.constraints.PrimaryKeyConstraint;
+import fr.multimc.api.commons.data.database.queries.InsertQuery;
+import fr.multimc.api.commons.data.database.queries.SelectQuery;
+import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.commons.data.database.queries.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;

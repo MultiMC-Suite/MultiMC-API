@@ -1,11 +1,11 @@
 package fr.multimc.api.spigot.pre_made.commands.executors;
 
-import fr.multimc.api.spigot.managers.games.GamesManager;
-import fr.multimc.api.spigot.managers.teams.MmcTeam;
-import fr.multimc.api.spigot.managers.teams.TeamManager;
+import fr.multimc.api.spigot.managers.GamesManager;
+import fr.multimc.api.spigot.teams.MmcTeam;
+import fr.multimc.api.spigot.managers.TeamManager;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.tools.utils.dispatcher.DispatchAlgorithm;
-import fr.multimc.api.spigot.tools.utils.dispatcher.Dispatcher;
+import fr.multimc.api.spigot.tools.dispatcher.DispatchAlgorithm;
+import fr.multimc.api.spigot.tools.dispatcher.Dispatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

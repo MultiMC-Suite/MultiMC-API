@@ -1,6 +1,7 @@
 package fr.multimc.api.spigot.tools.gui;
 
-import fr.multimc.api.commons.tools.messages.ComponentBuilder;
+import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
+import fr.multimc.api.spigot.tools.gui.interfaces.IGuiBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,7 +33,7 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class GuiManager implements Listener {
     private final Plugin plugin; // Main plugin instance.
-    private final Map<Class<? extends GuiBuilder>, GuiBuilder> guis; // GUIs list.
+    private final Map<Class<? extends IGuiBuilder>, IGuiBuilder> guis; // GUIs list.
 
     /**
      * Create the instance of the GUI manager.
@@ -47,7 +48,7 @@ public class GuiManager implements Listener {
      * Register a GUI to the list.
      * @param gui GuiBuilder instance.
      */
-    public void registerGui(@NotNull GuiBuilder gui) {
+    public void registerGui(@NotNull IGuiBuilder gui) {
         this.guis.put(gui.getClass(), gui);
     }
 
@@ -55,7 +56,7 @@ public class GuiManager implements Listener {
      * Register a list of GUIs to the main list.
      * @param guis Guis list.
      */
-    public void registerGui(@NotNull GuiBuilder... guis) {
+    public void registerGui(@NotNull IGuiBuilder... guis) {
         Arrays.asList(guis).forEach(this::registerGui);
     }
 
@@ -64,10 +65,10 @@ public class GuiManager implements Listener {
      * @param player Inventory owner.
      * @param guiClass GUI class reference.
      */
-    public void openGui(@NotNull Player player, @NotNull Class<? extends GuiBuilder> guiClass) {
+    public void openGui(@NotNull Player player, @NotNull Class<? extends IGuiBuilder> guiClass) {
         if (player.getOpenInventory() instanceof PlayerInventory) player.closeInventory();
 
-        final GuiBuilder gui = this.getGui(guiClass);
+        final IGuiBuilder gui = this.getGui(guiClass);
         gui.title();
         final Inventory inventory = this.plugin.getServer().createInventory(null, 0, new ComponentBuilder(gui.title()).build());
         gui.fill(player, inventory);
@@ -79,7 +80,7 @@ public class GuiManager implements Listener {
      * @param guiClass GUI class reference.
      * @return The GUI instance.
      */
-    private GuiBuilder getGui(@NotNull Class<? extends GuiBuilder> guiClass) {
+    private IGuiBuilder getGui(@NotNull Class<? extends IGuiBuilder> guiClass) {
         return this.guis.get(guiClass);
     }
 
