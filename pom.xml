@@ -6,7 +6,7 @@
 
     <groupId>fr.multimc</groupId>
     <artifactId>multimc-api</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
@@ -171,7 +171,7 @@
         <repository>
             <id>github</id>
             <name>MultiMC-API GitHub packages</name>
-            <url>https://maven.pkg.github.com/MultiMC-Suite/MultiMC-API/experimental</url>
+            <url>https://maven.pkg.github.com/MultiMC-Suite/MultiMC-API</url>
         </repository>
     </distributionManagement>
 </project>

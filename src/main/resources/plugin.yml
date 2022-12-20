@@ -3,7 +3,7 @@ name: 'MultiMC-API'
 softdepend:
   - WorldEdit
 
-version: '1.8-SNAPSHOT'
+version: '1.9-SNAPSHOT'
 api-version: '1.19'
 
 authors: [ 'Loïc MAES', 'Tom CZEKAJ' ]
