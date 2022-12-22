@@ -6,7 +6,7 @@
 
     <groupId>fr.multimc</groupId>
     <artifactId>multimc-api</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
@@ -25,10 +25,6 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>fren_gor</id>
-            <url>https://nexus.frengor.com/repository/public/</url>
-        </repository>
-        <repository>
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
@@ -36,13 +32,17 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.19.2-R0.1-SNAPSHOT</version>
+            <version>1.19.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -74,17 +74,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.frengor</groupId>
-            <artifactId>ultimateadvancementapi</artifactId>
-            <version>2.2.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.arcaniax</groupId>
             <artifactId>HeadDatabase-API</artifactId>
             <version>1.3.1</version>
@@ -96,9 +85,30 @@
             <version>7.18.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.MegavexNetwork</groupId>
-            <artifactId>scoreboard-library</artifactId>
-            <version>730f9794c5</version>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>api</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>implementation</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>v1_19_R2</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
+            <artifactId>packetevents</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.retrooper.packetevents</groupId>
+            <artifactId>spigot</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -127,6 +137,32 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <artifactSet>
+                        <includes>
+                            <include>*:*</include>
+                        </includes>
+                    </artifactSet>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <relocations combine.children="append">
+                        <relocation>
+                            <pattern>net.megavex.scoreboardlibrary</pattern>
+                            <shadedPattern>
+                                fr.multimc.api.spigot.scoreboardlibrary
+                            </shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -135,7 +171,7 @@
         <repository>
             <id>github</id>
             <name>MultiMC-API GitHub packages</name>
-            <url>https://maven.pkg.github.com/IUTRS-MultiMC-LAN/MultiMC-API</url>
+            <url>https://maven.pkg.github.com/MultiMC-Suite/MultiMC-API</url>
         </repository>
     </distributionManagement>
 </project>

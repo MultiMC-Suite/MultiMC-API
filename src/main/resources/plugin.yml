@@ -3,7 +3,7 @@ name: 'MultiMC-API'
 softdepend:
   - WorldEdit
 
-version: '1.8-SNAPSHOT'
+version: '1.9-SNAPSHOT'
 api-version: '1.19'
 
 authors: [ 'Loïc MAES', 'Tom CZEKAJ' ]
@@ -14,6 +14,12 @@ commands:
     description: Set the relative position of a player.
     usage: /relativeto <x> <y> <z>
     permission: fr.multimc.api.commands.relativeto
+  start-mmc:
+    description: Start instances
+    permission: fr.multimc.api.commands.start-mmc
+  stop-mmc:
+    description: Stop instances
+    permission: fr.multimc.api.commands.stop-mmc
 
 permissions:
   fr.multimc.api.*:
@@ -22,6 +28,14 @@ permissions:
   fr.multimc.api.commands.*:
     children:
       fr.multimc.api.commands.relativeto: true
+      fr.multimc.api.commands.start-mmc: true
+      fr.multimc.api.commands.stop-mmc: true
   fr.multimc.api.commands.relativeto:
     description: Give relative position from a given point.
+    default: op
+  fr.multimc.api.commands.start-mmc:
+    description: Start instances
+    default: op
+  fr.multimc.api.commands.stop-mmc:
+    description: Stop instances
     default: op
