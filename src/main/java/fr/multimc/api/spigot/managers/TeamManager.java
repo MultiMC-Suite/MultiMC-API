@@ -15,27 +15,27 @@ import java.util.Map;
 @SuppressWarnings({"unused", "DataFlowIssue"})
 public class TeamManager {
 
-    private final ITeamHandler ITeamHandler;
+    private final ITeamHandler teamHandler;
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
     public TeamManager(@NotNull Database database) {
-        this.ITeamHandler = new GameTablesHandler(database);
+        this.teamHandler = new GameTablesHandler(database);
     }
 
     public TeamManager(@NotNull String apiURL) {
         // TODO: init handler with REST API handler
-        this.ITeamHandler = null;
+        this.teamHandler = null;
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
-        this.ITeamHandler.addTeam(teamCode, name, players);
+        this.teamHandler.addTeam(teamCode, name, players);
     }
 
     public List<MmcTeam> loadTeams(){
         // Create teams
         this.mmcTeams.clear();
-        Map<String, List<String>> playersByTeam = this.ITeamHandler.getPlayersByTeam();
-        Map<String, String> teamNames = this.ITeamHandler.getTeamNamesByTeam();
+        Map<String, List<String>> playersByTeam = this.teamHandler.getPlayersByTeam();
+        Map<String, String> teamNames = this.teamHandler.getTeamNamesByTeam();
         // Iterate by team code
         for(String teamCode: playersByTeam.keySet()){
             List<String> playersName = playersByTeam.get(teamCode);
@@ -46,7 +46,7 @@ public class TeamManager {
                 players.add(player);
             }
             // Add team object to list
-            MmcTeam mmcTeam = new MmcTeam(teamCode, teamNames.get(teamCode), players.toArray(new MmcPlayer[0]));
+            MmcTeam mmcTeam = new MmcTeam(teamNames.get(teamCode), teamCode, players.toArray(new MmcPlayer[0]));
             this.mmcTeams.add(mmcTeam);
         }
         return this.mmcTeams;
@@ -75,10 +75,10 @@ public class TeamManager {
     }
 
     public void pushScores(@NotNull Map<String, Integer> localScores){
-        Map<String, Integer> currentScores = this.ITeamHandler.getScores();
+        Map<String, Integer> currentScores = this.teamHandler.getScores();
         Map<String, Integer> newScores = new HashMap<>();
         localScores.forEach((teamCode, score) -> newScores.put(teamCode, currentScores.getOrDefault(teamCode, 0) + score));
-        this.ITeamHandler.setScores(newScores);
+        this.teamHandler.setScores(newScores);
     }
 
     public void pushTeamScores(@NotNull Map<MmcTeam, Integer> localScores){
