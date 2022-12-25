@@ -21,7 +21,6 @@ public class MmcSidebar implements IScoreBoard {
 
     @Override
     public void addPlayer(MmcPlayer mmcPlayer) {
-        System.out.println("Adding player " + mmcPlayer.getName() + " to the sidebar");
         Player player = mmcPlayer.getPlayer();
         if(Objects.nonNull(player)) {
             this.sidebar.addPlayer(player);
@@ -29,7 +28,6 @@ public class MmcSidebar implements IScoreBoard {
     }
     @Override
     public void removePlayer(MmcPlayer mmcPlayer) {
-        System.out.println("Remove player " + mmcPlayer.getName() + " to the sidebar");
         Player player = mmcPlayer.getPlayer();
         if(Objects.nonNull(player)) {
             this.sidebar.removePlayer(player);
