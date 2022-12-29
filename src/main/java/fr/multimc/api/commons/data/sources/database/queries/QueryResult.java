@@ -1,7 +1,7 @@
-package fr.multimc.api.commons.data.database.queries;
+package fr.multimc.api.commons.data.sources.database.queries;
 
-import fr.multimc.api.commons.data.database.enums.QueryType;
-import fr.multimc.api.commons.data.database.enums.SQLState;
+import fr.multimc.api.commons.data.sources.database.enums.QueryType;
+import fr.multimc.api.commons.data.sources.database.enums.SQLState;
 
 import java.sql.ResultSet;
 

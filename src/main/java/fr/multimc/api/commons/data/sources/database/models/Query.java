@@ -1,9 +1,9 @@
-package fr.multimc.api.commons.data.database.models;
+package fr.multimc.api.commons.data.sources.database.models;
 
-import fr.multimc.api.commons.data.database.enums.DatabaseType;
-import fr.multimc.api.commons.data.database.enums.QueryType;
-import fr.multimc.api.commons.data.database.Database;
-import fr.multimc.api.commons.data.database.queries.QueryResult;
+import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
+import fr.multimc.api.commons.data.sources.database.enums.QueryType;
+import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.database.queries.QueryResult;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Query {

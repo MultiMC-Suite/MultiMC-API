@@ -1,7 +1,7 @@
-package fr.multimc.api.commons.data.database.models.constraints;
+package fr.multimc.api.commons.data.sources.database.models.constraints;
 
-import fr.multimc.api.commons.data.database.interfaces.IConstraint;
-import fr.multimc.api.commons.data.database.models.Field;
+import fr.multimc.api.commons.data.sources.database.interfaces.IConstraint;
+import fr.multimc.api.commons.data.sources.database.models.Field;
 
 public class PrimaryKeyConstraint implements IConstraint {
 

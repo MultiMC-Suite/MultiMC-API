@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot;
 
 import fr.multimc.api.spigot.pre_made.commands.executors.RelativeToCommand;
-import fr.multimc.api.spigot.pre_made.samplecode.instances.InstanceSampleCode;
+import fr.multimc.api.spigot.pre_made.samplecode.api.ApiSampleCode;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -22,7 +22,7 @@ public class ServerApi extends JavaPlugin {
     @Override
     public void onEnable() {
         this.getCommand("relativeto").setExecutor(new RelativeToCommand());
-        new InstanceSampleCode().run(this);
+        new ApiSampleCode().run(this);
     }
 
     public static JavaPlugin getInstance() {

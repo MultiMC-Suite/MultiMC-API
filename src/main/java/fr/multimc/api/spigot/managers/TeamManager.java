@@ -1,8 +1,8 @@
 package fr.multimc.api.spigot.managers;
 
-import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.commons.data.handlers.GameTablesHandler;
+import fr.multimc.api.commons.data.handlers.DatabaseHandler;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ public class TeamManager {
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
     public TeamManager(@NotNull Database database) {
-        this.teamHandler = new GameTablesHandler(database);
+        this.teamHandler = new DatabaseHandler(database);
     }
 
     public TeamManager(@NotNull String apiURL) {

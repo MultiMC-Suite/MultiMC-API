@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.data.database.interfaces;
+package fr.multimc.api.commons.data.sources.database.interfaces;
 
 public interface IConstraint {
 

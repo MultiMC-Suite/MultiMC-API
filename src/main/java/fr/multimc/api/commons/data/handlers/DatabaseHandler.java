@@ -1,21 +1,21 @@
 package fr.multimc.api.commons.data.handlers;
 
-import fr.multimc.api.commons.data.database.Database;
-import fr.multimc.api.commons.data.database.enums.SQLState;
-import fr.multimc.api.commons.data.database.queries.QueryResult;
-import fr.multimc.api.commons.data.database.tables.PlayersTable;
-import fr.multimc.api.commons.data.database.tables.TeamsTable;
+import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.database.enums.SQLState;
+import fr.multimc.api.commons.data.sources.database.queries.QueryResult;
+import fr.multimc.api.commons.data.sources.database.tables.PlayersTable;
+import fr.multimc.api.commons.data.sources.database.tables.TeamsTable;
 import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
-public class GameTablesHandler implements ITeamHandler {
+public class DatabaseHandler implements ITeamHandler {
     private final TeamsTable teamsTable;
     private final PlayersTable playersTable;
 
-    public GameTablesHandler(@NotNull Database database) {
+    public DatabaseHandler(@NotNull Database database) {
         this.teamsTable = new TeamsTable(database);
         this.playersTable = new PlayersTable(database);
     }

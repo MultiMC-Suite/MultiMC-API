@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.data.database.enums;
+package fr.multimc.api.commons.data.sources.database.enums;
 
 import org.jetbrains.annotations.NotNull;
 

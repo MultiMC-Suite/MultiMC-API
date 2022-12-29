@@ -1,11 +1,11 @@
-package fr.multimc.api.commons.data.database.queries;
+package fr.multimc.api.commons.data.sources.database.queries;
 
-import fr.multimc.api.commons.data.database.enums.DatabaseType;
-import fr.multimc.api.commons.data.database.enums.QueryType;
-import fr.multimc.api.commons.data.database.interfaces.IConstraint;
-import fr.multimc.api.commons.data.database.models.Field;
-import fr.multimc.api.commons.data.database.models.Query;
-import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
+import fr.multimc.api.commons.data.sources.database.enums.QueryType;
+import fr.multimc.api.commons.data.sources.database.interfaces.IConstraint;
+import fr.multimc.api.commons.data.sources.database.models.Field;
+import fr.multimc.api.commons.data.sources.database.models.Query;
+import fr.multimc.api.commons.data.sources.database.Database;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

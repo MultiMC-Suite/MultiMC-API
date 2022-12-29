@@ -1,4 +1,4 @@
-package fr.multimc.api.commons.data.database.enums;
+package fr.multimc.api.commons.data.sources.database.enums;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,33 +33,39 @@ public enum FieldType {
 
     @Nullable
     public String getField(DatabaseType type){
-        switch (type){
-            case MYSQL:
-                if(this.defaultSize != -1)
+        switch (type) {
+            case MYSQL -> {
+                if (this.defaultSize != -1)
                     return this.mysql + "(" + this.defaultSize + ")";
                 return this.mysql;
-            case SQLITE:
-                if(this.defaultSize != -1)
+            }
+            case SQLITE -> {
+                if (this.defaultSize != -1)
                     return this.sqlite + "(" + this.defaultSize + ")";
                 return this.sqlite;
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
     }
 
     @Nullable
     public String getField(DatabaseType type, int size){
-        switch (type){
-            case MYSQL:
-                if(this.defaultSize != -1)
+        switch (type) {
+            case MYSQL -> {
+                if (this.defaultSize != -1)
                     return this.mysql + "(" + size + ")";
                 return this.mysql;
-            case SQLITE:
-                if(this.defaultSize != -1)
+            }
+            case SQLITE -> {
+                if (this.defaultSize != -1)
                     return this.sqlite + "(" + size + ")";
                 return this.sqlite;
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
     }
 

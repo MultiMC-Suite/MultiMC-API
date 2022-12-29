@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
-import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.spigot.games.enums.GameType;
 import fr.multimc.api.spigot.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.GamesManager;
@@ -88,7 +88,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         WorldSettings gameWorldSettings = new WorldSettings(
                 "multimc_game");
         gameWorldSettings.addPrevention(WorldPrevention.ALL);
-        gameWorldSettings.addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw prevention because Prevention.ALL is already present
+        gameWorldSettings.addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw damage prevention because Prevention.ALL is already present
         gameWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         gameWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);

@@ -1,16 +1,18 @@
-package fr.multimc.api.commons.data.database;
+package fr.multimc.api.commons.data.sources.database;
 
-import fr.multimc.api.commons.data.database.enums.DatabaseType;
-import fr.multimc.api.commons.data.database.enums.QueryType;
-import fr.multimc.api.commons.data.database.enums.SQLState;
-import fr.multimc.api.commons.data.database.queries.QueryResult;
+import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
+import fr.multimc.api.commons.data.sources.database.enums.QueryType;
+import fr.multimc.api.commons.data.sources.database.enums.SQLState;
+import fr.multimc.api.commons.data.sources.database.queries.QueryResult;
+import fr.multimc.api.commons.data.sources.DataSourceType;
+import fr.multimc.api.commons.data.sources.IDataSource;
 
 import java.io.File;
 import java.sql.*;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public class Database {
+public class Database implements IDataSource {
 
     private String ip;
     private int port;
@@ -179,5 +181,10 @@ public class Database {
 
     public DatabaseType getDatabaseType() {
         return databaseType;
+    }
+
+    @Override
+    public DataSourceType getDataSourceType() {
+        return DataSourceType.DATABASE;
     }
 }
