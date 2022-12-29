@@ -23,11 +23,13 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.logging.Logger;
 
 @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
 public class GameInstance extends BukkitRunnable{
 
     private final JavaPlugin plugin;
+    private final Logger logger;
     private final GamesManager gamesManager;
     private final GameSettings gameSettings;
     private final Location instanceLocation;
@@ -39,6 +41,8 @@ public class GameInstance extends BukkitRunnable{
     private final List<MmcPlayer> players;
     private final Map<UUID, Location> playerSpawns;
 
+    private final List<MmcPlayer> spectators;
+
     private final List<Entity> instanceEntities;
 
     private final Map<Long, GameState> instanceStateUpdates = new HashMap<>();
@@ -48,6 +52,7 @@ public class GameInstance extends BukkitRunnable{
 
     public GameInstance(JavaPlugin plugin, GamesManager gamesManager, GameSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
         this.plugin = plugin;
+        this.logger = plugin.getLogger();
         this.gamesManager = gamesManager;
         this.updateState(GameState.PRE_CREATE);
         this.gameSettings = settings;
@@ -58,6 +63,7 @@ public class GameInstance extends BukkitRunnable{
         this.remainingTime = this.gameSettings.duration();
         this.players = this.getInstancePlayers();
         this.playerSpawns = this.getPlayerSpawnsList();
+        this.spectators = new ArrayList<>();
         this.updateState(GameState.CREATE);
     }
 
@@ -122,9 +128,6 @@ public class GameInstance extends BukkitRunnable{
         if(this.gameState == GameState.PRE_STOP || this.gameState == GameState.STOP) return;
         this.updateState(GameState.PRE_STOP);
         this.isRunning = false;
-        for(MmcPlayer mmcPlayer : this.players){
-            this.teleportPlayer(mmcPlayer, this.gamesManager.getLobbyWorld().getSpawnPoint());
-        }
         if(!this.isCancelled()) this.cancel();
         this.updateState(GameState.STOP);
     }
@@ -243,6 +246,24 @@ public class GameInstance extends BukkitRunnable{
     }
 
     /**
+     * Called when a spectator spectate this game
+     * @param spectator MmcPlayer instance of the spectator
+     */
+    public void onSpectatorJoin(@NotNull MmcPlayer spectator){
+        this.spectators.add(spectator);
+        logger.warning("Spectator " + spectator.getName() + " joined game " + this.instanceId);
+    }
+
+    /**
+     * Called when a spectator stop spectating this game
+     * @param spectator MmcPlayer instance of the spectator
+     */
+    public void onSpectatorLeave(@NotNull MmcPlayer spectator){
+        this.spectators.remove(spectator);
+        logger.warning("Spectator " + spectator.getName() + " left game " + this.instanceId);
+    }
+
+    /**
      * Paste instance gameSchematic
      * @param schematic Schematic object
      */
@@ -339,7 +360,22 @@ public class GameInstance extends BukkitRunnable{
         return this.players.stream().anyMatch(player -> player.equals(mmcPlayer));
     }
 
+    /**
+     * Check if the spectator is on this instance
+     * @param spectator Target spectator
+     * @return True if the spectator is on this instance
+     */
+    public boolean isSpectatorOnInstance(MmcPlayer spectator){
+        return this.spectators.stream().anyMatch(player -> player.equals(spectator));
+    }
+
     // PUBLIC GETTERS
+    public List<MmcPlayer> getSpectators() {
+        return spectators;
+    }
+    public Logger getLogger() {
+        return logger;
+    }
     public GameSettings getInstanceSettings() {
         return gameSettings;
     }

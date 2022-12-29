@@ -97,8 +97,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
                 CustomGameInstanceSample.class,
                 new MmcWorld(plugin, lobbyWorldSettings),
                 new MmcWorld(plugin, gameWorldSettings),
-                factory,
-                sidebar);
+                factory);
         gamesManager = new GamesManager(plugin, gamesManagerSettings);
         gamesManager.preAllocate(5);
 
