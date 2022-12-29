@@ -2,5 +2,5 @@ package fr.multimc.api.commons.data.sources;
 
 public enum DataSourceType {
     DATABASE,
-    REST
+    REST_API
 }

@@ -1,6 +1,8 @@
 package fr.multimc.api.spigot.managers;
 
+import fr.multimc.api.commons.data.handlers.RestHandler;
 import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.rest.RestAPI;
 import fr.multimc.api.spigot.teams.MmcTeam;
 import fr.multimc.api.commons.data.handlers.DatabaseHandler;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"unused", "DataFlowIssue"})
+@SuppressWarnings("unused")
 public class TeamManager {
 
     private final ITeamHandler teamHandler;
@@ -22,13 +24,13 @@ public class TeamManager {
         this.teamHandler = new DatabaseHandler(database);
     }
 
-    public TeamManager(@NotNull String apiURL) {
-        // TODO: init handler with REST API handler
-        this.teamHandler = null;
+    public TeamManager(@NotNull RestAPI api) {
+        this.teamHandler = new RestHandler(api);
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
-        this.teamHandler.addTeam(teamCode, name, players);
+        if(!(this.teamHandler instanceof DatabaseHandler)) throw new UnsupportedOperationException("This method is only available with a database handler");
+        ((DatabaseHandler) this.teamHandler).addTeam(teamCode, name, players);
     }
 
     public List<MmcTeam> loadTeams(){

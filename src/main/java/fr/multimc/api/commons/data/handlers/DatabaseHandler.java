@@ -20,7 +20,6 @@ public class DatabaseHandler implements ITeamHandler {
         this.playersTable = new PlayersTable(database);
     }
 
-    @Override
     public void addTeam(String teamCode, String teamName, String... playersName){
         QueryResult queryResult = this.teamsTable.addTeam(teamCode, teamName, playersName);
         if(queryResult.queryStatus() != SQLState.SUCCESS) throw new RuntimeException("Error while adding team to database: %s".formatted(queryResult.queryStatus()));
