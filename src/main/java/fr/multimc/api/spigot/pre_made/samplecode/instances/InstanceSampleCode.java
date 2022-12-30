@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
+import fr.multimc.api.commons.data.DataSourceLoader;
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.spigot.games.enums.GameType;
 import fr.multimc.api.spigot.games.settings.GameSettings;
@@ -58,9 +59,12 @@ public class InstanceSampleCode implements SampleCode, Listener {
         sidebar.getSidebar().title(Component.text("Sidebar title", NamedTextColor.GREEN));
         sidebar.getSidebar().line(0, Component.text("Test"));
 
-        new File(plugin.getDataFolder().getPath() + "/database.db").delete();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
+
+        plugin.saveDefaultConfig();
+
+        new File(plugin.getDataFolder().getPath() + "/database.db").delete();
+        Database database = (Database) new DataSourceLoader(plugin.getConfig(), plugin.getDataFolder(), plugin.getLogger()).loadDataSource();
         teamManager = new TeamManager(database);
         teamManager.addTeam("T1", "Name 1", "Xen0Xys");
 //        teamManager.addTeam("T2", "Name 2", "XenAdmin");

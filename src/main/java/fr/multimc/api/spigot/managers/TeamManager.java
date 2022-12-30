@@ -1,6 +1,7 @@
 package fr.multimc.api.spigot.managers;
 
 import fr.multimc.api.commons.data.handlers.RestHandler;
+import fr.multimc.api.commons.data.sources.IDataSource;
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.rest.RestAPI;
 import fr.multimc.api.spigot.teams.MmcTeam;
@@ -20,12 +21,14 @@ public class TeamManager {
     private final ITeamHandler teamHandler;
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
-    public TeamManager(@NotNull Database database) {
-        this.teamHandler = new DatabaseHandler(database);
-    }
-
-    public TeamManager(@NotNull RestAPI api) {
-        this.teamHandler = new RestHandler(api);
+    public TeamManager(@NotNull IDataSource dataSource){
+        if(dataSource instanceof Database){
+            this.teamHandler = new DatabaseHandler((Database) dataSource);
+        }else if(dataSource instanceof RestAPI){
+            this.teamHandler = new RestHandler((RestAPI) dataSource);
+        }else{
+            throw new IllegalArgumentException("DataSource must be a Database or a RestAPI");
+        }
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
