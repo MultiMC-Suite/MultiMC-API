@@ -11,15 +11,30 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Xen0Xys
+ * @version 1.0
+ * @see ITeamHandler
+ */
 public class DatabaseHandler implements ITeamHandler {
     private final TeamsTable teamsTable;
     private final PlayersTable playersTable;
 
+    /**
+     * Create a new DatabaseHandler
+     * @param database {@link Database} to use
+     */
     public DatabaseHandler(@NotNull Database database) {
         this.teamsTable = new TeamsTable(database);
         this.playersTable = new PlayersTable(database);
     }
 
+    /**
+     * Add a team to the database
+     * @param teamCode {@link String} team code
+     * @param teamName {@link String} team name
+     * @param playersName {@link String}[] players usernames
+     */
     public void addTeam(String teamCode, String teamName, String... playersName){
         QueryResult queryResult = this.teamsTable.addTeam(teamCode, teamName, playersName);
         if(queryResult.queryStatus() != SQLState.SUCCESS) throw new RuntimeException("Error while adding team to database: %s".formatted(queryResult.queryStatus()));

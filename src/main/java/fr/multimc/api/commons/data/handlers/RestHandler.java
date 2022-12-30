@@ -12,10 +12,19 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * @author Xen0Xys
+ * @version 1.0
+ * @see ITeamHandler
+ */
 public class RestHandler implements ITeamHandler {
 
     private final RestAPI api;
 
+    /**
+     * Create a new RestHandler
+     * @param api {@link RestAPI} to use
+     */
     public RestHandler(RestAPI api) {
         this.api = api;
     }
