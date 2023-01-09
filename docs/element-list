@@ -55,6 +55,10 @@ fr.multimc.api.spigot.worlds
 fr.multimc.api.spigot.worlds.generators
 fr.multimc.api.spigot.worlds.locations
 fr.multimc.api.spigot.worlds.locations.zones
+fr.multimc.api.spigot.worlds.locations.zones.effects
+fr.multimc.api.spigot.worlds.locations.zones.effects.effects
+fr.multimc.api.spigot.worlds.locations.zones.effects.interfaces
+fr.multimc.api.spigot.worlds.locations.zones.enums
 fr.multimc.api.spigot.worlds.schematics
 fr.multimc.api.spigot.worlds.settings
 fr.multimc.api.spigot.worlds.settings.enums
