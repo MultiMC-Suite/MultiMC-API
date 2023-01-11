@@ -1,8 +1,11 @@
 package fr.multimc.api.spigot.managers;
 
-import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.commons.data.handlers.RestHandler;
+import fr.multimc.api.commons.data.sources.IDataSource;
+import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.rest.RestAPI;
 import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.commons.data.handlers.GameTablesHandler;
+import fr.multimc.api.commons.data.handlers.DatabaseHandler;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import org.jetbrains.annotations.NotNull;
@@ -12,23 +15,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"unused", "DataFlowIssue"})
+@SuppressWarnings("unused")
 public class TeamManager {
 
     private final ITeamHandler teamHandler;
     private final List<MmcTeam> mmcTeams = new ArrayList<>();
 
-    public TeamManager(@NotNull Database database) {
-        this.teamHandler = new GameTablesHandler(database);
-    }
-
-    public TeamManager(@NotNull String apiURL) {
-        // TODO: init handler with REST API handler
-        this.teamHandler = null;
+    public TeamManager(@NotNull IDataSource dataSource){
+        if(dataSource instanceof Database){
+            this.teamHandler = new DatabaseHandler((Database) dataSource);
+        }else if(dataSource instanceof RestAPI){
+            this.teamHandler = new RestHandler((RestAPI) dataSource);
+        }else{
+            throw new IllegalArgumentException("DataSource must be a Database or a RestAPI");
+        }
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
-        this.teamHandler.addTeam(teamCode, name, players);
+        if(!(this.teamHandler instanceof DatabaseHandler)) throw new UnsupportedOperationException("This method is only available with a database handler");
+        ((DatabaseHandler) this.teamHandler).addTeam(teamCode, name, players);
     }
 
     public List<MmcTeam> loadTeams(){

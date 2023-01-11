@@ -156,9 +156,10 @@ public class GamesManagerEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerTeleport(PlayerTeleportEvent e){
-        if(e.getCause() != PlayerTeleportEvent.TeleportCause.SPECTATE) return;
+    public void onSpectatorTeleport(PlayerTeleportEvent e){
+        if(e.getCause() != PlayerTeleportEvent.TeleportCause.SPECTATE) return; // Only check for spectator teleportation
         Player player = e.getPlayer();
+        // Get the player corresponding to the teleport location
         Player targetPlayer = e.getTo().getWorld().getPlayers().get(0);
         for(Player worldPlayer : e.getTo().getWorld().getPlayers()){
             if(worldPlayer.getLocation().distance(e.getTo()) < targetPlayer.getLocation().distance(e.getTo())){
@@ -167,33 +168,56 @@ public class GamesManagerEvents implements Listener {
         }
         // If player go to another manager, remove him from spectators and stop here
         if(!e.getTo().getWorld().equals(this.gamesManager.getGameWorld().getWorld())){
-            this.gamesManager.getSpectators().remove(new MmcPlayer(e.getPlayer()));
+            this.gamesManager.removeSpectator(new MmcPlayer(player));
             return;
         }
-        // If player came from another manager, to this manager, set him as a manager's spectator
-        if(!e.getFrom().getWorld().equals(this.gamesManager.getGameWorld().getWorld()) && !e.getFrom().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld())){
-            if(e.getTo().getWorld().equals(this.gamesManager.getGameWorld().getWorld()) || e.getTo().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld())){
-                this.logger.info(String.format("Player %s came from another manager, make him a spectator", e.getPlayer().getName()));
-                this.gamesManager.addSpectator(new MmcPlayer(e.getPlayer()), 0);
-            }
-        }
 
-        // If target player is a spectator, set him spectate the same instance
-        if(gamesManager.isSpectator(new MmcPlayer(targetPlayer))){
-            int targetGameInstanceId = gamesManager.getSpectators().get(new MmcPlayer(targetPlayer));
-            gamesManager.getSpectators().replace(new MmcPlayer(player), targetGameInstanceId);
-            System.out.println("Player " + player.getName() + " is now spectating instance " + targetGameInstanceId);
+        // Remove spectator if already spectate an instance
+        if(this.gamesManager.isSpectator(new MmcPlayer(player)))
+            this.gamesManager.removeSpectator(new MmcPlayer(player));
+
+        // If the target player is spectating an instance, make player spectating the same instance
+        GameInstance targetInstance = this.gamesManager.getInstanceFromSpectator(new MmcPlayer(targetPlayer));
+        if(targetInstance != null){
+            this.logger.info("Spectator %s is now spectating instance %d like player %s".formatted(player.getName(), targetInstance.getInstanceId(), targetPlayer.getName()));
+            this.gamesManager.addSpectator(new MmcPlayer(player), targetInstance.getInstanceId());
+            return;
         }
-        // Else if target player is a game player, set him spectate his game
-        else{
-            for(GameInstance instance : gamesManager.getInstances()){
-                if(instance.isPlayerOnInstance(new MmcPlayer(targetPlayer))){
-                    gamesManager.getSpectators().replace(new MmcPlayer(player), instance.getInstanceId());
-                    System.out.println("Player " + player.getName() + " is now spectating instance " + instance.getInstanceId());
-                    return;
-                }
-            }
+        // If the target player is playing an instance, make player spectating the same instance
+        targetInstance = this.gamesManager.getInstanceFromPlayer(new MmcPlayer(targetPlayer));
+        if(targetInstance != null){
+            this.logger.info("Spectator %s is now spectating instance %d in which is player %s".formatted(player.getName(), targetInstance.getInstanceId(), targetPlayer.getName()));
+            this.gamesManager.addSpectator(new MmcPlayer(player), targetInstance.getInstanceId());
+            return;
         }
+        // If no corresponding instance found, make him spectate instance 0
+        this.logger.info("Spectator %s is now spectating instance 0".formatted(player.getName()));
+        this.gamesManager.addSpectator(new MmcPlayer(player), 0);
+
+//        // If player came from another manager, to this manager, set him as a manager's spectator
+//        if(!e.getFrom().getWorld().equals(this.gamesManager.getGameWorld().getWorld()) && !e.getFrom().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld())){
+//            if(e.getTo().getWorld().equals(this.gamesManager.getGameWorld().getWorld()) || e.getTo().getWorld().equals(this.gamesManager.getLobbyWorld().getWorld())){
+//                this.logger.info(String.format("Player %s came from another manager, make him a spectator", e.getPlayer().getName()));
+//                this.gamesManager.addSpectator(new MmcPlayer(e.getPlayer()), 0);
+//            }
+//        }
+//
+//        // If target player is a spectator, set him spectate the same instance
+//        if(gamesManager.isSpectator(new MmcPlayer(targetPlayer))){
+//            int targetGameInstanceId = gamesManager.getSpectators().get(new MmcPlayer(targetPlayer));
+//            gamesManager.getSpectators().replace(new MmcPlayer(player), targetGameInstanceId);
+//            System.out.println("Player " + player.getName() + " is now spectating instance " + targetGameInstanceId);
+//        }
+//        // Else if target player is a game player, set him spectate his game
+//        else{
+//            for(GameInstance instance : gamesManager.getInstances()){
+//                if(instance.isPlayerOnInstance(new MmcPlayer(targetPlayer))){
+//                    gamesManager.getSpectators().replace(new MmcPlayer(player), instance.getInstanceId());
+//                    System.out.println("Player " + player.getName() + " is now spectating instance " + instance.getInstanceId());
+//                    return;
+//                }
+//            }
+//        }
     }
 
 }
