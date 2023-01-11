@@ -74,12 +74,12 @@ public class InstanceSampleCode implements SampleCode, Listener {
         Schematic schematic = new Schematic(plugin, "instances_test", new SchematicOptions());
         GameSettings settings = new GameSettings(
                 schematic,
-                GameType.FFA,
+                GameType.SOLO,
                 null,
                 List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 null,
                 null,
-                120,
+                30,
                 1,
                 20);
         WorldSettings lobbyWorldSettings = new WorldSettings(
@@ -88,6 +88,8 @@ public class InstanceSampleCode implements SampleCode, Listener {
                 null,
                 Difficulty.PEACEFUL,
                 GameMode.ADVENTURE);
+        lobbyWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        lobbyWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         lobbyWorldSettings.addPrevention(WorldPrevention.ALL);
         WorldSettings gameWorldSettings = new WorldSettings(
                 "multimc_game");
@@ -98,7 +100,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
         GamesManagerSettings gamesManagerSettings = new GamesManagerSettings(
                 settings,
-                CustomGameInstanceSample.class,
+                SampleGameInstance.class,
                 new MmcWorld(plugin, lobbyWorldSettings),
                 new MmcWorld(plugin, gameWorldSettings),
                 factory);

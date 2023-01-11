@@ -26,7 +26,7 @@ public class PotionZoneEffect implements IZoneEffect {
      */
     public PotionZoneEffect(PotionEffectType effectType, int level, int duration, boolean particules) {
         this.effectType = effectType;
-        this.effect = new PotionEffect(effectType, duration, level, particules);
+        this.effect = new PotionEffect(effectType, duration, level, false, particules);
     }
 
     /**
