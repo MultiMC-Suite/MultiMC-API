@@ -8,6 +8,7 @@ import fr.multimc.api.spigot.managers.GamesManager;
 import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.managers.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
+import fr.multimc.api.spigot.pre_made.commands.executors.DebugCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
@@ -108,6 +109,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         gamesManager.preAllocate(5);
 
         // Commands
+        plugin.getCommand("debug-mmc").setExecutor(new DebugCommand(gamesManager));
         plugin.getCommand("stop-mmc").setExecutor(new StopCommand(gamesManager));
         plugin.getCommand("start-mmc").setExecutor(new StartCommand(gamesManager, teamManager));
         plugin.getCommand("start-mmc").setTabCompleter(new StartTabCompleter());
