@@ -1,0 +1,18 @@
+DataSource:
+  # May be SQLITE, MYSQL or REST_API
+  Type: "SQLITE"
+  # If type is SQLITE, the following properties are required
+  SQLite:
+    FileName: "database.db"
+  # If type is MYSQL, the following properties are required
+  MySQL:
+    HostName: "localhost"
+    Port: 3306
+    Username: "username"
+    Password: "password"
+    Database: "database"
+  # If type is REST_API, the following properties are required
+  RestApi:
+      Url: "http://localhost:8080"
+      Username: "root"
+      Password: "root"

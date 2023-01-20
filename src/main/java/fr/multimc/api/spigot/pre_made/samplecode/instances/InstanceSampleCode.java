@@ -1,12 +1,14 @@
 package fr.multimc.api.spigot.pre_made.samplecode.instances;
 
-import fr.multimc.api.commons.data.database.Database;
+import fr.multimc.api.commons.data.DataSourceLoader;
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.spigot.games.enums.GameType;
 import fr.multimc.api.spigot.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.GamesManager;
 import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.managers.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
+import fr.multimc.api.spigot.pre_made.commands.executors.DebugCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
@@ -58,9 +60,12 @@ public class InstanceSampleCode implements SampleCode, Listener {
         sidebar.getSidebar().title(Component.text("Sidebar title", NamedTextColor.GREEN));
         sidebar.getSidebar().line(0, Component.text("Test"));
 
-        new File(plugin.getDataFolder().getPath() + "/database.db").delete();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Database database = new Database(new File(plugin.getDataFolder().getPath() + "/database.db"), plugin.getLogger());
+
+        plugin.saveDefaultConfig();
+
+        new File(plugin.getDataFolder().getPath() + "/database.db").delete();
+        Database database = (Database) new DataSourceLoader(plugin.getConfig(), plugin.getDataFolder(), plugin.getLogger()).loadDataSource();
         teamManager = new TeamManager(database);
         teamManager.addTeam("T1", "Name 1", "Xen0Xys");
 //        teamManager.addTeam("T2", "Name 2", "XenAdmin");
@@ -70,12 +75,12 @@ public class InstanceSampleCode implements SampleCode, Listener {
         Schematic schematic = new Schematic(plugin, "instances_test", new SchematicOptions());
         GameSettings settings = new GameSettings(
                 schematic,
-                GameType.FFA,
+                GameType.SOLO,
                 null,
                 List.of(new RelativeLocation[]{new RelativeLocation(-2.5, 1, -1.5), new RelativeLocation(-4.5, 4, -5.5)}),
                 null,
                 null,
-                120,
+                30,
                 1,
                 20);
         WorldSettings lobbyWorldSettings = new WorldSettings(
@@ -84,25 +89,27 @@ public class InstanceSampleCode implements SampleCode, Listener {
                 null,
                 Difficulty.PEACEFUL,
                 GameMode.ADVENTURE);
+        lobbyWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        lobbyWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         lobbyWorldSettings.addPrevention(WorldPrevention.ALL);
         WorldSettings gameWorldSettings = new WorldSettings(
                 "multimc_game");
         gameWorldSettings.addPrevention(WorldPrevention.ALL);
-        gameWorldSettings.addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw prevention because Prevention.ALL is already present
+        gameWorldSettings.addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw damage prevention because Prevention.ALL is already present
         gameWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         gameWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
         GamesManagerSettings gamesManagerSettings = new GamesManagerSettings(
                 settings,
-                CustomGameInstanceSample.class,
+                SampleGameInstance.class,
                 new MmcWorld(plugin, lobbyWorldSettings),
                 new MmcWorld(plugin, gameWorldSettings),
-                factory,
-                sidebar);
+                factory);
         gamesManager = new GamesManager(plugin, gamesManagerSettings);
         gamesManager.preAllocate(5);
 
         // Commands
+        plugin.getCommand("debug-mmc").setExecutor(new DebugCommand(gamesManager));
         plugin.getCommand("stop-mmc").setExecutor(new StopCommand(gamesManager));
         plugin.getCommand("start-mmc").setExecutor(new StartCommand(gamesManager, teamManager));
         plugin.getCommand("start-mmc").setTabCompleter(new StartTabCompleter());

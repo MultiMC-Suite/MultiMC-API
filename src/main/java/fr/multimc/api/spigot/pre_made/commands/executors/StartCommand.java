@@ -17,16 +17,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class that implements the {@link CommandExecutor} interface for the "start" command.
+ * Allows for starting a game with specified teams.
+ */
 @SuppressWarnings("unused")
 public class StartCommand implements CommandExecutor {
     private final GamesManager gamesManager;
     private final TeamManager teamManager;
 
+    /**
+     * Constructor for the StartCommand class.
+     * @param gamesManager The {@link GamesManager} instance to be used for starting the game.
+     * @param teamManager The {@link TeamManager} instance to be used for managing teams.
+     */
     public StartCommand(@NotNull GamesManager gamesManager, @NotNull TeamManager teamManager){
         this.gamesManager = gamesManager;
         this.teamManager = teamManager;
     }
 
+    /**
+     * Executes the "start" command when called.
+     * @param commandSender The {@link CommandSender} of the command.
+     * @param command The {@link Command} being executed.
+     * @param s {@link String} that represents yhe name of the command being executed.
+     * @param args {@link String}[] that represents the additional arguments passed with the command.
+     * @return boolean indicating if the command was successful or not.
+     */
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         List<MmcTeam> teams;
@@ -46,6 +63,12 @@ public class StartCommand implements CommandExecutor {
         return true;
     }
 
+    /**
+     * Creates and dispatch players into teams with a specified team size and dispatch algorithm.
+     * @param teamSize The size of each team.
+     * @param dispatchAlgorithm The {@link DispatchAlgorithm} to be used for dispatching players into teams.
+     * @return A {@link List<MmcTeam>} with players.
+     */
     public List<MmcTeam> getTeams(int teamSize, DispatchAlgorithm dispatchAlgorithm){
         List<MmcTeam> teams = new ArrayList<>();
         List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
