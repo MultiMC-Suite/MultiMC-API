@@ -22,7 +22,7 @@ public class ServerApi extends JavaPlugin {
     @Override
     public void onEnable() {
         this.getCommand("relativeto").setExecutor(new RelativeToCommand());
-        new InstanceSampleCode().run(this);
+//        new InstanceSampleCode().run(this);
     }
 
     public static JavaPlugin getInstance() {
