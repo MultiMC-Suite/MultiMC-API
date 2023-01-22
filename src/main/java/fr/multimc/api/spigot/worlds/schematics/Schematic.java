@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Schematic {
@@ -28,6 +29,12 @@ public class Schematic {
     private final File schematicFile;
     private final SchematicOptions options;
 
+    /**
+     * Constructor for {@link Schematic} class
+     * @param plugin the {@link Plugin}
+     * @param name the name of the schematic
+     * @param options the {@link SchematicOptions} of the schematic
+     */
     public Schematic(@NotNull Plugin plugin, @NotNull String name, @NotNull SchematicOptions options) {
         File pluginFile = new File("schematics/" + name + ".schem");
         this.schematicFile = new File(plugin.getDataFolder() + "/" + pluginFile.getPath());
@@ -42,6 +49,11 @@ public class Schematic {
         }
     }
 
+    /**
+     * Constructor for {@link Schematic} class
+     * @param schematicFile the {@link File} of the schematic
+     * @param options the {@link SchematicOptions} of the {@link Schematic}
+     */
     public Schematic(@NotNull File schematicFile, @NotNull SchematicOptions options) {
         this.schematicFile = schematicFile;
         this.options = options;
@@ -52,6 +64,11 @@ public class Schematic {
         }
     }
 
+    /**
+     * Load the {@link Schematic}
+     * @return the loaded {@link Clipboard}
+     * @throws IOException if there is an issue reading the file
+     */
     private Clipboard load() throws IOException {
         Clipboard localClipboard;
         ClipboardFormat format = ClipboardFormats.findByFile(this.schematicFile);
@@ -64,10 +81,19 @@ public class Schematic {
         return localClipboard;
     }
 
+    /**
+     * Paste the schematic
+     * @throws WorldEditException the world edit exception
+     */
     public void paste() throws WorldEditException {
         this.paste(this.options);
     }
 
+    /**
+     * Paste the schematic
+     * @param options the options of the schematic
+     * @throws WorldEditException the world edit exception
+     */
     public void paste(@NotNull SchematicOptions options) throws WorldEditException {
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(options.getLocation().getWorld()))) {
             ClipboardHolder clipboardHolder = new ClipboardHolder(this.clipboard);
@@ -81,7 +107,11 @@ public class Schematic {
         }
     }
 
-    public HashMap<Material, Integer> getBlockCount(){
+    /**
+     * Get the block count of the schematic
+     * @return a {@link java.util.Map} containing the block count for each {@link Material}
+     */
+    public Map<Material, Integer> getBlockCount(){
         HashMap<Material, Integer> blockCount = new HashMap<>();
         for(BlockVector3 blockVector3: this.clipboard.getRegion()){
             Material material = BukkitAdapter.adapt(this.clipboard.getBlock(blockVector3).getBlockType());
@@ -94,12 +124,15 @@ public class Schematic {
         return blockCount;
     }
 
+    // PUBLIC GETTERS
     public File getSchematicFile() throws NullPointerException {
-        if (!this.schematicFile.exists()) throw new NullPointerException("Provied file doesn't exist!");
+        if (!this.schematicFile.exists()) throw new NullPointerException("Provided file doesn't exist!");
         return schematicFile;
     }
-
     public SchematicOptions getOptions() {
         return options;
+    }
+    public Clipboard getClipboard() {
+        return clipboard;
     }
 }
