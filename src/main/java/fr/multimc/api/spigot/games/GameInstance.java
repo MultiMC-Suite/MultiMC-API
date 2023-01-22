@@ -409,4 +409,9 @@ public class GameInstance extends BukkitRunnable{
     public Map<Long, GameState> getInstanceStateUpdates() {
         return instanceStateUpdates;
     }
+
+    // PUBLIC SETTERS
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
+    }
 }
