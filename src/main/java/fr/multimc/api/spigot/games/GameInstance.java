@@ -81,6 +81,7 @@ public class GameInstance extends BukkitRunnable{
 
     /**
      * Initialize game instance
+     * @param isPreAllocated If the gameSchematic is already pasted
      */
     public void init(boolean isPreAllocated){
         if(this.gameState == GameState.PRE_INIT || this.gameState == GameState.INIT) return;
@@ -91,6 +92,7 @@ public class GameInstance extends BukkitRunnable{
             this.updateState(GameState.ALLOCATE);
         }
         this.updateState(GameState.PRE_INIT);
+        // Teleport players
         for(UUID uuid: this.playerSpawns.keySet()){
             MmcPlayer mmcPlayer = this.players.stream().filter(p -> p.getUUID().equals(uuid)).findFirst().orElse(null);
             if(mmcPlayer != null){
@@ -208,12 +210,21 @@ public class GameInstance extends BukkitRunnable{
         }
     }
 
+    /**
+     * Asynchronously set a player spawn
+     * @param mmcPlayer Player to set spawn
+     * @param location Target location
+     */
     public void setPlayerSpawn(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
         if(location != null){
             Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.setSpawnPoint(location));
         }
     }
 
+    /**
+     * Broadcast a message to all players in the instance
+     * @param message Message to broadcast
+     */
     public void broadcast(@Nonnull Component message) {
         this.getPlayers().forEach(player -> player.sendMessage(message));
     }
