@@ -4,6 +4,7 @@ import fr.multimc.api.spigot.entities.interfaces.IHasGameMode;
 import fr.multimc.api.spigot.entities.interfaces.IHasSpeed;
 import fr.multimc.api.spigot.entities.interfaces.ITeleportable;
 import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
+import fr.multimc.api.spigot.entities.player.enums.ClearMethod;
 import fr.multimc.api.spigot.tools.builders.items.ItemBuilder;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import net.kyori.adventure.text.Component;
@@ -183,21 +184,40 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
         return true;
     }
 
-    public boolean clear() {
+    /**
+     * Clears the player's inventory and/or armor
+     * @param clearMethod The {@link ClearMethod} to use to clear the player's inventory
+     * @return true if the player was online and the inventory was cleared
+     */
+    public boolean clear(@Nullable ClearMethod clearMethod){
+        switch (clearMethod){
+            case INVENTORY -> {
+                return this.clearInventory();
+            }
+            case ARMOR -> {
+                return this.clearArmor();
+            }
+            default -> {
+                return this.clear();
+            }
+        }
+    }
+
+    private boolean clear() {
         if (!this.isOnline()) return false;
         this.getInventory().clear();
         this.getPlayer().updateInventory();
         return true;
     }
 
-    public boolean clearInventory() {
+    private boolean clearInventory() {
         if (!this.isOnline()) return false;
         this.getInventory().setStorageContents(new ItemStack[9*4]);
         this.getPlayer().updateInventory();
         return true;
     }
 
-    public boolean clearArmor() {
+    private boolean clearArmor() {
         if (!this.isOnline()) return false;
         this.getInventory().setArmorContents(new ItemStack[4]);
         this.getPlayer().updateInventory();
