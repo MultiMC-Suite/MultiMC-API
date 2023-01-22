@@ -116,6 +116,10 @@ public class Zone implements Listener {
                 && MathNumber.isDoubleBetween(location.getZ(), minZ, maxZ);
     }
 
+    /**
+     * Get a {@link List<Block>} of all the blocks in the zone.
+     * @return {@link List<Block>}
+     */
     public List<Block> getBlocks(){
         int minBlockX = this.minLocation.getBlockX();
         int minBlockY = this.minLocation.getBlockY();
@@ -124,13 +128,10 @@ public class Zone implements Listener {
         int maxBlockY = this.maxLocation.getBlockY();
         int maxBlockZ = this.maxLocation.getBlockZ();
         List<Block> blocks = new ArrayList<>();
-        for(int x = minBlockX; x <= maxBlockX; x++){
-            for(int y = minBlockY; y <= maxBlockY; y++){
-                for(int z = minBlockZ; z <= maxBlockZ; z++){
+        for(int x = minBlockX; x <= maxBlockX; x++)
+            for(int y = minBlockY; y <= maxBlockY; y++)
+                for(int z = minBlockZ; z <= maxBlockZ; z++)
                     blocks.add(this.world.getBlockAt(x, y, z));
-                }
-            }
-        }
         return blocks;
     }
 
