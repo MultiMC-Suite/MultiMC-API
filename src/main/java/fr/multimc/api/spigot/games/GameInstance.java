@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
 public class GameInstance extends BukkitRunnable{
 
-    private final JavaPlugin plugin;
+    private final Plugin plugin;
     private final Logger logger;
     private final GamesManager gamesManager;
     private final GameSettings gameSettings;
@@ -381,6 +382,9 @@ public class GameInstance extends BukkitRunnable{
     }
 
     // PUBLIC GETTERS
+    public Plugin getPlugin() {
+        return plugin;
+    }
     public List<MmcPlayer> getSpectators() {
         return spectators;
     }
