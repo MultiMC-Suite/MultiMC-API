@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"unused", "rawtypes"})
+@SuppressWarnings({"unused", "rawtypes", "UnusedReturnValue"})
 public class WorldSettings {
 
     private final String worldName;
@@ -65,16 +65,20 @@ public class WorldSettings {
         return gameRules;
     }
 
-    public void addGameRule(GameRule gameRule, Object value) {
+    public WorldSettings addGameRule(GameRule gameRule, Object value) {
         gameRules.put(gameRule, value);
+        return this;
     }
-    public void addPrevention(WorldPrevention prevention) {
+    public WorldSettings addPrevention(WorldPrevention prevention) {
         preventions.add(prevention);
+        return this;
     }
-    public void setDifficulty(Difficulty difficulty) {
+    public WorldSettings setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
+        return this;
     }
-    public void setGameMode(GameMode gameMode) {
+    public WorldSettings setGameMode(GameMode gameMode) {
         this.gameMode = gameMode;
+        return this;
     }
 }
