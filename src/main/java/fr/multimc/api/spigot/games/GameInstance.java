@@ -19,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +28,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
-public class GameInstance extends BukkitRunnable{
+public class GameInstance {
 
     private final Plugin plugin;
     private final Logger logger;
@@ -49,6 +50,7 @@ public class GameInstance extends BukkitRunnable{
     private final Map<Long, GameState> instanceStateUpdates = new HashMap<>();
 
     private boolean isRunning = false;
+    private BukkitTask task;
     private int taskId;
 
     private int remainingTime;
@@ -124,7 +126,7 @@ public class GameInstance extends BukkitRunnable{
         }
         if(taskId != 0)
             Bukkit.getScheduler().cancelTask(taskId);
-        this.taskId = this.runTaskAsynchronously(this.plugin).getTaskId();
+        this.taskId = this.run();
         this.updateState(GameState.START);
     }
 
@@ -173,40 +175,48 @@ public class GameInstance extends BukkitRunnable{
      * Main game loop, run async when instance is started
      */
     @SuppressWarnings("BusyWait")
-    @Override
-    public void run(){
-        this.isRunning = true;
-        double deltaTick = 0.05 * this.gameSettings.tickDelay();
-        long lastTickTime;
-        long lastSecondTime;
-        long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
-        long nextSecondTime = System.currentTimeMillis() + 1000L;
-        while(isRunning && remainingTime >= 0){
-            if(System.currentTimeMillis() >= nextTickTime){
-                this.tick();
-                lastTickTime = nextTickTime;
-                nextTickTime = (long) (lastTickTime + deltaTick * 1000L);
+    private int run(){
+        this.task = new BukkitRunnable(){
+            @Override
+            public void run() {
+                isRunning = true;
+                double deltaTick = 0.05 * gameSettings.tickDelay();
+                long lastTickTime;
+                long lastSecondTime;
+                long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
+                long nextSecondTime = System.currentTimeMillis() + 1000L;
+                while(isRunning && remainingTime >= 0){
+                    if(System.currentTimeMillis() >= nextTickTime){
+                        tick();
+                        lastTickTime = nextTickTime;
+                        nextTickTime = (long) (lastTickTime + deltaTick * 1000L);
+                    }
+                    if(System.currentTimeMillis() >= nextSecondTime){
+                        remainingTime--;
+                        lastSecondTime = nextSecondTime;
+                        nextSecondTime = lastSecondTime + 1000L;
+                    }
+                    try {
+                        Thread.sleep(2);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if(remainingTime < 0){
+                    stop();
+                }
             }
-            if(System.currentTimeMillis() >= nextSecondTime){
-                this.remainingTime--;
-                lastSecondTime = nextSecondTime;
-                nextSecondTime = lastSecondTime + 1000L;
-            }
-            try {
-                Thread.sleep(2);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if(remainingTime < 0){
-            this.stop();
-        }
+        }.runTaskAsynchronously(this.plugin);
+        return this.task.getTaskId();
     }
 
-    @Override
-    public synchronized void cancel() throws IllegalStateException {
+    public void cancel() throws IllegalStateException {
         this.isRunning = false;
-        super.cancel();
+        Bukkit.getScheduler().cancelTask(taskId);
+    }
+
+    public boolean isCancelled(){
+        return this.task.isCancelled();
     }
 
     /**
