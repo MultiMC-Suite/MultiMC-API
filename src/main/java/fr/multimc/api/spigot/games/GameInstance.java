@@ -49,6 +49,8 @@ public class GameInstance extends BukkitRunnable{
     private final Map<Long, GameState> instanceStateUpdates = new HashMap<>();
 
     private boolean isRunning = false;
+    private int taskId;
+
     private int remainingTime;
 
     public GameInstance(JavaPlugin plugin, GamesManager gamesManager, GameSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
@@ -120,7 +122,9 @@ public class GameInstance extends BukkitRunnable{
             player.setFoodLevel(20);
             player.setSaturation(20);
         }
-        this.runTaskAsynchronously(this.plugin);
+        if(taskId != 0)
+            Bukkit.getScheduler().cancelTask(taskId);
+        this.taskId = this.runTaskAsynchronously(this.plugin).getTaskId();
         this.updateState(GameState.START);
     }
 
@@ -197,6 +201,12 @@ public class GameInstance extends BukkitRunnable{
         if(remainingTime < 0){
             this.stop();
         }
+    }
+
+    @Override
+    public synchronized void cancel() throws IllegalStateException {
+        this.isRunning = false;
+        super.cancel();
     }
 
     /**
