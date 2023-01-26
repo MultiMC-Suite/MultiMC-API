@@ -6,6 +6,7 @@ import fr.multimc.api.spigot.worlds.locations.zones.enums.ZoneListener;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
@@ -24,6 +27,7 @@ public class Zone implements Listener {
 
     private final World world;
     private final double minX, maxX, minY, maxY, minZ, maxZ;
+    private final Location minLocation, maxLocation;
     private final ZoneListener callback;
 
     /**
@@ -44,6 +48,8 @@ public class Zone implements Listener {
         this.maxX = Math.max(location1.getBlockX(), location2.getBlockX());
         this.maxY = Math.max(location1.getBlockY(), location2.getBlockY());
         this.maxZ = Math.max(location1.getBlockZ(), location2.getBlockZ());
+        this.minLocation = new Location(world, minX, minY, minZ);
+        this.maxLocation = new Location(world, maxX, maxY, maxZ);
         this.callback = callback;
         if(Objects.nonNull(plugin) && Objects.nonNull(callback))
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -108,6 +114,25 @@ public class Zone implements Listener {
         return MathNumber.isDoubleBetween(location.getX(), minX, maxX)
                 && MathNumber.isDoubleBetween(location.getY(), minY, maxY)
                 && MathNumber.isDoubleBetween(location.getZ(), minZ, maxZ);
+    }
+
+    /**
+     * Get a {@link List<Block>} of all the blocks in the zone.
+     * @return {@link List<Block>}
+     */
+    public List<Block> getBlocks(){
+        int minBlockX = this.minLocation.getBlockX();
+        int minBlockY = this.minLocation.getBlockY();
+        int minBlockZ = this.minLocation.getBlockZ();
+        int maxBlockX = this.maxLocation.getBlockX();
+        int maxBlockY = this.maxLocation.getBlockY();
+        int maxBlockZ = this.maxLocation.getBlockZ();
+        List<Block> blocks = new ArrayList<>();
+        for(int x = minBlockX; x <= maxBlockX; x++)
+            for(int y = minBlockY; y <= maxBlockY; y++)
+                for(int z = minBlockZ; z <= maxBlockZ; z++)
+                    blocks.add(this.world.getBlockAt(x, y, z));
+        return blocks;
     }
 
     /**

@@ -4,6 +4,7 @@ import fr.multimc.api.spigot.entities.interfaces.IHasGameMode;
 import fr.multimc.api.spigot.entities.interfaces.IHasSpeed;
 import fr.multimc.api.spigot.entities.interfaces.ITeleportable;
 import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
+import fr.multimc.api.spigot.entities.player.enums.ClearMethod;
 import fr.multimc.api.spigot.tools.builders.items.ItemBuilder;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import net.kyori.adventure.text.Component;
@@ -17,7 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +56,7 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
     }
 
     @Override
-    public boolean setGameModeSync(@NotNull JavaPlugin plugin, @NotNull GameMode mode) {
+    public boolean setGameModeSync(@NotNull Plugin plugin, @NotNull GameMode mode) {
         if (!this.isOnline()) return false;
         if (this.getPlayer().getGameMode().equals(mode)) return false;
         Bukkit.getScheduler().runTask(plugin, () -> this.getPlayer().setGameMode(mode));
@@ -119,31 +120,31 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
     }
 
     @Override
-    public boolean teleportToSync(@NotNull JavaPlugin plugin, @NotNull MmcPlayer target) {
+    public boolean teleportToSync(@NotNull Plugin plugin, @NotNull MmcPlayer target) {
         if (!this.isOnline()) return false;
         Bukkit.getScheduler().runTask(plugin, () -> this.teleportTo(target));
         return true;
     }
 
     @Override
-    public boolean teleportRelativeSync(@NotNull JavaPlugin plugin, @NotNull RelativeLocation location) {
+    public boolean teleportRelativeSync(@NotNull Plugin plugin, @NotNull RelativeLocation location) {
         return this.teleportRelativeSync(plugin, location, false);
     }
 
     @Override
-    public boolean teleportRelativeSync(@NotNull JavaPlugin plugin, @NotNull RelativeLocation location, boolean center) {
+    public boolean teleportRelativeSync(@NotNull Plugin plugin, @NotNull RelativeLocation location, boolean center) {
         if (!this.isOnline()) return false;
         Bukkit.getScheduler().runTask(plugin, () -> this.teleportRelative(location, center));
         return true;
     }
 
     @Override
-    public boolean teleportSync(@NotNull JavaPlugin plugin, @NotNull Location location) {
+    public boolean teleportSync(@NotNull Plugin plugin, @NotNull Location location) {
         return this.teleportSync(plugin, location, false);
     }
 
     @Override
-    public boolean teleportSync(@NotNull JavaPlugin plugin, @NotNull Location location, boolean center) {
+    public boolean teleportSync(@NotNull Plugin plugin, @NotNull Location location, boolean center) {
         if (!this.isOnline()) return false;
         Bukkit.getScheduler().runTask(plugin, () -> this.teleport(location, center));
         return true;
@@ -183,21 +184,40 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
         return true;
     }
 
-    public boolean clear() {
+    /**
+     * Clears the player's inventory and/or armor
+     * @param clearMethod The {@link ClearMethod} to use to clear the player's inventory
+     * @return true if the player was online and the inventory was cleared
+     */
+    public boolean clear(@Nullable ClearMethod clearMethod){
+        switch (clearMethod){
+            case INVENTORY -> {
+                return this.clearInventory();
+            }
+            case ARMOR -> {
+                return this.clearArmor();
+            }
+            default -> {
+                return this.clear();
+            }
+        }
+    }
+
+    private boolean clear() {
         if (!this.isOnline()) return false;
         this.getInventory().clear();
         this.getPlayer().updateInventory();
         return true;
     }
 
-    public boolean clearInventory() {
+    private boolean clearInventory() {
         if (!this.isOnline()) return false;
         this.getInventory().setStorageContents(new ItemStack[9*4]);
         this.getPlayer().updateInventory();
         return true;
     }
 
-    public boolean clearArmor() {
+    private boolean clearArmor() {
         if (!this.isOnline()) return false;
         this.getInventory().setArmorContents(new ItemStack[4]);
         this.getPlayer().updateInventory();

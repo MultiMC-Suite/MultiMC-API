@@ -13,7 +13,7 @@ import java.util.Map;
 public class ApiSampleCode implements SampleCode {
     @Override
     public void run(JavaPlugin plugin) {
-        RestAPI api = new RestAPI(plugin.getLogger(), "http://194.9.172.252:3000", "root", "root");
+        RestAPI api = new RestAPI(plugin.getLogger(), "http://url:3000", "root", "root");
         if(!api.login()) Bukkit.getServer().shutdown();
 
         RestHandler handler = new RestHandler(api);

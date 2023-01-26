@@ -67,6 +67,8 @@ public class DataSourceLoader {
         String url = this.config.getString("DataSource.RestApi.Url");
         String username = this.config.getString("DataSource.RestApi.Username");
         String password = this.config.getString("DataSource.RestApi.Password");
-        return new RestAPI(this.logger, url, username, password);
+        RestAPI api = new RestAPI(this.logger, url, username, password);
+        if(!api.login()) throw new IllegalArgumentException("Cannot login to RestAPI");
+        return api;
     }
 }

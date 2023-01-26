@@ -16,8 +16,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,9 +29,9 @@ import java.util.*;
 import java.util.logging.Logger;
 
 @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
-public class GameInstance extends BukkitRunnable{
+public class GameInstance implements Listener {
 
-    private final JavaPlugin plugin;
+    private final Plugin plugin;
     private final Logger logger;
     private final GamesManager gamesManager;
     private final GameSettings gameSettings;
@@ -48,9 +51,12 @@ public class GameInstance extends BukkitRunnable{
     private final Map<Long, GameState> instanceStateUpdates = new HashMap<>();
 
     private boolean isRunning = false;
+    private BukkitTask task;
+    private int taskId;
+
     private int remainingTime;
 
-    public GameInstance(JavaPlugin plugin, GamesManager gamesManager, GameSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
+    public GameInstance(@NotNull JavaPlugin plugin, @NotNull GamesManager gamesManager, @NotNull GameSettings settings, @NotNull Location instanceLocation, @NotNull List<MmcTeam> mmcTeams, int instanceId) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.gamesManager = gamesManager;
@@ -74,16 +80,17 @@ public class GameInstance extends BukkitRunnable{
      * @param schematic Schematic to paste
      * @param location Location to paste the gameSchematic
      */
-    public static void allocate(Schematic schematic, Location location) {
+    public static void allocate(@NotNull Schematic schematic, @NotNull Location location) {
         schematic.getOptions().setLocation(location);
         GameInstance.pasteSchematic(schematic);
     }
 
     /**
      * Initialize game instance
+     * @param isPreAllocated If the gameSchematic is already pasted
      */
     public void init(boolean isPreAllocated){
-        if(this.gameState == GameState.PRE_INIT || this.gameState == GameState.INIT) return;
+        if(this.gameState == GameState.PRE_INIT || this.gameState == GameState.INIT) throw new RuntimeException("Game instance is already initialized or initializing");
         // Paste gameSchematic
         if(!isPreAllocated){
             this.updateState(GameState.PRE_ALLOCATE);
@@ -91,6 +98,7 @@ public class GameInstance extends BukkitRunnable{
             this.updateState(GameState.ALLOCATE);
         }
         this.updateState(GameState.PRE_INIT);
+        // Teleport players
         for(UUID uuid: this.playerSpawns.keySet()){
             MmcPlayer mmcPlayer = this.players.stream().filter(p -> p.getUUID().equals(uuid)).findFirst().orElse(null);
             if(mmcPlayer != null){
@@ -110,14 +118,16 @@ public class GameInstance extends BukkitRunnable{
      * Start game instance
      */
     public void start(){
-        if(this.gameState == GameState.PRE_START || this.gameState == GameState.START) return;
+        if(this.gameState == GameState.PRE_START || this.gameState == GameState.START) throw new RuntimeException("Game instance is already started or starting");
         this.updateState(GameState.PRE_START);
         for(MmcPlayer player : this.players){
             player.setHealth(20);
             player.setFoodLevel(20);
             player.setSaturation(20);
         }
-        this.runTaskAsynchronously(this.plugin);
+        if(taskId != 0)
+            Bukkit.getScheduler().cancelTask(taskId);
+        this.taskId = this.run();
         this.updateState(GameState.START);
     }
 
@@ -125,7 +135,7 @@ public class GameInstance extends BukkitRunnable{
      * Default instance stop (players will return to the lobby)
      */
     public void stop(){
-        if(this.gameState == GameState.PRE_STOP || this.gameState == GameState.STOP) return;
+        if(this.gameState == GameState.PRE_STOP || this.gameState == GameState.STOP) throw new RuntimeException("Game instance is already stopped or stopping");
         this.updateState(GameState.PRE_STOP);
         this.isRunning = false;
         if(!this.isCancelled()) this.cancel();
@@ -166,34 +176,48 @@ public class GameInstance extends BukkitRunnable{
      * Main game loop, run async when instance is started
      */
     @SuppressWarnings("BusyWait")
-    @Override
-    public void run(){
-        this.isRunning = true;
-        double deltaTick = 0.05 * this.gameSettings.tickDelay();
-        long lastTickTime;
-        long lastSecondTime;
-        long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
-        long nextSecondTime = System.currentTimeMillis() + 1000L;
-        while(isRunning && remainingTime >= 0){
-            if(System.currentTimeMillis() >= nextTickTime){
-                this.tick();
-                lastTickTime = nextTickTime;
-                nextTickTime = (long) (lastTickTime + deltaTick * 1000L);
+    private int run(){
+        this.task = new BukkitRunnable(){
+            @Override
+            public void run() {
+                isRunning = true;
+                double deltaTick = 0.05 * gameSettings.tickDelay();
+                long lastTickTime;
+                long lastSecondTime;
+                long nextTickTime = (long) (System.currentTimeMillis() + deltaTick * 1000L);
+                long nextSecondTime = System.currentTimeMillis() + 1000L;
+                while(isRunning && remainingTime >= 0){
+                    if(System.currentTimeMillis() >= nextTickTime){
+                        tick();
+                        lastTickTime = nextTickTime;
+                        nextTickTime = (long) (lastTickTime + deltaTick * 1000L);
+                    }
+                    if(System.currentTimeMillis() >= nextSecondTime){
+                        remainingTime--;
+                        lastSecondTime = nextSecondTime;
+                        nextSecondTime = lastSecondTime + 1000L;
+                    }
+                    try {
+                        Thread.sleep(2);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if(remainingTime < 0){
+                    stop();
+                }
             }
-            if(System.currentTimeMillis() >= nextSecondTime){
-                this.remainingTime--;
-                lastSecondTime = nextSecondTime;
-                nextSecondTime = lastSecondTime + 1000L;
-            }
-            try {
-                Thread.sleep(2);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if(remainingTime < 0){
-            this.stop();
-        }
+        }.runTaskAsynchronously(this.plugin);
+        return this.task.getTaskId();
+    }
+
+    public void cancel() throws IllegalStateException {
+        this.isRunning = false;
+        Bukkit.getScheduler().cancelTask(taskId);
+    }
+
+    public boolean isCancelled(){
+        return this.task.isCancelled();
     }
 
     /**
@@ -208,12 +232,36 @@ public class GameInstance extends BukkitRunnable{
         }
     }
 
+    /**
+     * Teleport all players to their spawn
+     */
+    public void teleportPlayersToSpawn(){
+        this.getPlayers().forEach(this::teleportPlayerToSpawn);
+    }
+
+    /**
+     * Teleport a player to his spawn
+     * @param player {@link MmcPlayer} to teleport
+     */
+    public void teleportPlayerToSpawn(@NotNull MmcPlayer player){
+        this.getPlayers().stream().filter(p -> p.getUUID().equals(player.getUUID())).findFirst().ifPresent(mmcPlayer -> this.teleportPlayer(mmcPlayer, this.getPlayerSpawns().get(player.getUUID())));
+    }
+
+    /**
+     * Asynchronously set a player spawn
+     * @param mmcPlayer Player to set spawn
+     * @param location Target location
+     */
     public void setPlayerSpawn(@NotNull MmcPlayer mmcPlayer, @Nullable Location location){
         if(location != null){
             Bukkit.getScheduler().runTask(this.plugin, () -> mmcPlayer.setSpawnPoint(location));
         }
     }
 
+    /**
+     * Broadcast a message to all players in the instance
+     * @param message Message to broadcast
+     */
     public void broadcast(@Nonnull Component message) {
         this.getPlayers().forEach(player -> player.sendMessage(message));
     }
@@ -356,7 +404,7 @@ public class GameInstance extends BukkitRunnable{
      * @param mmcPlayer Target player
      * @return True if the player is on this instance
      */
-    public boolean isPlayerOnInstance(MmcPlayer mmcPlayer){
+    public boolean isPlayerOnInstance(@NotNull MmcPlayer mmcPlayer){
         return this.players.stream().anyMatch(player -> player.equals(mmcPlayer));
     }
 
@@ -365,11 +413,14 @@ public class GameInstance extends BukkitRunnable{
      * @param spectator Target spectator
      * @return True if the spectator is on this instance
      */
-    public boolean isSpectatorOnInstance(MmcPlayer spectator){
+    public boolean isSpectatorOnInstance(@NotNull MmcPlayer spectator){
         return this.spectators.stream().anyMatch(player -> player.equals(spectator));
     }
 
     // PUBLIC GETTERS
+    public Plugin getPlugin() {
+        return plugin;
+    }
     public List<MmcPlayer> getSpectators() {
         return spectators;
     }
@@ -408,5 +459,10 @@ public class GameInstance extends BukkitRunnable{
     }
     public Map<Long, GameState> getInstanceStateUpdates() {
         return instanceStateUpdates;
+    }
+
+    // PUBLIC SETTERS
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
     }
 }
