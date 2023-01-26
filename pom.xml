@@ -6,7 +6,7 @@
 
     <groupId>fr.multimc</groupId>
     <artifactId>multimc-api</artifactId>
-    <version>1.10.1-SNAPSHOT</version>
+    <version>1.10.2-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>

@@ -216,7 +216,9 @@ public class GamesManager {
      * Stop all instances
      */
     private void stopInstances(){
-        gameInstances.forEach(this::stopInstance);
+        for(GameInstance gameInstance: this.gameInstances)
+            if(gameInstance.getInstanceState() != GameState.PRE_STOP && gameInstance.getInstanceState() != GameState.STOP)
+                gameInstance.stop();
     }
 
     /**
