@@ -56,7 +56,7 @@ public class GameInstance implements Listener {
 
     private int remainingTime;
 
-    public GameInstance(JavaPlugin plugin, GamesManager gamesManager, GameSettings settings, Location instanceLocation, List<MmcTeam> mmcTeams, int instanceId) {
+    public GameInstance(@NotNull JavaPlugin plugin, @NotNull GamesManager gamesManager, @NotNull GameSettings settings, @NotNull Location instanceLocation, @NotNull List<MmcTeam> mmcTeams, int instanceId) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.gamesManager = gamesManager;
@@ -80,7 +80,7 @@ public class GameInstance implements Listener {
      * @param schematic Schematic to paste
      * @param location Location to paste the gameSchematic
      */
-    public static void allocate(Schematic schematic, Location location) {
+    public static void allocate(@NotNull Schematic schematic, @NotNull Location location) {
         schematic.getOptions().setLocation(location);
         GameInstance.pasteSchematic(schematic);
     }
@@ -243,7 +243,7 @@ public class GameInstance implements Listener {
      * Teleport a player to his spawn
      * @param player {@link MmcPlayer} to teleport
      */
-    public void teleportPlayerToSpawn(MmcPlayer player){
+    public void teleportPlayerToSpawn(@NotNull MmcPlayer player){
         this.getPlayers().stream().filter(p -> p.getUUID().equals(player.getUUID())).findFirst().ifPresent(mmcPlayer -> this.teleportPlayer(mmcPlayer, this.getPlayerSpawns().get(player.getUUID())));
     }
 
@@ -404,7 +404,7 @@ public class GameInstance implements Listener {
      * @param mmcPlayer Target player
      * @return True if the player is on this instance
      */
-    public boolean isPlayerOnInstance(MmcPlayer mmcPlayer){
+    public boolean isPlayerOnInstance(@NotNull MmcPlayer mmcPlayer){
         return this.players.stream().anyMatch(player -> player.equals(mmcPlayer));
     }
 
@@ -413,7 +413,7 @@ public class GameInstance implements Listener {
      * @param spectator Target spectator
      * @return True if the spectator is on this instance
      */
-    public boolean isSpectatorOnInstance(MmcPlayer spectator){
+    public boolean isSpectatorOnInstance(@NotNull MmcPlayer spectator){
         return this.spectators.stream().anyMatch(player -> player.equals(spectator));
     }
 
