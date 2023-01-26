@@ -233,6 +233,21 @@ public class GameInstance implements Listener {
     }
 
     /**
+     * Teleport all players to their spawn
+     */
+    public void teleportPlayersToSpawn(){
+        this.getPlayers().forEach(this::teleportPlayerToSpawn);
+    }
+
+    /**
+     * Teleport a player to his spawn
+     * @param player {@link MmcPlayer} to teleport
+     */
+    public void teleportPlayerToSpawn(MmcPlayer player){
+        this.getPlayers().stream().filter(p -> p.getUUID().equals(player.getUUID())).findFirst().ifPresent(mmcPlayer -> this.teleportPlayer(mmcPlayer, this.getPlayerSpawns().get(player.getUUID())));
+    }
+
+    /**
      * Asynchronously set a player spawn
      * @param mmcPlayer Player to set spawn
      * @param location Target location
