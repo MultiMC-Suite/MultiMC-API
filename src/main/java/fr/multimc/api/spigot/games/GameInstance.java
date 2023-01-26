@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
-public class GameInstance {
+public class GameInstance implements Listener {
 
     private final Plugin plugin;
     private final Logger logger;
@@ -89,7 +90,7 @@ public class GameInstance {
      * @param isPreAllocated If the gameSchematic is already pasted
      */
     public void init(boolean isPreAllocated){
-        if(this.gameState == GameState.PRE_INIT || this.gameState == GameState.INIT) return;
+        if(this.gameState == GameState.PRE_INIT || this.gameState == GameState.INIT) throw new RuntimeException("Game instance is already initialized or initializing");
         // Paste gameSchematic
         if(!isPreAllocated){
             this.updateState(GameState.PRE_ALLOCATE);
@@ -117,7 +118,7 @@ public class GameInstance {
      * Start game instance
      */
     public void start(){
-        if(this.gameState == GameState.PRE_START || this.gameState == GameState.START) return;
+        if(this.gameState == GameState.PRE_START || this.gameState == GameState.START) throw new RuntimeException("Game instance is already started or starting");
         this.updateState(GameState.PRE_START);
         for(MmcPlayer player : this.players){
             player.setHealth(20);
@@ -134,7 +135,7 @@ public class GameInstance {
      * Default instance stop (players will return to the lobby)
      */
     public void stop(){
-        if(this.gameState == GameState.PRE_STOP || this.gameState == GameState.STOP) return;
+        if(this.gameState == GameState.PRE_STOP || this.gameState == GameState.STOP) throw new RuntimeException("Game instance is already stopped or stopping");
         this.updateState(GameState.PRE_STOP);
         this.isRunning = false;
         if(!this.isCancelled()) this.cancel();
