@@ -64,7 +64,6 @@ public class RestHandler implements ITeamHandler {
         try {
             HttpResponse response = this.api.sendGetRequest("/api/teams?complete=users", true);
             String jsonResponse = EntityUtils.toString(response.getEntity());
-            System.out.println(jsonResponse);
             return JSONUtils.fromJson(TeamModel[].class, jsonResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -73,7 +72,16 @@ public class RestHandler implements ITeamHandler {
 
     @Override
     public void setScores(Map<String, Integer> scores) {
-        scores.forEach(this::setScore);
+        for(String team : scores.keySet()){
+            this.api.getLogger().info("Setting score for team %s to %d".formatted(team, scores.get(team)));
+            this.setScore(team, scores.get(team));
+            this.api.getLogger().info("Score set for team %s".formatted(team));
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void setScore(String team, int score) {
