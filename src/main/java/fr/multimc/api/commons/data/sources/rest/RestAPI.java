@@ -77,4 +77,8 @@ public class RestAPI implements IDataSource {
     public DataSourceType getDataSourceType() {
         return DataSourceType.REST_API;
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
 }
