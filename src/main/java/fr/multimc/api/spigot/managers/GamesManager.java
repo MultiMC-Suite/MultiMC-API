@@ -279,7 +279,7 @@ public class GamesManager {
                     randomInstance.onSpectatorJoin(player);
                 }
             }else{
-                for(MmcPlayer spectator: gameInstance.getSpectators()){
+                for(MmcPlayer spectator: new ArrayList<>(gameInstance.getSpectators())){
                     gameInstance.onSpectatorLeave(spectator);
                 }
             }
