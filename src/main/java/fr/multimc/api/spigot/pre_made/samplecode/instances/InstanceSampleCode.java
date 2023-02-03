@@ -13,6 +13,7 @@ import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
 import fr.multimc.api.spigot.scoreboards.MmcSidebar;
+import fr.multimc.api.spigot.worlds.settings.enums.GameRuleSet;
 import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.worlds.schematics.Schematic;
@@ -89,15 +90,16 @@ public class InstanceSampleCode implements SampleCode, Listener {
                 null,
                 Difficulty.PEACEFUL,
                 GameMode.ADVENTURE);
-        lobbyWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        lobbyWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        lobbyWorldSettings
+                .addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+                .addGameRule(GameRule.DO_WEATHER_CYCLE, false);
         lobbyWorldSettings.addPrevention(WorldPrevention.ALL);
         WorldSettings gameWorldSettings = new WorldSettings(
                 "multimc_game");
-        gameWorldSettings.addPrevention(WorldPrevention.ALL);
-        gameWorldSettings.addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw damage prevention because Prevention.ALL is already present
-        gameWorldSettings.addGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        gameWorldSettings.addGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        gameWorldSettings
+                .addPrevention(WorldPrevention.ALL)
+                .addPrevention(WorldPrevention.PREVENT_DAMAGES); // Withdraw damage prevention because Prevention.ALL is already present
+        gameWorldSettings.addGameRuleSet(GameRuleSet.DEFAULT);
         gameWorldSettings.setDifficulty(Difficulty.PEACEFUL);
         GamesManagerSettings gamesManagerSettings = new GamesManagerSettings(
                 settings,
