@@ -24,7 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
-@SuppressWarnings({"unused", "rawtypes", "unchecked"})
+@SuppressWarnings({"unused", "unchecked"})
 public class MmcWorld implements Listener {
 
     private final WorldSettings worldSettings;
@@ -40,9 +40,9 @@ public class MmcWorld implements Listener {
         this.world.setDifficulty(this.worldSettings.getDifficulty());
     }
 
-    private void applyGameRules(){
-        for(Map.Entry<GameRule, Object> gameRule : this.worldSettings.getGameRules().entrySet()){
-            this.world.setGameRule(gameRule.getKey(), gameRule.getValue());
+    private <T> void applyGameRules(){
+        for(Map.Entry<GameRule<?>, Object> gameRule : this.worldSettings.getGameRules().entrySet()){
+            this.world.setGameRule((GameRule<T>) gameRule.getKey(), (T) gameRule.getValue());
         }
     }
 
