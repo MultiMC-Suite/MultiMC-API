@@ -8,11 +8,9 @@ import fr.multimc.api.spigot.managers.GamesManager;
 import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.managers.TeamManager;
 import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
-import fr.multimc.api.spigot.pre_made.commands.executors.DebugCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
 import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
 import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
-import fr.multimc.api.spigot.scoreboards.MmcSidebar;
 import fr.multimc.api.spigot.worlds.settings.enums.GameRuleSet;
 import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
@@ -44,22 +42,17 @@ public class InstanceSampleCode implements SampleCode, Listener {
 
     private GamesManager gamesManager;
     private TeamManager teamManager;
+    private static ScoreboardLibrary scoreboardLibrary;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void run(JavaPlugin plugin) {
         // Load scoreboard library
-        ScoreboardLibrary scoreboardLibrary;
         try {
             scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
         } catch (NoPacketAdapterAvailableException e) {
             scoreboardLibrary = new NoopScoreboardLibrary();
         }
-
-        // Scoreboard sample
-        MmcSidebar sidebar = new MmcSidebar(scoreboardLibrary, 5);
-        sidebar.getSidebar().title(Component.text("Sidebar title", NamedTextColor.GREEN));
-        sidebar.getSidebar().line(0, Component.text("Test"));
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
@@ -111,7 +104,7 @@ public class InstanceSampleCode implements SampleCode, Listener {
         gamesManager.preAllocate(5);
 
         // Commands
-        plugin.getCommand("debug-mmc").setExecutor(new DebugCommand(gamesManager));
+//        plugin.getCommand("debug-mmc").setExecutor(new DebugCommand(gamesManager));
         plugin.getCommand("stop-mmc").setExecutor(new StopCommand(gamesManager));
         plugin.getCommand("start-mmc").setExecutor(new StartCommand(gamesManager, teamManager));
         plugin.getCommand("start-mmc").setTabCompleter(new StartTabCompleter());
@@ -139,5 +132,9 @@ public class InstanceSampleCode implements SampleCode, Listener {
 //            scores.put("T2", 15);
             teamManager.pushScores(scores);
         }
+    }
+
+    public static ScoreboardLibrary getScoreboardLibrary() {
+        return scoreboardLibrary;
     }
 }
