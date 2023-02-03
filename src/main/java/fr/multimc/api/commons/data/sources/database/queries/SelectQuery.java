@@ -37,7 +37,7 @@ public class SelectQuery extends Query {
         queryBuilder.append("SELECT %s FROM %s".formatted(fieldsBuilder, this.tableName));
         if(Objects.nonNull(this.whereClause))
             queryBuilder.append(" WHERE %s".formatted(this.whereClause));
-        if(!Objects.isNull(this.orderByClause))
+        if(Objects.nonNull(this.orderByClause))
             queryBuilder.append(" ORDER BY %s".formatted(this.orderByClause));
         queryBuilder.append(";");
         return queryBuilder.toString();
