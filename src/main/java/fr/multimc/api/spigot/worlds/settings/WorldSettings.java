@@ -1,5 +1,6 @@
 package fr.multimc.api.spigot.worlds.settings;
 
+import fr.multimc.api.spigot.worlds.settings.enums.GameRuleSet;
 import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.worlds.schematics.Schematic;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"unused", "rawtypes", "UnusedReturnValue"})
+@SuppressWarnings("UnusedReturnValue")
 public class WorldSettings {
 
     private final String worldName;
@@ -23,7 +24,7 @@ public class WorldSettings {
     private Difficulty difficulty;
     private GameMode gameMode;
     private final List<WorldPrevention> preventions = new ArrayList<>();
-    private final Map<GameRule, Object> gameRules = new HashMap<>();
+    private final Map<GameRule<?>, Object> gameRules = new HashMap<>();
 
     public WorldSettings(@NotNull String worldName) {
         this(worldName, null, null, Difficulty.NORMAL, null);
@@ -61,12 +62,16 @@ public class WorldSettings {
     public List<WorldPrevention> getPreventions() {
         return preventions;
     }
-    public Map<GameRule, Object> getGameRules() {
+    public Map<GameRule<?>, Object> getGameRules() {
         return gameRules;
     }
 
-    public WorldSettings addGameRule(GameRule gameRule, Object value) {
+    public WorldSettings addGameRule(GameRule<?> gameRule, Object value) {
         gameRules.put(gameRule, value);
+        return this;
+    }
+    public WorldSettings addGameRuleSet(GameRuleSet gameRuleSet){
+        this.gameRules.putAll(gameRuleSet.getGameRules());
         return this;
     }
     public WorldSettings addPrevention(WorldPrevention prevention) {
