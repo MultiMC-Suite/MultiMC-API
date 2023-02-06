@@ -13,14 +13,14 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class AdvancementBuilder {
 
-    private Material icon;
-    private String title;
-    private List<String> description;
-    private AdvancementFrameType frameType;
-    private float x;
-    private float y;
-    private boolean showToast;
-    private boolean announceToChat;
+    private Material icon = Material.STONE;
+    private String title = "Title";
+    private List<String> description = List.of("Description");
+    private AdvancementFrameType frameType = AdvancementFrameType.TASK;
+    private float x = 0;
+    private float y = 0;
+    private boolean showToast = true;
+    private boolean announceToChat = true;
 
     /**
      * Sets the icon of the {@link AdvancementDisplay}.
@@ -67,23 +67,14 @@ public class AdvancementBuilder {
     }
 
     /**
-     * Sets the x-coordinate of the {@link AdvancementDisplay}.
+     * Set the advancement location
      *
-     * @param x the x-coordinate of the {@link AdvancementDisplay}.
+     * @param x the x coordinate of the {@link AdvancementDisplay}.
+     * @param y the y coordinate of the {@link AdvancementDisplay}.
      * @return this builder instance.
      */
-    public AdvancementBuilder setX(final float x){
+    public AdvancementBuilder setLocation(float x, float y){
         this.x = x;
-        return this;
-    }
-
-    /**
-     * Sets the y-coordinate of the {@link AdvancementDisplay}.
-     *
-     * @param y the y-coordinate of the {@link AdvancementDisplay}.
-     * @return this builder instance.
-     */
-    public AdvancementBuilder setY(final float y){
         this.y = y;
         return this;
     }
