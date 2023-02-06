@@ -2,9 +2,9 @@ package fr.multimc.api.spigot.worlds;
 
 import com.sk89q.worldedit.WorldEditException;
 import fr.multimc.api.spigot.worlds.generators.VoidGenerator;
+import fr.multimc.api.spigot.worlds.schematics.SchematicOptions;
 import fr.multimc.api.spigot.worlds.settings.WorldSettings;
 import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
-import fr.multimc.api.spigot.worlds.schematics.SchematicOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;

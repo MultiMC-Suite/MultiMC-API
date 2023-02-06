@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.games.settings;
 
-import fr.multimc.api.spigot.games.enums.GameType;
 import fr.multimc.api.spigot.entities.MmcEntity;
+import fr.multimc.api.spigot.games.enums.GameType;
 import fr.multimc.api.spigot.scoreboards.interfaces.IScoreBoard;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.worlds.schematics.Schematic;
