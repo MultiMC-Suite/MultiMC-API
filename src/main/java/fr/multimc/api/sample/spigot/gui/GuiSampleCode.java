@@ -22,7 +22,7 @@ public class GuiSampleCode implements SampleCode, CommandExecutor {
         // Create a new gui
         this.sampleGui = new SampleGui(plugin, Component.text("Sample"), GuiSize.ONE_ROW);
         // Set background
-        this.sampleGui.setBackground(Material.GRAY_STAINED_GLASS_PANE);
+        this.sampleGui.fill(Material.GRAY_STAINED_GLASS_PANE);
         // Register debug command
         plugin.getCommand("debug-mmc").setExecutor(this);
     }
