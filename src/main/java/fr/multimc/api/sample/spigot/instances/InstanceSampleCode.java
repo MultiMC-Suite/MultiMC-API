@@ -1,17 +1,17 @@
-package fr.multimc.api.spigot.pre_made.samplecode.instances;
+package fr.multimc.api.sample.spigot.instances;
 
 import fr.multimc.api.commons.data.DataSourceLoader;
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
+import fr.multimc.api.sample.spigot.SampleCode;
+import fr.multimc.api.spigot.commands.completers.StartTabCompleter;
+import fr.multimc.api.spigot.commands.executors.StartCommand;
+import fr.multimc.api.spigot.commands.executors.StopCommand;
 import fr.multimc.api.spigot.games.enums.GameType;
 import fr.multimc.api.spigot.games.settings.GameSettings;
 import fr.multimc.api.spigot.managers.GamesManager;
 import fr.multimc.api.spigot.managers.TeamManager;
 import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
-import fr.multimc.api.spigot.pre_made.commands.completers.StartTabCompleter;
-import fr.multimc.api.spigot.pre_made.commands.executors.StartCommand;
-import fr.multimc.api.spigot.pre_made.commands.executors.StopCommand;
-import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
 import fr.multimc.api.spigot.worlds.MmcWorld;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.worlds.schematics.Schematic;

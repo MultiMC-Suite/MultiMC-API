@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.pre_made.samplecode.database;
+package fr.multimc.api.sample.spigot.database;
 
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.FieldType;
@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "resource"})
 public class CustomTableSample extends Table {
 
     public static final String name = "multimc_sample";

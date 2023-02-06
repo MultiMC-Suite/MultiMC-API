@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.pre_made.samplecode.instances;
+package fr.multimc.api.sample.spigot.instances;
 
 import fr.multimc.api.spigot.games.GameInstance;
 import fr.multimc.api.spigot.games.settings.GameSettings;

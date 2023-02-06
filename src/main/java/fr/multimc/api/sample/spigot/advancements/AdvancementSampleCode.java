@@ -1,19 +1,20 @@
-package fr.multimc.api.spigot.pre_made.samplecode.advancements;
+package fr.multimc.api.sample.spigot.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
+import fr.multimc.api.sample.spigot.SampleCode;
+import fr.multimc.api.sample.spigot.advancements.advancement.GetItemAdvancement;
 import fr.multimc.api.spigot.advancements.AdvancementBuilder;
 import fr.multimc.api.spigot.advancements.MmcAdvancementTab;
 import fr.multimc.api.spigot.advancements.enums.AdvancementProperty;
-import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
-import fr.multimc.api.spigot.pre_made.samplecode.advancements.advancement.GetItemAdvancement;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class AdvancementSampleCode implements SampleCode, Listener {
 
     @Override

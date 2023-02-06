@@ -1,7 +1,7 @@
-package fr.multimc.api.spigot.pre_made.samplecode.database;
+package fr.multimc.api.sample.spigot.database;
 
 import fr.multimc.api.commons.data.sources.database.Database;
-import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
+import fr.multimc.api.sample.spigot.SampleCode;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;

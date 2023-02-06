@@ -1,8 +1,8 @@
-package fr.multimc.api.spigot.pre_made.samplecode.api;
+package fr.multimc.api.sample.spigot.api;
 
 import fr.multimc.api.commons.data.handlers.RestHandler;
 import fr.multimc.api.commons.data.sources.rest.RestAPI;
-import fr.multimc.api.spigot.pre_made.samplecode.SampleCode;
+import fr.multimc.api.sample.spigot.SampleCode;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

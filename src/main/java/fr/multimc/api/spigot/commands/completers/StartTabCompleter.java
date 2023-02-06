@@ -1,4 +1,4 @@
-package fr.multimc.api.spigot.pre_made.commands.completers;
+package fr.multimc.api.spigot.commands.completers;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

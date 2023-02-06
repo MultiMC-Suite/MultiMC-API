@@ -1,6 +1,6 @@
 package fr.multimc.api.spigot;
 
-import fr.multimc.api.spigot.pre_made.commands.executors.RelativeToCommand;
+import fr.multimc.api.spigot.commands.executors.RelativeToCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
