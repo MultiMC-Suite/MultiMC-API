@@ -21,9 +21,9 @@ commands:
   stop-mmc:
     description: Stop instances
     permission: fr.multimc.api.commands.stop-mmc
-  mmc-debug:
+  debug-mmc:
     description: Debug command
-    permission: fr.multimc.api.commands.mmc-debug
+    permission: fr.multimc.api.commands.debug-mmc
 
 permissions:
   fr.multimc.api.*:
@@ -34,7 +34,7 @@ permissions:
       fr.multimc.api.commands.relativeto: true
       fr.multimc.api.commands.start-mmc: true
       fr.multimc.api.commands.stop-mmc: true
-      fr.multimc.api.commands.mmc-debug: true
+      fr.multimc.api.commands.debug-mmc: true
   fr.multimc.api.commands.relativeto:
     description: Give relative position from a given point.
     default: op
@@ -44,6 +44,6 @@ permissions:
   fr.multimc.api.commands.stop-mmc:
     description: Stop instances
     default: op
-  fr.multimc.api.commands.mmc-debug:
+  fr.multimc.api.commands.debug-mmc:
     description: Debug command
     default: op
