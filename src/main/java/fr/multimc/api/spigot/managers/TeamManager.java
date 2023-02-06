@@ -1,13 +1,13 @@
 package fr.multimc.api.spigot.managers;
 
+import fr.multimc.api.commons.data.handlers.DatabaseHandler;
 import fr.multimc.api.commons.data.handlers.RestHandler;
+import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import fr.multimc.api.commons.data.sources.IDataSource;
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.rest.RestAPI;
-import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.commons.data.handlers.DatabaseHandler;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
+import fr.multimc.api.spigot.teams.MmcTeam;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

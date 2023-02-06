@@ -1,15 +1,15 @@
 package fr.multimc.api.spigot.managers;
 
 import fr.multimc.api.commons.tools.formatters.times.TimeFormatter;
+import fr.multimc.api.commons.tools.messages.MessagesFactory;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.games.GameInstance;
 import fr.multimc.api.spigot.games.enums.GameState;
-import fr.multimc.api.spigot.managers.events.GamesManagerEvents;
 import fr.multimc.api.spigot.games.settings.GameSettings;
-import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.managers.enums.ManagerState;
+import fr.multimc.api.spigot.managers.events.GamesManagerEvents;
+import fr.multimc.api.spigot.managers.settings.GamesManagerSettings;
 import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.commons.tools.messages.MessagesFactory;
 import fr.multimc.api.spigot.tools.dispatcher.DispatchAlgorithm;
 import fr.multimc.api.spigot.tools.dispatcher.Dispatcher;
 import fr.multimc.api.spigot.worlds.MmcWorld;

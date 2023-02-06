@@ -3,7 +3,10 @@ package fr.multimc.api.spigot.tools.dispatcher;
 import fr.multimc.api.spigot.tools.utils.random.MmcRandom;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Dispatcher {

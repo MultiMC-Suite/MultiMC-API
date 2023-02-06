@@ -2,11 +2,11 @@ package fr.multimc.api.spigot.managers.events;
 
 import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
 import fr.multimc.api.commons.tools.messages.enums.MessageType;
-import fr.multimc.api.spigot.managers.enums.ManagerState;
+import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.games.GameInstance;
 import fr.multimc.api.spigot.managers.GamesManager;
+import fr.multimc.api.spigot.managers.enums.ManagerState;
 import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.spigot.entities.player.MmcPlayer;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

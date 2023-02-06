@@ -1,9 +1,9 @@
 package fr.multimc.api.spigot.worlds.settings;
 
-import fr.multimc.api.spigot.worlds.settings.enums.GameRuleSet;
-import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
 import fr.multimc.api.spigot.worlds.schematics.Schematic;
+import fr.multimc.api.spigot.worlds.settings.enums.GameRuleSet;
+import fr.multimc.api.spigot.worlds.settings.enums.WorldPrevention;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;

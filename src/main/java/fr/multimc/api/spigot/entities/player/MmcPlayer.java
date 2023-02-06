@@ -1,9 +1,9 @@
 package fr.multimc.api.spigot.entities.player;
 
+import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
 import fr.multimc.api.spigot.entities.interfaces.IHasGameMode;
 import fr.multimc.api.spigot.entities.interfaces.IHasSpeed;
 import fr.multimc.api.spigot.entities.interfaces.ITeleportable;
-import fr.multimc.api.commons.tools.messages.components.ComponentBuilder;
 import fr.multimc.api.spigot.entities.player.enums.ClearMethod;
 import fr.multimc.api.spigot.tools.builders.items.ItemBuilder;
 import fr.multimc.api.spigot.worlds.locations.RelativeLocation;

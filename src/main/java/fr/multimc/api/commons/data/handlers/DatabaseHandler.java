@@ -1,11 +1,11 @@
 package fr.multimc.api.commons.data.handlers;
 
+import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.SQLState;
 import fr.multimc.api.commons.data.sources.database.queries.QueryResult;
 import fr.multimc.api.commons.data.sources.database.tables.PlayersTable;
 import fr.multimc.api.commons.data.sources.database.tables.TeamsTable;
-import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

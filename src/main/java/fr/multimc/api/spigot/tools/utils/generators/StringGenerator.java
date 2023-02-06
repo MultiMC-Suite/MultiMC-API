@@ -1,7 +1,7 @@
 package fr.multimc.api.spigot.tools.utils.generators;
 
-import fr.multimc.api.spigot.tools.utils.random.MmcRandom;
 import fr.multimc.api.spigot.tools.utils.generators.enums.StringConstraint;
+import fr.multimc.api.spigot.tools.utils.random.MmcRandom;
 
 import java.util.List;
 
