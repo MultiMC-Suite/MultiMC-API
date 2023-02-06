@@ -2,6 +2,7 @@ main: 'fr.multimc.api.spigot.ServerApi'
 name: 'MultiMC-API'
 softdepend:
   - WorldEdit
+  - UltimateAdvancementAPI
 
 version: '1.10.2-SNAPSHOT'
 api-version: '1.19'
