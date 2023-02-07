@@ -2,9 +2,6 @@ package fr.multimc.api.sample.spigot.gui;
 
 import fr.multimc.api.sample.spigot.SampleCode;
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.gui.enums.GuiSize;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,9 +17,7 @@ public class GuiSampleCode implements SampleCode, CommandExecutor {
     @Override
     public void run(JavaPlugin plugin) {
         // Create a new gui
-        this.sampleGui = new SampleGui(plugin, Component.text("Sample"), GuiSize.ONE_ROW);
-        // Set background
-        this.sampleGui.fill(Material.GRAY_STAINED_GLASS_PANE);
+        this.sampleGui = new SampleGui(plugin);
         // Register debug command
         plugin.getCommand("debug-mmc").setExecutor(this);
     }
