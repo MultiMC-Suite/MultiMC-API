@@ -17,6 +17,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -413,5 +414,17 @@ public class MmcPlayer implements IHasGameMode, IHasSpeed, ITeleportable {
 
     public int getFoodLevel() {
         return this.isOnline() ? this.getPlayer().getFoodLevel() : -1;
+    }
+
+    public void openInventory(@NotNull final Inventory inventory) {
+        Player player = this.getPlayer();
+        if(Objects.nonNull(player))
+            player.openInventory(inventory);
+    }
+
+    public void closeInventory(@NotNull final Inventory inventory) {
+        Player player = this.getPlayer();
+        if(Objects.nonNull(player))
+            player.closeInventory();
     }
 }
