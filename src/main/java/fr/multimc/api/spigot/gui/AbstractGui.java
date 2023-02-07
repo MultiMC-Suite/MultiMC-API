@@ -64,7 +64,7 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
      * @param item the item to set
      * @return the instance of the GUI
      */
-    public AbstractGui setItem(int slot, ItemStack item){
+    public AbstractGui setItem(final int slot, @NotNull final ItemStack item){
         inventory.setItem(slot, item);
         return this;
     }
@@ -92,20 +92,20 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
      *
      * @param background the {@link Material} to fill the GUI with
      */
-    public void fill(Material background){
+    public void fill(@NotNull final Material background){
         this.fill(new ItemStack(background));
     }
 
-    public void fill(ItemStack item){
+    public void fill(@NotNull final ItemStack item){
         for(int i = 0; i < size.getSize(); i++)
             inventory.setItem(i, item);
     }
 
-    public void fill(Material material, List<Integer> slots){
+    public void fill(@NotNull final Material material, @NotNull final List<Integer> slots){
         this.fill(new ItemStack(material), slots);
     }
 
-    public void fill(ItemStack item, List<Integer> slots){
+    public void fill(@NotNull final ItemStack item, @NotNull final List<Integer> slots){
         slots.forEach(slot -> inventory.setItem(slot, item));
     }
 
@@ -115,7 +115,7 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
      * @param e the {@link InventoryClickEvent} to handle
      */
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent e) {
+    public void onInventoryClick(@NotNull final InventoryClickEvent e) {
         if (e.getInventory().equals(inventory)){
             e.setCancelled(true);
             final int slot = e.getSlot();

@@ -18,7 +18,7 @@ public abstract class AbstractComponent {
      *
      * @param itemStack The {@link ItemStack} representing this component.
      */
-    public AbstractComponent(ItemStack itemStack) {
+    public AbstractComponent(@NotNull final ItemStack itemStack) {
         this.itemStack = itemStack;
     }
 
