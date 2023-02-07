@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class SampleGui extends AbstractGui {
 
-    public SampleGui(@NotNull Plugin plugin) {
+    public SampleGui(@NotNull final Plugin plugin) {
         super(plugin, Component.text("Sample").color(NamedTextColor.GOLD), GuiSize.DOUBLE_CHEST);
         this.fill(Material.GRAY_STAINED_GLASS_PANE);
         this.fill(Material.RED_STAINED_GLASS_PANE, this.getBorder(Side.TOP));

@@ -16,7 +16,7 @@ public class ExitComponent extends AbstractComponent {
     }
 
     @Override
-    public void onClicked(@NotNull AbstractGui gui, @NotNull MmcPlayer mmcPlayer) {
+    public void onClicked(@NotNull final AbstractGui gui, @NotNull final MmcPlayer mmcPlayer) {
         gui.closeInventory(mmcPlayer);
     }
 }

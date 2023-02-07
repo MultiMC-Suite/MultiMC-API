@@ -15,7 +15,7 @@ public class GuiSampleCode implements SampleCode, CommandExecutor {
     private SampleGui sampleGui;
 
     @Override
-    public void run(JavaPlugin plugin) {
+    public void run(@NotNull final JavaPlugin plugin) {
         // Create a new gui
         this.sampleGui = new SampleGui(plugin);
         // Register debug command
@@ -23,7 +23,7 @@ public class GuiSampleCode implements SampleCode, CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public boolean onCommand(@NotNull final CommandSender commandSender, @NotNull final Command command, @NotNull final String s, @NotNull final String[] strings) {
         if(commandSender instanceof Player player)
             this.sampleGui.openInventory(new MmcPlayer(player));
         return false;
