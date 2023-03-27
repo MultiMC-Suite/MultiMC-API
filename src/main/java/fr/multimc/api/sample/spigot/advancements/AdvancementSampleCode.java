@@ -5,9 +5,9 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDispla
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import fr.multimc.api.sample.spigot.SampleCode;
 import fr.multimc.api.sample.spigot.advancements.advancement.GetItemAdvancement;
-import fr.multimc.api.spigot.advancements.AdvancementBuilder;
-import fr.multimc.api.spigot.advancements.MmcAdvancementTab;
-import fr.multimc.api.spigot.advancements.enums.AdvancementProperty;
+import fr.multimc.api.spigot.common.advancements.AdvancementBuilder;
+import fr.multimc.api.spigot.common.advancements.MmcAdvancementTab;
+import fr.multimc.api.spigot.common.advancements.enums.AdvancementProperty;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;

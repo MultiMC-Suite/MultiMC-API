@@ -1,10 +1,10 @@
 package fr.multimc.api.sample.spigot.gui.basic;
 
-import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.gui.GuiView;
-import fr.multimc.api.spigot.gui.enums.GuiSize;
-import fr.multimc.api.spigot.gui.enums.Side;
-import fr.multimc.api.spigot.gui.gui.AbstractGui;
+import fr.multimc.api.spigot.common.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.common.gui.GuiView;
+import fr.multimc.api.spigot.common.gui.enums.GuiSize;
+import fr.multimc.api.spigot.common.gui.enums.Side;
+import fr.multimc.api.spigot.common.gui.gui.AbstractGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
