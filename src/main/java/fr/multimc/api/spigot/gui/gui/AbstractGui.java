@@ -1,23 +1,18 @@
-package fr.multimc.api.spigot.gui;
+package fr.multimc.api.spigot.gui.gui;
 
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.gui.GuiView;
+import fr.multimc.api.spigot.gui.components.AbstractComponent;
 import fr.multimc.api.spigot.gui.enums.GuiSize;
 import fr.multimc.api.spigot.gui.slots.SlotsManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  *  An abstract class representing a GUI.
@@ -27,7 +22,7 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
 
     private final GuiSize size;
     private final Inventory inventory;
-    private final Map<Integer, AbstractComponent> components;
+    private GuiView view;
 
     /**
      * Creates a new GUI instance with a given title, size and plugin.
@@ -37,36 +32,15 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
      * @param size the size of the GUI, represented by a {@link GuiSize}
      */
     public AbstractGui(@NotNull final Plugin plugin, @NotNull final Component title, @NotNull final GuiSize size) {
+        this(plugin, title, size, new GuiView(size));
+    }
+
+    public AbstractGui(@NotNull final Plugin plugin, @NotNull final Component title, @NotNull final GuiSize size, @NotNull final GuiView view) {
         super(size);
         this.size = size;
         this.inventory = Bukkit.createInventory(null, size.getSize(), title);
-        this.components = new HashMap<>();
+        this.view = view;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-    /**
-     * Adds a {@link AbstractComponent} to the GUI.
-     *
-     * @param slot the slot number where the component will be placed
-     * @param component the component to add
-     * @return the instance of the GUI
-     */
-    public AbstractGui addComponent(final int slot, @NotNull final AbstractComponent component){
-        components.put(slot, component);
-        inventory.setItem(slot, component.getItemStack());
-        return this;
-    }
-
-    /**
-     * Sets an item in the GUI at a specific slot.
-     *
-     * @param slot the slot number where the item will be placed
-     * @param item the item to set
-     * @return the instance of the GUI
-     */
-    public AbstractGui setItem(final int slot, @NotNull final ItemStack item){
-        inventory.setItem(slot, item);
-        return this;
     }
 
     /**
@@ -87,26 +61,20 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
         mmcPlayer.closeInventory(this.inventory);
     }
 
-    /**
-     * Fills the GUI with a specific material.
-     *
-     * @param background the {@link Material} to fill the GUI with
-     */
-    public void fill(@NotNull final Material background){
-        this.fill(new ItemStack(background));
+    public GuiSize getSize() {
+        return size;
     }
 
-    public void fill(@NotNull final ItemStack item){
-        for(int i = 0; i < size.getSize(); i++)
-            inventory.setItem(i, item);
+    public GuiView getView() {
+        return view;
     }
 
-    public void fill(@NotNull final Material material, @NotNull final List<Integer> slots){
-        this.fill(new ItemStack(material), slots);
+    public void setView(@NotNull final GuiView view) {
+        this.view = view;
     }
 
-    public void fill(@NotNull final ItemStack item, @NotNull final List<Integer> slots){
-        slots.forEach(slot -> inventory.setItem(slot, item));
+    public void render(){
+        this.view.apply(this.inventory);
     }
 
     /**
@@ -119,9 +87,12 @@ public abstract class AbstractGui extends SlotsManager implements Listener {
         if (e.getInventory().equals(inventory)){
             e.setCancelled(true);
             final int slot = e.getSlot();
-            final AbstractComponent component = components.get(slot);
-            if(Objects.nonNull(component))
+            this.onInventoryClick(slot, new MmcPlayer(e.getWhoClicked()));
+            if(view.getItems().get(slot) instanceof AbstractComponent component){
                 component.onClicked(this, new MmcPlayer(e.getWhoClicked()));
+            }
         }
     }
+
+    public abstract void onInventoryClick(final int slot, @NotNull final MmcPlayer mmcPlayer);
 }
