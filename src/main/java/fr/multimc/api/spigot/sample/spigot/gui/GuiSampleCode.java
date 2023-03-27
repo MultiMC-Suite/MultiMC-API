@@ -1,8 +1,8 @@
-package fr.multimc.api.sample.spigot.gui;
+package fr.multimc.api.spigot.sample.spigot.gui;
 
-import fr.multimc.api.sample.spigot.SampleCode;
-import fr.multimc.api.sample.spigot.gui.basic.SampleGui;
-import fr.multimc.api.sample.spigot.gui.linked.SampleLinkedGui;
+import fr.multimc.api.spigot.sample.spigot.SampleCode;
+import fr.multimc.api.spigot.sample.spigot.gui.basic.SampleGui;
+import fr.multimc.api.spigot.sample.spigot.gui.linked.SampleLinkedGui;
 import fr.multimc.api.spigot.common.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.common.gui.GuiView;
 import fr.multimc.api.spigot.common.gui.enums.GuiSize;

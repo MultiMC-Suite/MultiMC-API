@@ -1,4 +1,4 @@
-package fr.multimc.api.sample.spigot.instances;
+package fr.multimc.api.spigot.sample.spigot.instances;
 
 import fr.multimc.api.spigot.common.scoreboards.MmcSidebar;
 import fr.multimc.api.spigot.common.worlds.locations.RelativeLocation;

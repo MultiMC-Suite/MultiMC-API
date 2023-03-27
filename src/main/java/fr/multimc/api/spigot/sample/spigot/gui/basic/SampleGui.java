@@ -1,4 +1,4 @@
-package fr.multimc.api.sample.spigot.gui.basic;
+package fr.multimc.api.spigot.sample.spigot.gui.basic;
 
 import fr.multimc.api.spigot.common.entities.player.MmcPlayer;
 import fr.multimc.api.spigot.common.gui.GuiView;

@@ -1,4 +1,4 @@
-package fr.multimc.api.sample.spigot;
+package fr.multimc.api.spigot.sample.spigot;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

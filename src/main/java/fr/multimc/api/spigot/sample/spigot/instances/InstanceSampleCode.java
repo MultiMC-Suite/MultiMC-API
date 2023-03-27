@@ -1,9 +1,9 @@
-package fr.multimc.api.sample.spigot.instances;
+package fr.multimc.api.spigot.sample.spigot.instances;
 
 import fr.multimc.api.commons.data.DataSourceLoader;
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
-import fr.multimc.api.sample.spigot.SampleCode;
+import fr.multimc.api.spigot.sample.spigot.SampleCode;
 import fr.multimc.api.spigot.common.commands.completers.StartTabCompleter;
 import fr.multimc.api.spigot.common.commands.executors.StartCommand;
 import fr.multimc.api.spigot.common.commands.executors.StopCommand;

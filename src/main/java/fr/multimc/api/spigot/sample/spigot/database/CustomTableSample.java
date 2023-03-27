@@ -1,4 +1,4 @@
-package fr.multimc.api.sample.spigot.database;
+package fr.multimc.api.spigot.sample.spigot.database;
 
 import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.FieldType;

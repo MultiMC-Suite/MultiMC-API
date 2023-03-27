@@ -1,4 +1,4 @@
-package fr.multimc.api.sample.spigot.advancements.advancement;
+package fr.multimc.api.spigot.sample.spigot.advancements.advancement;
 
 import com.fren_gor.ultimateAdvancementAPI.advancement.Advancement;
 import com.fren_gor.ultimateAdvancementAPI.events.advancement.AdvancementProgressionUpdateEvent;

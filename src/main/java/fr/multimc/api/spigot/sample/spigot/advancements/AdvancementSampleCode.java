@@ -1,10 +1,10 @@
-package fr.multimc.api.sample.spigot.advancements;
+package fr.multimc.api.spigot.sample.spigot.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
-import fr.multimc.api.sample.spigot.SampleCode;
-import fr.multimc.api.sample.spigot.advancements.advancement.GetItemAdvancement;
+import fr.multimc.api.spigot.sample.spigot.SampleCode;
+import fr.multimc.api.spigot.sample.spigot.advancements.advancement.GetItemAdvancement;
 import fr.multimc.api.spigot.common.advancements.AdvancementBuilder;
 import fr.multimc.api.spigot.common.advancements.MmcAdvancementTab;
 import fr.multimc.api.spigot.common.advancements.enums.AdvancementProperty;
