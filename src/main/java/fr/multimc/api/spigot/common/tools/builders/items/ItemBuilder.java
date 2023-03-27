@@ -99,7 +99,7 @@ public class ItemBuilder {
     @Deprecated
     public ItemBuilder setLegacyLore(@Nullable List<String> lore) {
         List<Component> list = new ArrayList<>();
-        if (!Objects.isNull(lore)) lore.forEach(line -> list.add(new ComponentBuilder(ChatColor.translateAlternateColorCodes('&', line)).build()));
+        if (Objects.nonNull(lore)) lore.forEach(line -> list.add(new ComponentBuilder(ChatColor.translateAlternateColorCodes('&', line)).build()));
         return this.setLore(list);
     }
 
