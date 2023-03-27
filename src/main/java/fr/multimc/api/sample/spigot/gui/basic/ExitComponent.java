@@ -1,8 +1,8 @@
-package fr.multimc.api.sample.spigot.gui;
+package fr.multimc.api.sample.spigot.gui.basic;
 
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.gui.AbstractComponent;
-import fr.multimc.api.spigot.gui.AbstractGui;
+import fr.multimc.api.spigot.gui.components.AbstractComponent;
+import fr.multimc.api.spigot.gui.gui.AbstractGui;
 import fr.multimc.api.spigot.tools.builders.items.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -1,6 +1,7 @@
-package fr.multimc.api.spigot.gui;
+package fr.multimc.api.spigot.gui.components;
 
 import fr.multimc.api.spigot.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.gui.gui.AbstractGui;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,9 +10,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author MultiMC
  */
-public abstract class AbstractComponent {
-
-    private final ItemStack itemStack;
+public abstract class AbstractComponent extends ItemStack{
 
     /**
      * Creates a new {@link AbstractComponent} instance.
@@ -19,16 +18,7 @@ public abstract class AbstractComponent {
      * @param itemStack The {@link ItemStack} representing this component.
      */
     public AbstractComponent(@NotNull final ItemStack itemStack) {
-        this.itemStack = itemStack;
-    }
-
-    /**
-     * Gets the {@link ItemStack} representing this component.
-     *
-     * @return The {@link ItemStack} representing this component.
-     */
-    public ItemStack getItemStack() {
-        return itemStack;
+        super(itemStack);
     }
 
     /**
