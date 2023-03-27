@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class UpdateQuery extends Query {
 
     private final String tableName;
@@ -20,7 +19,7 @@ public class UpdateQuery extends Query {
 
     public UpdateQuery(@NotNull String tableName, @NotNull Map<Field, Object> valuesMap, @Nullable String whereClause) {
         this.tableName = tableName;
-        this.valuesMap = valuesMap;
+        this.valuesMap = Map.copyOf(valuesMap);
         this.whereClause = whereClause;
     }
 

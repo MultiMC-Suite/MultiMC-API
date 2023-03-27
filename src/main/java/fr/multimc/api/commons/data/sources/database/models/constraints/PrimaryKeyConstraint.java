@@ -3,6 +3,8 @@ package fr.multimc.api.commons.data.sources.database.models.constraints;
 import fr.multimc.api.commons.data.sources.database.interfaces.IConstraint;
 import fr.multimc.api.commons.data.sources.database.models.Field;
 
+import java.util.Arrays;
+
 public class PrimaryKeyConstraint implements IConstraint {
 
     private final String constraintName;
@@ -10,7 +12,7 @@ public class PrimaryKeyConstraint implements IConstraint {
 
     public PrimaryKeyConstraint(String constraintName, Field... fields) {
         this.constraintName = constraintName;
-        this.fields = fields;
+        this.fields = Arrays.copyOf(fields, fields.length);
     }
 
     @Override

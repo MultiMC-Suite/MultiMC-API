@@ -21,7 +21,7 @@ public class CreateTableQuery extends Query {
 
     public CreateTableQuery(@NotNull String tableName, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints) {
         this.tableName = tableName;
-        this.fields = fields;
+        this.fields = new ArrayList<>(fields);
         this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : new ArrayList<>(constraints);
     }
 
