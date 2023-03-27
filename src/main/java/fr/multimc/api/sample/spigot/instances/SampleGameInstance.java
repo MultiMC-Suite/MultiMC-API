@@ -1,13 +1,13 @@
 package fr.multimc.api.sample.spigot.instances;
 
+import fr.multimc.api.spigot.common.scoreboards.MmcSidebar;
+import fr.multimc.api.spigot.common.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.common.worlds.locations.zones.effects.ZoneEffect;
+import fr.multimc.api.spigot.common.worlds.locations.zones.effects.effects.PotionZoneEffect;
 import fr.multimc.api.spigot.games.GameInstance;
+import fr.multimc.api.spigot.games.GamesManager;
 import fr.multimc.api.spigot.games.settings.GameSettings;
-import fr.multimc.api.spigot.managers.GamesManager;
-import fr.multimc.api.spigot.scoreboards.MmcSidebar;
-import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
-import fr.multimc.api.spigot.worlds.locations.zones.effects.ZoneEffect;
-import fr.multimc.api.spigot.worlds.locations.zones.effects.effects.PotionZoneEffect;
+import fr.multimc.api.spigot.games.teams.MmcTeam;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;

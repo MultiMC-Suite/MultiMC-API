@@ -2,10 +2,10 @@ package fr.multimc.api.sample.spigot.advancements.advancement;
 
 import com.fren_gor.ultimateAdvancementAPI.advancement.Advancement;
 import com.fren_gor.ultimateAdvancementAPI.events.advancement.AdvancementProgressionUpdateEvent;
-import fr.multimc.api.spigot.advancements.AbstractAdvancement;
-import fr.multimc.api.spigot.advancements.AdvancementBuilder;
-import fr.multimc.api.spigot.advancements.enums.AdvancementProperty;
-import fr.multimc.api.spigot.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.common.advancements.AbstractAdvancement;
+import fr.multimc.api.spigot.common.advancements.AdvancementBuilder;
+import fr.multimc.api.spigot.common.advancements.enums.AdvancementProperty;
+import fr.multimc.api.spigot.common.entities.player.MmcPlayer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;

@@ -1,10 +1,10 @@
 package fr.multimc.api.sample.spigot.gui.linked;
 
 import fr.multimc.api.sample.spigot.gui.basic.ExitComponent;
-import fr.multimc.api.spigot.gui.GuiView;
-import fr.multimc.api.spigot.gui.components.LinkedComponent;
-import fr.multimc.api.spigot.gui.enums.GuiSize;
-import fr.multimc.api.spigot.gui.gui.LinkedGui;
+import fr.multimc.api.spigot.common.gui.GuiView;
+import fr.multimc.api.spigot.common.gui.components.LinkedComponent;
+import fr.multimc.api.spigot.common.gui.enums.GuiSize;
+import fr.multimc.api.spigot.common.gui.gui.LinkedGui;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
