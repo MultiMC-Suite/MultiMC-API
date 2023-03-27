@@ -80,10 +80,14 @@ public class ItemBuilder {
      * @param name Display name.
      * @return Current instance of the builder.
      */
-    public ItemBuilder setName(@Nullable String name) {
+    @Deprecated
+    public ItemBuilder setLegacyName(@NotNull String name) {
+        return this.setName(new ComponentBuilder(name).build());
+    }
+
+    public ItemBuilder setName(@NotNull Component name){
         ItemMeta meta = this.getMeta();
-        String display = Objects.isNull(name) ? null : ChatColor.translateAlternateColorCodes('&', name);
-        meta.displayName(new ComponentBuilder(display).build());
+        meta.displayName(name);
         return this.applyMeta(meta);
     }
 
@@ -92,12 +96,16 @@ public class ItemBuilder {
      * @param lore Description lines.
      * @return Current instance of the builder.
      */
-    public ItemBuilder setLore(@Nullable List<String> lore) {
+    @Deprecated
+    public ItemBuilder setLegacyLore(@Nullable List<String> lore) {
         List<Component> list = new ArrayList<>();
         if (!Objects.isNull(lore)) lore.forEach(line -> list.add(new ComponentBuilder(ChatColor.translateAlternateColorCodes('&', line)).build()));
+        return this.setLore(list);
+    }
 
-        ItemMeta meta = this.getMeta();
-        meta.lore(list);
+    public ItemBuilder setLore(@NotNull final List<Component> lore) {
+        final ItemMeta meta = this.getMeta();
+        meta.lore(lore);
         return this.applyMeta(meta);
     }
 
@@ -106,7 +114,12 @@ public class ItemBuilder {
      * @param lore Descriptions lines.
      * @return Current instance of the builder.
      */
-    public ItemBuilder setLore(@NotNull String... lore) {
+    @Deprecated
+    public ItemBuilder setLegacyLore(@NotNull String... lore) {
+        return this.setLegacyLore(Arrays.asList(lore));
+    }
+
+    public ItemBuilder setLore(@NotNull Component... lore) {
         return this.setLore(Arrays.asList(lore));
     }
 
