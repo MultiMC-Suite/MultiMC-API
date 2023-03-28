@@ -100,8 +100,8 @@ public class TeamsTable extends Table {
 
     public void setScores(Map<String, Integer> scores){
         StringBuilder playersQueryString = new StringBuilder();
-        for(String teamCode : scores.keySet()){
-            setScore(teamCode, scores.get(teamCode));
+        for(Map.Entry<String, Integer> entry : scores.entrySet()){
+            setScore(entry.getKey(), entry.getValue());
         }
     }
 

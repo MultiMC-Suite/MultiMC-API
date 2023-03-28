@@ -41,8 +41,8 @@ public class TeamManager {
         Map<String, List<String>> playersByTeam = this.teamHandler.getPlayersByTeam();
         Map<String, String> teamNames = this.teamHandler.getTeamNamesByTeam();
         // Iterate by team code
-        for(String teamCode: playersByTeam.keySet()){
-            List<String> playersName = playersByTeam.get(teamCode);
+        for(Map.Entry<String, List<String>> entry : playersByTeam.entrySet()){
+            List<String> playersName = entry.getValue();
             List<MmcPlayer> players = new ArrayList<>();
             // Add all players to team
             for(String playerName: playersName){
@@ -50,7 +50,7 @@ public class TeamManager {
                 players.add(player);
             }
             // Add team object to list
-            MmcTeam mmcTeam = new MmcTeam(teamNames.get(teamCode), teamCode, players.toArray(new MmcPlayer[0]));
+            MmcTeam mmcTeam = new MmcTeam(teamNames.get(entry.getKey()), entry.getKey(), players.toArray(new MmcPlayer[0]));
             this.mmcTeams.add(mmcTeam);
         }
         return this.mmcTeams;
