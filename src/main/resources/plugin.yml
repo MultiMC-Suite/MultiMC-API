@@ -4,7 +4,7 @@ softdepend:
   - WorldEdit
   - UltimateAdvancementAPI
 
-version: '1.10.2-SNAPSHOT'
+version: '1.11.0-SNAPSHOT'
 api-version: '1.19'
 
 authors: [ 'Loïc MAES', 'Tom CZEKAJ' ]
