@@ -8,6 +8,7 @@ import fr.multimc.api.commons.data.sources.database.models.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class SelectQuery extends Query {
@@ -21,7 +22,7 @@ public class SelectQuery extends Query {
         this.tableName = tableName;
         this.whereClause = whereClause;
         this.orderByClause = orderByClause;
-        this.targetFields = targetFields;
+        this.targetFields = Arrays.copyOf(targetFields, targetFields.length);
     }
 
     @Override

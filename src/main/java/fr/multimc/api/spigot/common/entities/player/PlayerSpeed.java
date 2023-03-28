@@ -23,7 +23,8 @@ public enum PlayerSpeed {
     LEVEL_9(.9f, .9f),
     LEVEL_10(1f, 1f);
 
-    private final float walkLevel, flyLevel;
+    private final float walkLevel;
+    private final float flyLevel;
 
     PlayerSpeed(float walkLevel, float flyLevel) {
         this.walkLevel = walkLevel;

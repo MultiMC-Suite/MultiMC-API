@@ -14,7 +14,8 @@ public enum TimeUnit {
     SECOND("ss", "Second", 1000L),
     MILLISECOND("ms", "Millisecond", 1L);
 
-    private final String shortcut, name;
+    private final String shortcut;
+    private final String name;
     private final long duration;
 
     TimeUnit(String shortcut, String name, long duration) {

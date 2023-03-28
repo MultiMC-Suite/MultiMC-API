@@ -26,8 +26,14 @@ import java.util.Objects;
 public class Zone implements Listener {
 
     private final World world;
-    private final double minX, maxX, minY, maxY, minZ, maxZ;
-    private final Location minLocation, maxLocation;
+    private final double minX;
+    private final double maxX;
+    private final double minY;
+    private final double maxY;
+    private final double minZ;
+    private final double maxZ;
+    private final Location minLocation;
+    private final Location maxLocation;
     private final ZoneListener callback;
 
     /**

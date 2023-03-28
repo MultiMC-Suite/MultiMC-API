@@ -33,6 +33,8 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unused")
 public class GamesManager {
 
+    private static final Random random = new Random();
+
     private final JavaPlugin plugin;
     private final Logger logger;
     private final GamesManagerSettings managerSettings;
@@ -268,13 +270,13 @@ public class GamesManager {
             if(runningInstances.size() != 0){
                 for(MmcPlayer spectator: gameInstance.getSpectators()){
                     spectator.setGameModeSync(this.plugin, GameMode.SPECTATOR);
-                    GameInstance randomInstance = runningInstances.get(new Random().nextInt(runningInstances.size()));
+                    GameInstance randomInstance = runningInstances.get(random.nextInt(runningInstances.size()));
                     gameInstance.onSpectatorLeave(spectator);
                     randomInstance.onSpectatorJoin(spectator);
                 }
                 for(MmcPlayer player: gameInstance.getPlayers()){
                     player.setGameModeSync(this.plugin, GameMode.SPECTATOR);
-                    GameInstance randomInstance = runningInstances.get(new Random().nextInt(runningInstances.size()));
+                    GameInstance randomInstance = runningInstances.get(random.nextInt(runningInstances.size()));
                     randomInstance.onSpectatorJoin(player);
                 }
             }else{

@@ -75,10 +75,10 @@ public class RestHandler implements ITeamHandler {
 
     @Override
     public void setScores(Map<String, Integer> scores) {
-        for(String team : scores.keySet()){
-            this.api.getLogger().info("Setting score for team %s to %d".formatted(team, scores.get(team)));
-            this.setScore(team, scores.get(team));
-            this.api.getLogger().info("Score set for team %s".formatted(team));
+        for(Map.Entry<String, Integer> entry : scores.entrySet()){
+            this.api.getLogger().info("Setting score for team %s to %d".formatted(entry.getKey(), entry.getValue()));
+            this.setScore(entry.getKey(), entry.getValue());
+            this.api.getLogger().info("Score set for team %s".formatted(entry.getKey()));
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {

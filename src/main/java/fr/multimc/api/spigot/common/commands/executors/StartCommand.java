@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +83,7 @@ public class StartCommand implements CommandExecutor {
             selectedPlayers.add(onlinePlayers.get(i));
             if((i + 1) % teamSize == 0 || i == onlinePlayers.size() - 1){
                 Map<Player, MmcTeam> dispatchedTeams = new Dispatcher(dispatchAlgorithm).dispatch(selectedPlayers, teams);
-                if(dispatchedTeams == null) return null;
+                if(dispatchedTeams == null) return Collections.emptyList();
                 for(Map.Entry<Player, MmcTeam> entry: dispatchedTeams.entrySet()){
                     entry.getValue().addPlayer(new MmcPlayer(entry.getKey()));
                 }

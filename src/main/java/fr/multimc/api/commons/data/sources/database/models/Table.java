@@ -33,8 +33,8 @@ public class Table {
     public Table(@NotNull Database database, @NotNull String name, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints, boolean autoId) {
         this.database = database;
         this.name = name;
-        this.fields = fields;
-        this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : constraints;
+        this.fields = new ArrayList<>(fields);
+        this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : new ArrayList<>(constraints);
         if(autoId){
             Field idField = new Field("id", FieldType.INTEGER, Property.AUTO_INCREMENT);
             this.fields.add(0, idField);

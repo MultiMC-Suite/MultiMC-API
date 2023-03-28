@@ -8,7 +8,9 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unused")
 public class SchematicOptions {
     private Location location;
-    private final boolean IGNORE_AIR, COPY_ENTITIES, COPY_BIOMES;
+    private final boolean IGNORE_AIR;
+    private final boolean COPY_ENTITIES;
+    private final boolean COPY_BIOMES;
 
     public SchematicOptions() {
         this.location = null;
