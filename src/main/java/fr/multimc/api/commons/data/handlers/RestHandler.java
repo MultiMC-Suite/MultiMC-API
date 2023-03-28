@@ -10,7 +10,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Xen0Xys
@@ -64,7 +67,6 @@ public class RestHandler implements ITeamHandler {
         try {
             HttpResponse response = this.api.sendGetRequest("/api/teams?complete=users", true);
             String jsonResponse = EntityUtils.toString(response.getEntity());
-            System.out.println(jsonResponse);
             return JSONUtils.fromJson(TeamModel[].class, jsonResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -73,7 +75,16 @@ public class RestHandler implements ITeamHandler {
 
     @Override
     public void setScores(Map<String, Integer> scores) {
-        scores.forEach(this::setScore);
+        for(Map.Entry<String, Integer> entry : scores.entrySet()){
+            this.api.getLogger().info("Setting score for team %s to %d".formatted(entry.getKey(), entry.getValue()));
+            this.setScore(entry.getKey(), entry.getValue());
+            this.api.getLogger().info("Score set for team %s".formatted(entry.getKey()));
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void setScore(String team, int score) {

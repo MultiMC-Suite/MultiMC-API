@@ -1,7 +1,7 @@
 package fr.multimc.api.commons.data.sources.database.models;
 
-import fr.multimc.api.commons.data.sources.database.enums.FieldType;
 import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
+import fr.multimc.api.commons.data.sources.database.enums.FieldType;
 import fr.multimc.api.commons.data.sources.database.enums.Property;
 import org.jetbrains.annotations.NotNull;
 

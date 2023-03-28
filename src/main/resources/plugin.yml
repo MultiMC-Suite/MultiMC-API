@@ -2,8 +2,9 @@ main: 'fr.multimc.api.spigot.ServerApi'
 name: 'MultiMC-API'
 softdepend:
   - WorldEdit
+  - UltimateAdvancementAPI
 
-version: '1.10.2-SNAPSHOT'
+version: '1.11.0-SNAPSHOT'
 api-version: '1.19'
 
 authors: [ 'Loïc MAES', 'Tom CZEKAJ' ]
@@ -20,6 +21,9 @@ commands:
   stop-mmc:
     description: Stop instances
     permission: fr.multimc.api.commands.stop-mmc
+  debug-mmc:
+    description: Debug command
+    permission: fr.multimc.api.commands.debug-mmc
 
 permissions:
   fr.multimc.api.*:
@@ -30,6 +34,7 @@ permissions:
       fr.multimc.api.commands.relativeto: true
       fr.multimc.api.commands.start-mmc: true
       fr.multimc.api.commands.stop-mmc: true
+      fr.multimc.api.commands.debug-mmc: true
   fr.multimc.api.commands.relativeto:
     description: Give relative position from a given point.
     default: op
@@ -38,4 +43,7 @@ permissions:
     default: op
   fr.multimc.api.commands.stop-mmc:
     description: Stop instances
+    default: op
+  fr.multimc.api.commands.debug-mmc:
+    description: Debug command
     default: op

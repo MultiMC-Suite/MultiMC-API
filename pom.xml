@@ -6,7 +6,7 @@
 
     <groupId>fr.multimc</groupId>
     <artifactId>multimc-api</artifactId>
-    <version>1.10.2-SNAPSHOT</version>
+    <version>1.11.0-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
@@ -29,12 +29,16 @@
             <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>fren_gor</id>
+            <url>https://nexus.frengor.com/repository/public/</url>
         </repository>
         <repository>
             <id>codemc-snapshots</id>
             <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -42,19 +46,19 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.19.3-R0.1-SNAPSHOT</version>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-core</artifactId>
-            <version>7.2.13</version>
+            <version>7.2.14</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>7.2.13</version>
+            <version>7.2.14</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -70,7 +74,7 @@
         <dependency>
             <groupId>io.github.waterfallmc</groupId>
             <artifactId>waterfall-api</artifactId>
-            <version>1.18-R0.1-SNAPSHOT</version>
+            <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -82,38 +86,38 @@
         <dependency>
             <groupId>io.github.bananapuncher714</groupId>
             <artifactId>nbteditor</artifactId>
-            <version>7.18.4</version>
+            <version>7.18.5</version>
         </dependency>
         <dependency>
             <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
-            <artifactId>api</artifactId>
-            <version>2.0.0-RC3</version>
+            <artifactId>scoreboard-library-api</artifactId>
+            <version>2.0.0-RC6</version>
         </dependency>
         <dependency>
             <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
-            <artifactId>implementation</artifactId>
-            <version>2.0.0-RC3</version>
+            <artifactId>scoreboard-library-implementation</artifactId>
+            <version>2.0.0-RC6</version>
         </dependency>
         <dependency>
             <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
-            <artifactId>v1_19_R2</artifactId>
-            <version>2.0.0-RC3</version>
+            <artifactId>scoreboard-library-v1_19_R3</artifactId>
+            <version>2.0.0-RC6</version>
         </dependency>
         <dependency>
             <groupId>com.github.MegavexNetwork.scoreboard-library</groupId>
-            <artifactId>packetevents</artifactId>
-            <version>2.0.0-RC3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.retrooper.packetevents</groupId>
-            <artifactId>spigot</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
+            <artifactId>scoreboard-library-packetevents</artifactId>
+            <version>2.0.0-RC6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.frengor</groupId>
+            <artifactId>ultimateadvancementapi</artifactId>
+            <version>2.2.3</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

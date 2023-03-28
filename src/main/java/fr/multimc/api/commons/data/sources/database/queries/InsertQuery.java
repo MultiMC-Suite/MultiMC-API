@@ -1,15 +1,14 @@
 package fr.multimc.api.commons.data.sources.database.queries;
 
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
 import fr.multimc.api.commons.data.sources.database.enums.QueryType;
 import fr.multimc.api.commons.data.sources.database.models.Field;
 import fr.multimc.api.commons.data.sources.database.models.Query;
-import fr.multimc.api.commons.data.sources.database.Database;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class InsertQuery extends Query {
 
     private final String tableName;
@@ -17,7 +16,7 @@ public class InsertQuery extends Query {
 
     public InsertQuery(@NotNull String tableName, @NotNull Map<Field, Object> values) {
         this.tableName = tableName;
-        this.values = values;
+        this.values = Map.copyOf(values);
     }
 
     @Override

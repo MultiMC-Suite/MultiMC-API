@@ -1,11 +1,11 @@
 package fr.multimc.api.commons.data.sources.database;
 
+import fr.multimc.api.commons.data.sources.DataSourceType;
+import fr.multimc.api.commons.data.sources.IDataSource;
 import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
 import fr.multimc.api.commons.data.sources.database.enums.QueryType;
 import fr.multimc.api.commons.data.sources.database.enums.SQLState;
 import fr.multimc.api.commons.data.sources.database.queries.QueryResult;
-import fr.multimc.api.commons.data.sources.DataSourceType;
-import fr.multimc.api.commons.data.sources.IDataSource;
 
 import java.io.File;
 import java.sql.*;

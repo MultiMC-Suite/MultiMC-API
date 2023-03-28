@@ -1,17 +1,16 @@
 package fr.multimc.api.commons.data.sources.database.queries;
 
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
+import fr.multimc.api.commons.data.sources.database.enums.QueryType;
 import fr.multimc.api.commons.data.sources.database.models.Field;
 import fr.multimc.api.commons.data.sources.database.models.Query;
-import fr.multimc.api.commons.data.sources.database.Database;
-import fr.multimc.api.commons.data.sources.database.enums.QueryType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class UpdateQuery extends Query {
 
     private final String tableName;
@@ -20,7 +19,7 @@ public class UpdateQuery extends Query {
 
     public UpdateQuery(@NotNull String tableName, @NotNull Map<Field, Object> valuesMap, @Nullable String whereClause) {
         this.tableName = tableName;
-        this.valuesMap = valuesMap;
+        this.valuesMap = Map.copyOf(valuesMap);
         this.whereClause = whereClause;
     }
 

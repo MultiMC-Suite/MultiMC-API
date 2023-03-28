@@ -1,13 +1,14 @@
 package fr.multimc.api.commons.data.sources.database.queries;
 
-import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
-import fr.multimc.api.commons.data.sources.database.models.Query;
-import fr.multimc.api.commons.data.sources.database.models.Field;
 import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
 import fr.multimc.api.commons.data.sources.database.enums.QueryType;
+import fr.multimc.api.commons.data.sources.database.models.Field;
+import fr.multimc.api.commons.data.sources.database.models.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class SelectQuery extends Query {
@@ -21,7 +22,7 @@ public class SelectQuery extends Query {
         this.tableName = tableName;
         this.whereClause = whereClause;
         this.orderByClause = orderByClause;
-        this.targetFields = targetFields;
+        this.targetFields = Arrays.copyOf(targetFields, targetFields.length);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class SelectQuery extends Query {
         queryBuilder.append("SELECT %s FROM %s".formatted(fieldsBuilder, this.tableName));
         if(Objects.nonNull(this.whereClause))
             queryBuilder.append(" WHERE %s".formatted(this.whereClause));
-        if(!Objects.isNull(this.orderByClause))
+        if(Objects.nonNull(this.orderByClause))
             queryBuilder.append(" ORDER BY %s".formatted(this.orderByClause));
         queryBuilder.append(";");
         return queryBuilder.toString();

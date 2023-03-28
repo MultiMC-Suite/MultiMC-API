@@ -1,11 +1,11 @@
 package fr.multimc.api.commons.data.sources.database.queries;
 
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.DatabaseType;
 import fr.multimc.api.commons.data.sources.database.enums.QueryType;
 import fr.multimc.api.commons.data.sources.database.interfaces.IConstraint;
 import fr.multimc.api.commons.data.sources.database.models.Field;
 import fr.multimc.api.commons.data.sources.database.models.Query;
-import fr.multimc.api.commons.data.sources.database.Database;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class CreateTableQuery extends Query {
 
     public CreateTableQuery(@NotNull String tableName, @NotNull List<Field> fields, @Nullable List<IConstraint> constraints) {
         this.tableName = tableName;
-        this.fields = fields;
+        this.fields = new ArrayList<>(fields);
         this.constraints = Objects.isNull(constraints) ? new ArrayList<>() : new ArrayList<>(constraints);
     }
 

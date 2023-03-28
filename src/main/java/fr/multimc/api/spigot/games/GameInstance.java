@@ -1,16 +1,15 @@
 package fr.multimc.api.spigot.games;
 
 import com.sk89q.worldedit.WorldEditException;
-import fr.multimc.api.spigot.games.settings.GameSettings;
+import fr.multimc.api.spigot.common.entities.MmcEntity;
+import fr.multimc.api.spigot.common.entities.player.MmcPlayer;
+import fr.multimc.api.spigot.common.tools.dispatcher.DispatchAlgorithm;
+import fr.multimc.api.spigot.common.tools.dispatcher.Dispatcher;
+import fr.multimc.api.spigot.common.worlds.locations.RelativeLocation;
+import fr.multimc.api.spigot.common.worlds.schematics.Schematic;
 import fr.multimc.api.spigot.games.enums.GameState;
-import fr.multimc.api.spigot.managers.GamesManager;
-import fr.multimc.api.spigot.teams.MmcTeam;
-import fr.multimc.api.spigot.entities.MmcEntity;
-import fr.multimc.api.spigot.entities.player.MmcPlayer;
-import fr.multimc.api.spigot.worlds.locations.RelativeLocation;
-import fr.multimc.api.spigot.worlds.schematics.Schematic;
-import fr.multimc.api.spigot.tools.dispatcher.DispatchAlgorithm;
-import fr.multimc.api.spigot.tools.dispatcher.Dispatcher;
+import fr.multimc.api.spigot.games.settings.GameSettings;
+import fr.multimc.api.spigot.games.teams.MmcTeam;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;

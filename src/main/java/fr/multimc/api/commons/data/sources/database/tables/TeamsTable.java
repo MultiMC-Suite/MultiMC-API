@@ -1,16 +1,16 @@
 package fr.multimc.api.commons.data.sources.database.tables;
 
-import fr.multimc.api.commons.data.sources.database.models.constraints.PrimaryKeyConstraint;
-import fr.multimc.api.commons.data.sources.database.queries.SelectQuery;
-import fr.multimc.api.commons.data.sources.database.queries.UpdateQuery;
+import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.enums.FieldType;
 import fr.multimc.api.commons.data.sources.database.enums.Property;
 import fr.multimc.api.commons.data.sources.database.interfaces.IConstraint;
 import fr.multimc.api.commons.data.sources.database.models.Field;
 import fr.multimc.api.commons.data.sources.database.models.Table;
+import fr.multimc.api.commons.data.sources.database.models.constraints.PrimaryKeyConstraint;
 import fr.multimc.api.commons.data.sources.database.queries.InsertQuery;
-import fr.multimc.api.commons.data.sources.database.Database;
 import fr.multimc.api.commons.data.sources.database.queries.QueryResult;
+import fr.multimc.api.commons.data.sources.database.queries.SelectQuery;
+import fr.multimc.api.commons.data.sources.database.queries.UpdateQuery;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -100,8 +100,8 @@ public class TeamsTable extends Table {
 
     public void setScores(Map<String, Integer> scores){
         StringBuilder playersQueryString = new StringBuilder();
-        for(String teamCode : scores.keySet()){
-            setScore(teamCode, scores.get(teamCode));
+        for(Map.Entry<String, Integer> entry : scores.entrySet()){
+            setScore(entry.getKey(), entry.getValue());
         }
     }
 
