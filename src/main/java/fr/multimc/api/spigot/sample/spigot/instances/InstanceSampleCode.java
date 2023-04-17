@@ -2,6 +2,7 @@ package fr.multimc.api.spigot.sample.spigot.instances;
 
 import fr.multimc.api.commons.data.DataSourceLoader;
 import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.hibernate.Hibernate;
 import fr.multimc.api.commons.tools.messages.MessagesFactory;
 import fr.multimc.api.spigot.sample.spigot.SampleCode;
 import fr.multimc.api.spigot.common.commands.completers.StartTabCompleter;
@@ -59,9 +60,12 @@ public class InstanceSampleCode implements SampleCode, Listener {
         plugin.saveDefaultConfig();
 
         new File(plugin.getDataFolder().getPath() + "/database.db").delete();
-        Database database = (Database) new DataSourceLoader(plugin.getConfig(), plugin.getDataFolder(), plugin.getLogger()).loadDataSource();
+        Hibernate database = (Hibernate) new DataSourceLoader(plugin.getConfig(), plugin.getDataFolder(), plugin.getLogger()).loadDataSource();
         teamManager = new TeamManager(database);
         teamManager.addTeam("T1", "Name 1", "Xen0Xys");
+        teamManager.pushScores(new HashMap<>() {{
+            put("T1", 10);
+        }});
 //        teamManager.addTeam("T2", "Name 2", "XenAdmin");
 
         MessagesFactory factory = new MessagesFactory(Component.text("InstanceSample").color(NamedTextColor.YELLOW));

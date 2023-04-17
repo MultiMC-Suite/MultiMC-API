@@ -1,10 +1,12 @@
 package fr.multimc.api.spigot.games.teams;
 
 import fr.multimc.api.commons.data.handlers.DatabaseHandler;
+import fr.multimc.api.commons.data.handlers.HibernateHandler;
 import fr.multimc.api.commons.data.handlers.RestHandler;
 import fr.multimc.api.commons.data.handlers.interfaces.ITeamHandler;
 import fr.multimc.api.commons.data.sources.IDataSource;
 import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.hibernate.Hibernate;
 import fr.multimc.api.commons.data.sources.rest.RestAPI;
 import fr.multimc.api.spigot.common.entities.player.MmcPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -25,14 +27,19 @@ public class TeamManager {
             this.teamHandler = new DatabaseHandler((Database) dataSource);
         }else if(dataSource instanceof RestAPI){
             this.teamHandler = new RestHandler((RestAPI) dataSource);
+        }else if(dataSource instanceof Hibernate){
+            this.teamHandler = new HibernateHandler((Hibernate) dataSource);
         }else{
             throw new IllegalArgumentException("DataSource must be a Database or a RestAPI");
         }
     }
 
     public void addTeam(@NotNull String teamCode, @NotNull String name, @NotNull String... players){
-        if(!(this.teamHandler instanceof DatabaseHandler)) throw new UnsupportedOperationException("This method is only available with a database handler");
-        ((DatabaseHandler) this.teamHandler).addTeam(teamCode, name, players);
+        if(this.teamHandler instanceof RestHandler) throw new UnsupportedOperationException("This method is not available with a rest handler");
+        if(this.teamHandler instanceof DatabaseHandler)
+            ((DatabaseHandler) this.teamHandler).addTeam(teamCode, name, players);
+        else if(this.teamHandler instanceof HibernateHandler)
+            ((HibernateHandler) this.teamHandler).addTeam(teamCode, name, players);
     }
 
     public List<MmcTeam> loadTeams(){

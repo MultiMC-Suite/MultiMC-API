@@ -2,8 +2,15 @@ package fr.multimc.api.commons.data;
 
 import fr.multimc.api.commons.data.sources.IDataSource;
 import fr.multimc.api.commons.data.sources.database.Database;
+import fr.multimc.api.commons.data.sources.hibernate.Hibernate;
+import fr.multimc.api.commons.data.sources.hibernate.models.Player;
+import fr.multimc.api.commons.data.sources.hibernate.models.Team;
 import fr.multimc.api.commons.data.sources.rest.RestAPI;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.community.dialect.SQLiteDialect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +44,7 @@ public class DataSourceLoader {
     public IDataSource loadDataSource() {
         IDataSource dataSource;
         switch (this.config.getString("DataSource.Type")){
-            case "SQLITE" -> dataSource = this.loadSQLiteDataSource();
+            case "SQLITE" -> dataSource = this.loadHibernateSQLiteDataSource(); // TODO: temporary
             case "MYSQL" -> dataSource = this.loadMySQLDataSource();
             case "REST_API" -> dataSource = this.loadRestAPIDataSource();
             default -> throw new IllegalArgumentException("DataSource.Type must be SQLITE, MYSQL or REST_API");
@@ -70,5 +77,21 @@ public class DataSourceLoader {
         RestAPI api = new RestAPI(this.logger, url, username, password);
         if(!api.login()) throw new IllegalArgumentException("Cannot login to RestAPI");
         return api;
+    }
+
+    private IDataSource loadHibernateSQLiteDataSource(){
+        Configuration configuration = new Configuration();
+        // Configuration de la base de données
+        configuration.setProperty(AvailableSettings.DRIVER, "org.sqlite.JDBC");
+        configuration.setProperty(AvailableSettings.URL, "jdbc:sqlite:%s/%s?foreign_keys=true".formatted(this.dataFolder.getPath(), this.config.getString("DataSource.SQLite.FileName")));
+        // Configuration du dialecte
+        configuration.setProperty(AvailableSettings.DIALECT, SQLiteDialect.class.getName());
+        // Configuration de Hibernate
+        configuration.setProperty(AvailableSettings.SHOW_SQL, "false");
+        configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "update");
+        configuration.addAnnotatedClass(Team.class);
+        configuration.addAnnotatedClass(Player.class);
+        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        return new Hibernate(sessionFactory);
     }
 }
